@@ -1,0 +1,14 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.botjourney.gigat",
+      "sha256_cert_fingerprints": [
+        "01:35:d0:44:cc:43:b3:00:43:6c:52:7d:a2:54:c4:c0:41:ec:a6:d1:de:bb:62:84:de:a1:0b:7c:54:66:bf:2b",
+        "4D:9F:2F:38:01:52:3E:F1:F0:4E:76:36:17:2D:E6:7E:26:DE:A5:80:32:2A:86:D2:5F:A6:DD:FD:B9:A5:B0:E9",
+      "4D:9F:2F:38:01:52:3E:F1:F0:4E:76:36:17:2D:E6:7E:26:DE:A5:80:32:2A:86:D2:5F:A6:DD:FD:B9:A5:B0:E9"
+      ]
+    }
+  }
+]

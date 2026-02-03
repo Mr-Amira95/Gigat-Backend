@@ -1,0 +1,19 @@
+{
+    "logout_successful": "Logged out successfully",
+    "success": "Operation completed successfully",
+    "login_successful": "Logged in successfully",
+    "user_not_found": "User not found",
+    "code_generated_successfully": "Verification code generated successfully",
+    "invalid_verification_code": "Invalid verification code",
+    "code_verified_successfully": "Code verified successfully",
+    "password_reset_successfully": "Password reset successfully",
+    "cannot_delete_super_admin": "Cannot delete super admin",
+    "cannot_delete_last_admin": "Cannot delete the last active admin",
+    "sliders": "Sliders",
+    "mobile_intro_screens": "Mobile Intro Screens",
+    "web_sliders": "Web Sliders",
+    "users": "Users",
+    "new_update_released": "New Update Released",
+    "new_update_message": "A new update is now available. You can check it now."
+
+}

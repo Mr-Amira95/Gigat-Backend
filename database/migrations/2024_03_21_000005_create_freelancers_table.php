@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('freelancers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->longText('bio');
+            $table->text('file')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->softDeletes();
+            $table->timestamps();
+
+            // Add indexes
+            $table->index('status');
+            $table->unique('nick_name');
+            $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('set null');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('freelancers');
+    }
+};

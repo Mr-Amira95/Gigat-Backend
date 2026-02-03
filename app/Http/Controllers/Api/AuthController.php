@@ -1,0 +1,404 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use Exception;
+use App\Services\AuthService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\CreateFreelancerRequest;
+use App\Http\Requests\Api\GenerateCodeRequest;
+use App\Http\Requests\Api\RegisterRequest;
+use App\Http\Requests\Api\LoginRequest;
+use App\Http\Requests\Api\ResetPasswordRequest;
+use App\Http\Requests\Api\VerifyCodeRequest;
+use App\Http\Resources\UserResource;
+use App\Models\Notification;
+use App\Models\PlayerId;
+use App\Models\User;
+use App\Services\FreelancerService;
+use App\Services\NoticeService;
+use App\Services\OneSignalService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class AuthController extends Controller
+{
+    protected $authService;
+    protected $freelancerService;
+    protected $noticeService;
+
+
+    public function __construct(AuthService $authService, FreelancerService $freelancerService, NoticeService $noticeService)
+    {
+        $this->authService = $authService;
+        $this->freelancerService = $freelancerService;
+        $this->noticeService    = $noticeService;
+    }
+
+    public function register(RegisterRequest $request)
+    {
+        try {
+            $result = $this->authService->register($request->validated());
+            return $this->successResponse(__('success'), 201);
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
+    /**
+     * Login user
+     *
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
+    public function login(LoginRequest $request)
+    {
+        try {
+            $result = $this->authService->login($request->validated());
+            // dd($result);
+            $user = $result['user'];
+
+            if ($request->input('player_id')) {
+                // Check if this player_id already exists for this user
+                $exists = PlayerId::where('user_id', $user->id)
+                    ->where('player_id', $request->player_id)
+                    ->where('platform', $request->platform)
+                    ->exists();
+
+                if (!$exists) {
+                    PlayerId::create([
+                        'user_id'   => $user->id,
+                        'player_id' => $request->player_id,
+                        'platform'  => $request->platform,
+                    ]);
+                }
+            }
+
+            return $this->successResponse(__('login_successful'), [
+                'user' => new UserResource($result['user']),
+                'token' => $result['token']
+            ]);
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
+    public function webLogin(LoginRequest $request)
+    {
+        try {
+            $result = $this->authService->login($request->validated());
+            // dd($result);
+            $user = $result['user'];
+
+            if ($request->input('player_id')) {
+                // Check if this player_id already exists for this user
+                $exists = PlayerId::where('user_id', $user->id)
+                    ->where('player_id', $request->player_id)
+                    ->where('platform', $request->platform)
+                    ->exists();
+
+                if (!$exists) {
+                    PlayerId::create([
+                        'user_id'   => $user->id,
+                        'player_id' => $request->player_id,
+                        'platform'  => $request->platform,
+                    ]);
+                }
+            }
+
+            if ($user->freelancer) {
+                DB::table('sessions')->where('user_id', $user->id)->delete();
+
+                $encryptedId = encrypt($user->id);
+                $url = route('freelancer.login', ['token' => $encryptedId]);
+
+                return $this->successResponse(__('login_successful'), [
+                    'redirect_to' => $url,
+                    'user' => new UserResource($result['user']),
+                    'token' => $result['token']
+                ]);
+            }
+            // dd($user);
+
+
+            return $this->successResponse(__('login_successful'), [
+                'user' => new UserResource($result['user']),
+                'token' => $result['token']
+            ]);
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
+    public function generateFreelancerRedirect(Request $request)
+    {
+        try {
+            $userId = Auth()->id();
+
+            // Delete all sessions for this user
+            DB::table('sessions')->where('user_id', $userId)->delete();
+
+            $encryptedId = encrypt($userId);
+            $url = route('freelancer.login', ['token' => $encryptedId]);
+
+            return $this->successResponse(__('login_successful'), [
+                'redirect_to' => $url,
+                // 'user' => new UserResource($result['user']),
+            ]);
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+    public function socialLogin(Request $request)
+    {
+        $request->validate([
+            'google_id' => 'required|string',
+            'email' => 'required|string',
+            'player_id' => 'nullable|string',
+            'platform'  => 'nullable|string',
+        ]);
+
+        try {
+            $user = User::with(['languages.language'])->where('email', $request->email)->first();
+            if ($user) {
+                if ($user->google_id == null || $user->google_id == $request->google_id) {
+                    $user->google_id = $request->google_id;
+                    $user->save();
+
+                    if ($request->input('player_id')) {
+                        $exists = PlayerId::where('user_id', $user->id)
+                            ->where('player_id', $request->player_id)
+                            ->where('platform', $request->platform)
+                            ->exists();
+
+                        if (!$exists) {
+                            PlayerId::create([
+                                'user_id'   => $user->id,
+                                'player_id' => $request->player_id,
+                                'platform'  => $request->platform,
+                            ]);
+                        }
+                    }
+                    $token = $user->createToken('User Token')->accessToken;
+
+                    return $this->successResponse(__('login_successful'), [
+                        'user'  => new UserResource($user),
+                        'token' => $token
+                    ]);
+                } else {
+                    return $this->successResponse(__('user_not_found'));
+                };
+            } else {
+                return $this->successResponse(__('user_not_found'));
+            }
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
+    public function SendNotification($userId)
+    {
+        // one signal notification
+        $user = User::where('id', $userId)->first();
+        if ($user) {
+            $playerIdRecord = PlayerId::where('user_id', $user->id)
+                ->where('is_notifiable', 1)
+                ->pluck('player_id')->toArray();
+
+
+            if ($playerIdRecord) {
+                $titles = [
+                    'en' => __('notifications.item_added_title', [], 'en'),
+                    'ar' => __('notifications.item_added_title', [], 'ar'),
+                ];
+
+                $messages = [
+                    'en' => __('notifications.item_added_message', [], 'en'),
+                    'ar' => __('notifications.item_added_message', [], 'ar'),
+                ];
+
+                $response = app(OneSignalService::class)->sendNotificationToUserCall(
+                    $playerIdRecord, // نرسل player_id من جدول player_ids
+                    $titles,
+                    $messages,
+                    'call',
+                    1
+                );
+
+                Notification::create([
+                    'user_id'           => $user->id,
+                    'title'             => json_encode($titles),
+                    'body'              => json_encode($messages),
+                    'type'              => 'call',
+                    'type_id'           => 1,
+                    'is_read'           => false,
+                    'onesignal_id'      => $response['id'] ?? null,
+                    'response_onesignal' => json_encode($response),
+                ]);
+            }
+        }
+        // *********************************************//
+
+        return $this->successResponse('sent');
+    }
+
+
+    public function generateCode(GenerateCodeRequest $request)
+    {
+        try {
+            $result = $this->authService->findByPhoneAndPrefix($request->validated());
+            if (!$result['user']) {
+                return $this->errorResponse(__('user_not_found'), 404);
+            }
+
+            $result = $this->authService->generateCode($result['user']);
+            return $this->successResponse(__('code_generated_successfully'));
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
+    /**
+     * Verify code
+     *
+     * @param VerifyCodeRequest $request
+     * @return JsonResponse
+     */
+
+
+    public function verifyCode(VerifyCodeRequest $request)
+    {
+        try {
+            $result = $this->authService->findByPhoneAndPrefix($request->validated());
+            if (!$result['user']) {
+                return $this->errorResponse(__('user_not_found'), 404);
+            }
+
+            if ($result['user']->code !== $request['code']) {
+                return $this->errorResponse(__('invalid_verification_code'));
+            }
+            $result = $this->authService->verifyCode($result['user']);
+            return $this->successResponse(__('code_verified_successfully'), [
+                'user' => new UserResource($result['user']),
+                'token' => $result['token']
+            ]);
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
+    /**
+     * Reset password
+     *
+     * @param ResetPasswordRequest $request
+     * @return JsonResponse
+     */
+
+
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        try {
+            $result = $this->authService->findByPhoneAndPrefix($request->validated());
+            if (!$result['user']) {
+                return $this->errorResponse(__('user_not_found'), 404);
+            }
+
+            $result = $this->authService->resetPassword($result['user'], $request->password);
+            return $this->successResponse(__('password_reset_successfully'), [
+                'user' => new UserResource($result['user']),
+                'token' => $result['token']
+            ]);
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
+
+    public function logout(Request $request)
+    {
+        try {
+            $user = auth()->user();
+
+            // Revoke the current token (if using Passport)
+            $token = $user->token();
+            if ($token) {
+                $token->revoke();
+            }
+
+            // Delete player_id for this device if provided
+            if ($request->filled('player_id')) {
+                PlayerId::where('user_id', $user->id)
+                    ->where('player_id', $request->player_id)
+                    ->delete();
+            }
+
+            return $this->successResponse(__('logout_successful'));
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
+
+    public function createFreelancer(CreateFreelancerRequest $request)
+    {
+        try {
+            $validated = $request->validated();
+
+            // Step 1: Register the user
+            $user = $this->authService->register($validated);
+
+            // ✅ Inject user_id into $validated for use in completeProfile
+            $validated['user_id'] = $user['id'];
+
+            // Step 2: Complete freelancer profile
+            $this->freelancerService->completeProfile($validated);
+
+            // STEP 3: Send OneSignal welcome notification
+            $titles = [
+                'en' => __('messages.welcome_freelancer_title', [], 'en'),
+                'ar' => __('messages.welcome_freelancer_title', [], 'ar'),
+            ];
+
+            $messages = [
+                'en' => __('messages.welcome_freelancer_message', [], 'en'),
+                'ar' => __('messages.welcome_freelancer_message', [], 'ar'),
+            ];
+
+            $this->noticeService->send(
+                $user['id'],
+                $titles,
+                $messages,
+                'new_freelancer',
+                null,
+                false
+            );
+
+            return $this->successResponse(__('freelancer_created'), new UserResource($user));
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            $user->is_active = false;
+            $user->save();
+
+            if ($user->freelancer) {
+                $user->services()->delete();
+                $user->portfolios()->delete();
+            }
+
+            $user->delete();
+
+            return $this->successResponse(__('account_deleted_successfully'));
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+}
