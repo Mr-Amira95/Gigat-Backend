@@ -1,0 +1,18 @@
+{
+    "logout_successful": "تم تسجيل الخروج بنجاح",
+    "success": "تمت العملية بنجاح",
+    "login_successful": "تم تسجيل الدخول بنجاح",
+    "user_not_found": "المستخدم غير موجود",
+    "code_generated_successfully": "تم إنشاء رمز التحقق بنجاح",
+    "invalid_verification_code": "رمز التحقق غير صالح",
+    "code_verified_successfully": "تم التحقق من الرمز بنجاح",
+    "password_reset_successfully": "تم إعادة تعيين كلمة المرور بنجاح",
+    "cannot_delete_super_admin": "لا يمكن حذف المشرف الأعلى",
+    "cannot_delete_last_admin": "لا يمكن حذف آخر مشرف نشط",
+    "sliders": "الشرائح",
+    "mobile_intro_screens": "شاشات المقدمة للجوال",
+    "web_sliders": "شرائح الويب",
+    "users": "المستخدمين",
+    "new_update_released": "إصدار تحديث جديد",
+    "new_update_message": "تحديث جديد متاح الآن، يمكنك التحقق منه."
+}

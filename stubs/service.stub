@@ -1,0 +1,15 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Repositories\{{ class }}Repository;
+
+class {{ class }}Service
+{
+    protected $repository;
+
+    public function __construct({{ class }}Repository $repository)
+    {
+        $this->repository = $repository;
+    }
+}

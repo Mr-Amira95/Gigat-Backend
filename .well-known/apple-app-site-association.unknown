@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["8U2UN9LLF2.com.botjourny.gigat"],
+        "paths": ["*"],
+        "components": [
+          { "/": "/*" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["8U2UN9LLF2.com.botjourny.gigat"]
+  }
+}
