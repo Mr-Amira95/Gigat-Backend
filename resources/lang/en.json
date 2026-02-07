@@ -738,7 +738,7 @@
     "attachment_deleted_successfully": "Attachment deleted successfully.",
     "request_feedback_not_allowed": "You can only send feedback for completed requests.",
     "feedback_submitted_successfully": "Your feedback has been submitted successfully.",
-    "max_revisions_reached": "You have reached the maximum number of allowed revisions.",
+    "max_revisions_reached": "You have reached the maximum number of allowed revisions. Please contact support for further assistance.",
     "account_inactive_complete_bank": "Your account is inactive. Please add your bank details to activate your account and create services."
 
 

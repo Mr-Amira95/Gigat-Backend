@@ -112,6 +112,7 @@ class CheckoutController extends Controller
             $commissionConverted = (float) str_replace(',', '', $commissionConverted);
 
             $total = $planPriceConverted + $feesConverted;
+
         } else {
             // 👇 Handle normal service/plan flow (your current code)
             $service = $this->serviceService->getServiceDetails($data['service_id']);
@@ -150,6 +151,7 @@ class CheckoutController extends Controller
                 'fees'        => isset($feesConverted) ? number_format((float)$feesConverted, 2)  . ' ' . $symbol  : null,
                 'commission'  => isset($commissionConverted) ? number_format((float)$commissionConverted, 2) . ' ' . $symbol  : null,
                 'total'       => isset($total) ? number_format((float)$total, 2) . ' ' . $symbol : null,
+                'original_total'=> isset($price) ? (float)$price : null,
             ],
         ]);
     }

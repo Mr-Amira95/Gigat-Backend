@@ -29,7 +29,7 @@ class StripeController extends Controller
             $checkoutController = app(CheckoutController::class);
             $response = $checkoutController->proceedCheckout($request);
             $serviceTitle = $response->getData(true)['data']['request_info']['title'];
-            $formattedTotal = $response->getData(true)['data']['request_info']['total'];
+            $formattedTotal = $response->getData(true)['data']['request_info']['original_total'];
             $amount = floatval(preg_replace('/[^0-9.]/', '', $formattedTotal));
             // dd($amount); // e.g. 24.99
 
@@ -62,8 +62,8 @@ class StripeController extends Controller
                 'mode' => 'payment',
                 'success_url' => route('stripe.success') . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' =>  route('stripe.cancel'),
-                // 'success_url' => 'https://b8eb9471ac3d.ngrok-free.app/stripe/success?session_id={CHECKOUT_SESSION_ID}',
-                // 'cancel_url' =>  'https://b8eb9471ac3d.ngrok-free.app/stripe/cancel',
+                // 'success_url' => 'https://5eba-176-29-167-63.ngrok-free.app/stripe/success?session_id={CHECKOUT_SESSION_ID}',
+                // 'cancel_url' =>  'https://5eba-176-29-167-63.ngrok-free.app/stripe/cancel',
                 'payment_intent_data' => [
                     'metadata' => [
                         'platform' => 'Gigat',
