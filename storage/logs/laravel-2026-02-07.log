@@ -1,0 +1,26 @@
+[2026-02-07 14:25:22] local.ERROR: Uncaught RuntimeException: Translation file [D:\irhebo\gigat-dashboard\resources\lang/en.json] contains an invalid JSON structure. in D:\irhebo\gigat-dashboard\vendor\laravel\framework\src\Illuminate\Translation\FileLoader.php:153
+Stack trace:
+#0 D:\irhebo\gigat-dashboard\vendor\laravel\framework\src\Illuminate\Collections\Traits\EnumeratesValues.php(820): Illuminate\Translation\FileLoader->Illuminate\Translation\{closure}(Array, 'D:\\irhebo\\gigat...', 1)
+#1 D:\irhebo\gigat-dashboard\vendor\laravel\framework\src\Illuminate\Translation\FileLoader.php(148): Illuminate\Support\Collection->reduce(Object(Closure), Array)
+#2 D:\irhebo\gigat-dashboard\vendor\laravel\framework\src\Illuminate\Translation\FileLoader.php(65): Illuminate\Translation\FileLoader->loadJsonPaths('en')
+#3 D:\irhebo\gigat-dashboard\vendor\laravel\framework\src\Illuminate\Translation\Translator.php(335): Illuminate\Translation\FileLoader->load('en', '*', '*')
+#4 D:\irhebo\gigat-dashboard\vendor\laravel\framework\src\Illuminate\Translation\Translator.php(157): Illuminate\Translation\Translator->load('*', '*', 'en')
+#5 D:\irhebo\gigat-dashboard\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(965): Illuminate\Translation\Translator->get('auth', Array, 'en')
+#6 D:\irhebo\gigat-dashboard\vendor\laravel\framework\src\Illuminate\Foundation\helpers.php(1000): trans('auth', Array, NULL)
+#7 Command line code(1): __('auth')
+#8 {main}
+  thrown {"exception":"[object] (Symfony\\Component\\ErrorHandler\\Error\\FatalError(code: 0): Uncaught RuntimeException: Translation file [D:\\irhebo\\gigat-dashboard\\resources\\lang/en.json] contains an invalid JSON structure. in D:\\irhebo\\gigat-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Translation\\FileLoader.php:153
+Stack trace:
+#0 D:\\irhebo\\gigat-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Collections\\Traits\\EnumeratesValues.php(820): Illuminate\\Translation\\FileLoader->Illuminate\\Translation\\{closure}(Array, 'D:\\\\irhebo\\\\gigat...', 1)
+#1 D:\\irhebo\\gigat-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Translation\\FileLoader.php(148): Illuminate\\Support\\Collection->reduce(Object(Closure), Array)
+#2 D:\\irhebo\\gigat-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Translation\\FileLoader.php(65): Illuminate\\Translation\\FileLoader->loadJsonPaths('en')
+#3 D:\\irhebo\\gigat-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Translation\\Translator.php(335): Illuminate\\Translation\\FileLoader->load('en', '*', '*')
+#4 D:\\irhebo\\gigat-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Translation\\Translator.php(157): Illuminate\\Translation\\Translator->load('*', '*', 'en')
+#5 D:\\irhebo\\gigat-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\helpers.php(965): Illuminate\\Translation\\Translator->get('auth', Array, 'en')
+#6 D:\\irhebo\\gigat-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\helpers.php(1000): trans('auth', Array, NULL)
+#7 Command line code(1): __('auth')
+#8 {main}
+  thrown at D:\\irhebo\\gigat-dashboard\\vendor\\laravel\\framework\\src\\Illuminate\\Translation\\FileLoader.php:153)
+[stacktrace]
+#0 {main}
+"} 

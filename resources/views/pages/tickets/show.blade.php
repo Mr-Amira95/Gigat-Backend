@@ -11,23 +11,35 @@
                 <div class="box-body">
                     <div class="grid grid-cols-12 gap-4">
                         <!-- ticket Code -->
-                        <div class="col-span-12 md:col-span-3">
+                        <div class="col-span-12 md:col-span-2">
                             <label class="block text-sm font-bold text-gray-700">{{ __('code') }}</label>
                             <p>{{ $ticket->code }}</p>
                         </div>
                         <!-- User -->
-                        <div class="col-span-12 md:col-span-3">
+                        <div class="col-span-12 md:col-span-2">
                             <label class="block text-sm font-bold text-gray-700">{{ __('user') }}</label>
                             <p>{{ $ticket->user->username }}</p>
                         </div>
                         <!-- Subject -->
-                        <div class="col-span-12 md:col-span-3">
+                        <div class="col-span-12 md:col-span-2">
                             <label class="block text-sm font-bold text-gray-700">{{ __('subject') }}</label>
                             <p>{{ $ticket->subject }}</p>
                         </div>
+
+                        <!-- Related Request -->
+                        @if ($ticket->request_id)
+                            <div class="col-span-12 md:col-span-2">
+                                <label class="block text-sm font-bold text-gray-700">{{ __('request') }}</label>
+
+                                <a href="{{ route('requests.show', $ticket->request_id) }}"
+                                    class="inline-block mt-1 px-3 py-2 bg-green-600 bg-primary text-white rounded hover:bg-green-700 transition">
+                                    {{ __('view_request') }}
+                                </a>
+                            </div>
+                        @endif
                         <!-- Status -->
                         <!-- Status -->
-                        <div class="col-span-12 md:col-span-3">
+                        <div class="col-span-12 md:col-span-2">
                             <label class="block text-sm font-bold text-gray-700">{{ __('status') }}</label>
                             <p>
                                 {!! \App\Enums\TicketStatusEnum::tryFrom($ticket->status)?->badge() !!}
