@@ -6,13 +6,17 @@ use App\Enums\PaymentStatusEnum;
 use App\Models\Finance;
 
 use App\Repositories\Interfaces\FinanceRepositoryInterface;
+use App\Services\NoticeService;
 
 class FinanceRepository implements FinanceRepositoryInterface
 {
     protected $model;
-    public function __construct(Finance $model)
+    protected $noticeService;
+
+    public function __construct(Finance $model, NoticeService $noticeService)
     {
         $this->model = $model;
+        $this->noticeService    = $noticeService;
     }
     public function getAll()
     {
@@ -53,13 +57,58 @@ class FinanceRepository implements FinanceRepositoryInterface
             ->get();
     }
 
+    // public function markAsPaid(array $ids)
+    // {
+    //     return $this->model->whereIn('id', $ids)->update([
+    //         'payment_status' => PaymentStatusEnum::PAID,
+    //         'paid_at' => now()->toDateTimeString()
+    //     ]);
+    // }
+
     public function markAsPaid(array $ids)
     {
-        return $this->model->whereIn('id', $ids)->update([
+        // Get finances with user_id before update
+        $finances = $this->model
+            ->whereIn('id', $ids)
+            ->where('payment_status', '!=', PaymentStatusEnum::PAID)
+            ->get();
+
+        if ($finances->isEmpty()) {
+            return false;
+        }
+
+        // Update finances
+        $this->model->whereIn('id', $ids)->update([
             'payment_status' => PaymentStatusEnum::PAID,
-            'paid_at' => now()->toDateTimeString()
+            'paid_at' => now()
         ]);
+
+        // Send notification to each user
+        foreach ($finances as $finance) {
+
+            $titles = [
+                'en' => __('finance_paid_title', [], 'en'),
+                'ar' => __('finance_paid_title', [], 'ar'),
+            ];
+
+            $messages = [
+                'en' => __('finance_paid_message', [], 'en'),
+                'ar' => __('finance_paid_message', [], 'ar'),
+            ];
+
+            $this->noticeService->send(
+                $finance->request->service->user_id,   // user id
+                $titles,
+                $messages,
+                'finance',
+                $finance->id,
+                true
+            );
+        }
+
+        return true;
     }
+
 
     public function getAllFiltered(array $filters)
     {
