@@ -266,6 +266,18 @@ class CallController extends Controller
 
         $call = Call::findOrFail($request->call_id);
 
+        if ($call->ended_at !== null) {
+            // return $this->errorResponse(
+            //     __('call_already_ended'),
+            //     400
+            // );
+
+            return $this->successResponse(
+                __('Call ended'),
+                null
+            );
+        }
+
         $call->update([
             'ended_at' => now(),
         ]);
