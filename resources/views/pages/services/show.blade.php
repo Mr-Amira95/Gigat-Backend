@@ -6,7 +6,7 @@
     <div class="content">
         <div class="main-content">
             <!-- Page Header -->
-            <div class="block justify-between page-header md:flex">
+            {{-- <div class="block justify-between page-header md:flex">
                 <div>
                     <h3 class="text-[1.125rem] font-semibold">{{ $service->translation->title }}</h3>
                 </div>
@@ -19,7 +19,13 @@
                     </li>
                     <li class="text-[0.813rem] font-semibold">{{ __('service_details') }}</li>
                 </ol>
+            </div> --}}
+            <div class="block justify-between page-header md:flex items-center">
+                <div>
+                    <h3 class="text-[1.125rem] font-semibold">{{ $service->translation->title }}</h3>
+                </div>
             </div>
+
 
             <div class="container mt-6">
                 <div class="grid grid-cols-12 gap-6">
@@ -28,15 +34,15 @@
                             <div class="box-body">
                                 <!-- Cover Image -->
                                 @if ($service->cover)
-                                    <img src="{{ asset($service->cover) }}" alt="Cover Image"
-                                        class="w-full rounded-lg mb-6">
+                                    <img src="{{ asset($service->cover) }}" alt="Cover Image" class="w-full rounded-lg mb-6">
                                 @endif
 
                                 <!-- Basic Details -->
                                 <div class="mb-6">
                                     <h4 class="text-lg font-semibold mb-3">{{ __('basic_info') }}</h4>
                                     <div class="grid grid-cols-2 gap-4 text-[0.95rem]">
-                                        <div><strong>{{ __('title') }}:</strong> {{ $service->translation->title }}</div>
+                                        <div><strong>{{ __('title') }}:</strong> {{ $service->translation->title }}
+                                        </div>
                                         <div><strong>{{ __('category') }}:</strong>
                                             {{ $service->subCategory->category->translation->title }}</div>
                                         <div><strong>{{ __('sub_category') }}:</strong>
@@ -111,7 +117,7 @@
                     </div>
 
                     <!-- Sidebar Summary -->
-                    <div class="col-span-12 lg:col-span-4">
+                    {{-- <div class="col-span-12 lg:col-span-4">
                         <div class="box">
                             <div class="box-body">
                                 <h4 class="text-lg font-semibold mb-4">{{ __('service_summary') }}</h4>
@@ -130,6 +136,69 @@
                             </div>
                         </div>
 
+                    </div> --}}
+                    <!-- Sidebar Summary -->
+                    <div class="col-span-12 lg:col-span-4">
+                        <div class="box">
+                            <div class="box-body">
+
+                                <!-- Header with buttons -->
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-lg font-semibold">{{ __('service_summary') }}</h4>
+
+                                    <div>
+
+                                        {{-- Edit Button --}}
+                                        @can('edit_services')
+                                            <a aria-label="anchor" href="{{ route('services.edit', $service->id) }}"
+                                                class="ti-btn btn-wave ti-btn-icon ti-btn-sm ti-btn-success mx-1 rounded-pill">
+                                                <i class="las la-edit"></i>
+                                            </a>
+                                        @endcan
+
+                                        {{-- Delete Button --}}
+                                        @can('delete_services')
+                                            <a aria-label="anchor" href="javascript:void(0);"
+                                                onclick="showDeleteConfirmation('{{ __('are_you_sure') }}', {{ $service->id }})"
+                                                class="ti-btn btn-wave ti-btn-icon ti-btn-sm ti-btn-danger mx-1 rounded-pill">
+                                                <i class="las la-trash"></i>
+                                            </a>
+
+                                            <form id="delete-form-{{ $service->id }}"
+                                                action="{{ route('services.destroy', $service->id) }}" method="POST"
+                                                class="hidden">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        @endcan
+
+                                    </div>
+                                </div>
+
+                                <!-- Summary info -->
+                                <div class="text-[0.95rem] text-gray-700 space-y-2">
+                                    <div>
+                                        <strong>{{ __('created_at') }}:</strong>
+                                        {{ $service->created_at->format('Y-m-d') }}
+                                    </div>
+
+                                    <div>
+                                        <strong>{{ __('updated_at') }}:</strong>
+                                        {{ $service->updated_at->format('Y-m-d') }}
+                                    </div>
+
+                                    <div>
+                                        <strong>{{ __('status') }}:</strong>
+                                        <span
+                                            class="inline-block px-2 py-1 text-xs rounded-full {{ $service->status == 'active' ? 'bg-green-500 text-white' : 'bg-red-500 text-white' }}">
+                                            {{ __($service->status) }}
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
 
                 </div>

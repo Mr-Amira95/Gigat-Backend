@@ -24,9 +24,41 @@
                 <div class="grid grid-cols-12 gap-6">
                     <div class="col-span-12">
                         <div class="box">
-                            <div class="box-header">
+                            {{-- <div class="box-header">
                                 <h5 class="box-title">{{ $portfolio->translation->title }}</h5>
+                            </div> --}}
+                            <div class="box-header flex justify-between items-center">
+                                <h5 class="box-title">{{ $portfolio->translation->title }}</h5>
+
+                                <div>
+
+                                    {{-- Edit Button --}}
+                                    @can('edit_portfolio')
+                                        <a aria-label="anchor" href="{{ route('portfolios.edit', $portfolio->id) }}"
+                                            class="ti-btn btn-wave ti-btn-icon ti-btn-sm ti-btn-success mx-1 rounded-pill">
+                                            <i class="las la-edit"></i>
+                                        </a>
+                                    @endcan
+
+                                    {{-- Delete Button --}}
+                                    @can('delete_portfolio')
+                                        <a aria-label="anchor" href="javascript:void(0);"
+                                            onclick="showDeleteConfirmation('{{ __('are_you_sure') }}', {{ $portfolio->id }})"
+                                            class="ti-btn btn-wave ti-btn-icon ti-btn-sm ti-btn-danger mx-1 rounded-pill">
+                                            <i class="las la-trash"></i>
+                                        </a>
+
+                                        <form id="delete-form-{{ $portfolio->id }}"
+                                            action="{{ route('portfolios.destroy', $portfolio->id) }}" method="POST"
+                                            class="hidden">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                    @endcan
+
+                                </div>
                             </div>
+
                             <div class="box-body space-y-4">
                                 <div>
                                     <strong>{{ __('title') }}:</strong>
