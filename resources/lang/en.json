@@ -740,7 +740,9 @@
     "feedback_submitted_successfully": "Your feedback has been submitted successfully.",
     "max_revisions_reached": "You have reached the maximum number of allowed revisions. Please contact support for further assistance.",
     "account_inactive_complete_bank": "Your account is inactive. Please add your bank details to activate your account and create services.",
-    "view_request": "View Request"
+    "view_request": "View Request",
+    "call_already_ended": "This call has already ended."
+
 
 
 
