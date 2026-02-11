@@ -168,7 +168,7 @@ class AuthController extends Controller
                 ->first();
 
             if (!$user) {
-                return $this->errorResponse(__('user_not_found'));
+                return $this->successResponse(__('user_not_found'));
             }
 
             // Determine provider
@@ -177,7 +177,7 @@ class AuthController extends Controller
 
             // Validate provider ID match
             if ($user->$provider && $user->$provider !== $providerId) {
-                return $this->errorResponse(__('user_not_found'));
+                return $this->successResponse(__('user_not_found'));
             }
 
             // Attach provider ID if not already set
