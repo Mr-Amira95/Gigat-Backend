@@ -35,6 +35,7 @@ class User extends Authenticatable
         'country_id',
         'password',
         'google_id',
+        'apple_id',
         'linkedin_id',
         'avatar',
         'verified_at',
