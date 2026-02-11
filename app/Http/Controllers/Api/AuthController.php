@@ -151,49 +151,58 @@ class AuthController extends Controller
             return $this->exceptionResponse($e);
         }
     }
+
     public function socialLogin(Request $request)
     {
         $request->validate([
-            'google_id' => 'required|string',
-            'email' => 'required|string',
+            'google_id' => 'nullable|string|required_without:apple_id',
+            'apple_id'  => 'nullable|string|required_without:google_id',
+            'email'     => 'required|string|email',
             'player_id' => 'nullable|string',
             'platform'  => 'nullable|string',
         ]);
 
         try {
-            $user = User::with(['languages.language'])->where('email', $request->email)->first();
-            if ($user) {
-                if ($user->google_id == null || $user->google_id == $request->google_id) {
-                    $user->google_id = $request->google_id;
-                    $user->save();
+            $user = User::with(['languages.language'])
+                ->where('email', $request->email)
+                ->first();
 
-                    if ($request->input('player_id')) {
-                        $exists = PlayerId::where('user_id', $user->id)
-                            ->where('player_id', $request->player_id)
-                            ->where('platform', $request->platform)
-                            ->exists();
-
-                        if (!$exists) {
-                            PlayerId::create([
-                                'user_id'   => $user->id,
-                                'player_id' => $request->player_id,
-                                'platform'  => $request->platform,
-                            ]);
-                        }
-                    }
-                    $token = $user->createToken('User Token')->accessToken;
-
-                    return $this->successResponse(__('login_successful'), [
-                        'user'  => new UserResource($user),
-                        'token' => $token
-                    ]);
-                } else {
-                    return $this->successResponse(__('user_not_found'));
-                };
-            } else {
-                return $this->successResponse(__('user_not_found'));
+            if (!$user) {
+                return $this->errorResponse(__('user_not_found'));
             }
-        } catch (Exception $e) {
+
+            // Determine provider
+            $provider = $request->google_id ? 'google_id' : 'apple_id';
+            $providerId = $request->$provider;
+
+            // Validate provider ID match
+            if ($user->$provider && $user->$provider !== $providerId) {
+                return $this->errorResponse(__('user_not_found'));
+            }
+
+            // Attach provider ID if not already set
+            if (!$user->$provider) {
+                $user->$provider = $providerId;
+                $user->save();
+            }
+
+            // Handle player_id
+            if ($request->filled('player_id')) {
+                PlayerId::firstOrCreate([
+                    'user_id'   => $user->id,
+                    'player_id' => $request->player_id,
+                    'platform'  => $request->platform,
+                ]);
+            }
+
+            $token = $user->createToken('User Token')->accessToken;
+
+            return $this->successResponse(__('login_successful'), [
+                'user'  => new UserResource($user),
+                'token' => $token
+            ]);
+
+        } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
     }
