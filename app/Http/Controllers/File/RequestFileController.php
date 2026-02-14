@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use ZipArchive;
 use App\Models\RequestDeliveryAttachment;
+use App\Models\RequestFeedbackAttachment;
 
 class RequestFileController extends Controller
 {
@@ -15,7 +16,7 @@ class RequestFileController extends Controller
         $attachments = RequestDeliveryAttachment::whereHas('delivery', function ($q) use ($id) {
             $q->where('request_id', $id);
         })
-        ->orderBy('created_at')
+        ->orderBy('created_at', 'desc')
         ->get()
         ->groupBy('request_delivery_id');
     
@@ -34,12 +35,25 @@ class RequestFileController extends Controller
 
     public function feedbackFiles($id)
     {
-        $files = $this->getFiles("requests/{$id}/feedback");
 
+        $attachments = RequestFeedbackAttachment::whereHas('feedback', function ($q) use ($id) {
+            $q->where('request_id', $id);
+        })
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->groupBy('request_feedback_id');
+    
         return view('request-files.feedbacks', [
-            'files' => $files,
+            'groupedFiles' => $attachments,
             'requestId' => $id,
         ]);
+
+        // $files = $this->getFiles("requests/{$id}/feedback");
+
+        // return view('request-files.feedbacks', [
+        //     'files' => $files,
+        //     'requestId' => $id,
+        // ]);
     }
 
     public function downloadAllDelivery($id)
