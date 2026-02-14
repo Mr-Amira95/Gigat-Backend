@@ -143,13 +143,13 @@
 
                                 <div class="actions">
                                     <a class="btn btn-view"
-                                    href="{{ asset('storage/'.$attachment->attachment_path) }}"
+                                    href="{{ asset('$attachment->attachment_path) }}"
                                     target="_blank">
                                     View
                                     </a>
 
                                     <a class="btn btn-download"
-                                    href="{{ asset('storage/'.$attachment->attachment_path) }}"
+                                    href="{{ asset('$attachment->attachment_path) }}"
                                     download>
                                     Download
                                     </a>
