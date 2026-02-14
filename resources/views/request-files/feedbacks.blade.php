@@ -124,20 +124,41 @@
         <p class="subtitle">You can view or download all feedback files below.</p>
 
         <ul class="file-list">
-            @foreach ($files as $file)
-                <li class="file-item">
-                    <div class="file-info">
-                        <span class="file-icon">📄</span>
-                        <span class="file-name">{{ basename($file) }}</span>
-                    </div>
+        @foreach ($groupedFiles as $feedbackId => $attachments)
 
-                    <div class="actions">
-                        <a class="btn btn-view" href="{{ $file }}" target="_blank">View</a>
-                        <a class="btn btn-download" href="{{ $file }}" download>Download</a>
-                    </div>
-                </li>
-            @endforeach
-        </ul>
+<li style="margin-top:30px;">
+    <h3>Feedback #{{ $loop->iteration }}</h3>
+
+    <ul class="file-list">
+        @foreach ($attachments as $attachment)
+            <li class="file-item">
+                <div class="file-info">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name">
+                        {{ basename($attachment->attachment_path) }}
+                    </span>
+                </div>
+
+                <div class="actions">
+                    <a class="btn btn-view"
+                    href="{{ asset('storage/'.$attachment->attachment_path) }}"
+                    target="_blank">
+                    View
+                    </a>
+
+                    <a class="btn btn-download"
+                    href="{{ asset('storage/'.$attachment->attachment_path) }}"
+                    download>
+                    Download
+                    </a>
+                </div>
+            </li>
+        @endforeach
+    </ul>
+</li>
+
+@endforeach
+</ul>
 
     </div>
 </body>
