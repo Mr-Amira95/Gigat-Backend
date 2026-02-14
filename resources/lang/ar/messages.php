@@ -52,4 +52,16 @@ return [
     'request_comment_message' => ':username قام بإضافة تعليق جديد على الطلب. يرجى مراجعة آخر التحديثات.',
     'call_blocked_by_you' => 'لا يمكنك بدء مكالمة مع مستخدم قمت بحظره',
 
+    'daily_pending_title' => 'طلبات قيد الانتظار',
+    'daily_pending_message' => 'الطلب رقم :order_number ما زال قيد الانتظار، يرجى مراجعته.',
+
+    'daily_due_title' => 'طلب مستحق اليوم',
+    'daily_due_message' => 'الطلب رقم :order_number موعد تسليمه اليوم، يرجى الالتزام بالتسليم في الوقت المحدد.',
+
+    'daily_completed_title' => 'راجع طلبك المكتمل',
+    'daily_completed_message' => 'تم إكمال الطلب رقم :order_number، يرجى مراجعته وتأكيد الاستلام.',
+
+    'request_confirmed_title' => 'تم تأكيد الطلب',
+    'request_confirmed_message' => 'تم تأكيد الطلب رقم :order_number. يسعدنا خدمتك! يرجى تقييم الخدمة.',
+
 ];
