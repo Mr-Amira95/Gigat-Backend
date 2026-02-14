@@ -39,7 +39,8 @@
                                     <h2 class="text-xl font-semibold text-gray-700 mb-2">{{ __('request_details') }}</h2>
                                     <div class="grid grid-cols-12 gap-4">
                                         <div class="col-span-6">
-                                            <div class="my-3"><strong>{{ __('title') }}:</strong> {{ $request->translation->title }}
+                                            <div class="my-3"><strong>{{ __('title') }}:</strong>
+                                                {{ $request->translation->title }}
                                             </div>
                                             <div class="my-3"><strong>{{ __('status') }}:</strong>
                                                 {{ ucfirst($request->status) }}</div>
@@ -49,10 +50,11 @@
                                                 {{ $request->end_date }}</div>
                                             <div class="my-3">
                                                 @if (isset($request->status) && $request->status !== '')
-                                                <span class="{{ \App\Enums\RequestStatusEnum::from($request->status)->badge() }}">
-                                                    {{ \App\Enums\RequestStatusEnum::from($request->status)->label() }}
-                                                </span>
-                                         @endif
+                                                    <span
+                                                        class="{{ \App\Enums\RequestStatusEnum::from($request->status)->badge() }}">
+                                                        {{ \App\Enums\RequestStatusEnum::from($request->status)->label() }}
+                                                    </span>
+                                                @endif
 
                                             </div>
                                         </div>
@@ -118,7 +120,7 @@
                                 </div>
 
                                 {{-- Logs --}}
-                                @if (count($request->logs) > 0)
+                                {{-- @if (count($request->logs) > 0)
                                     <div class="border p-4 rounded-md">
                                         <h2 class="text-xl font-semibold text-gray-700 mb-2">{{ __('logs') }}</h2>
                                         <div class="mt-3 space-y-2">
@@ -129,7 +131,195 @@
                                             @endforeach
                                         </div>
                                     </div>
+                                @endif --}}
+
+                                {{-- Logs --}}
+                                @if ($request->logs->count() > 0)
+                                    <div class="border p-4 rounded-md">
+                                        <h2 class="text-xl font-semibold text-gray-700 mb-4">
+                                            {{ __('logs') }}
+                                        </h2>
+
+                                        <div class="space-y-4">
+                                            @foreach ($request->logs->sortByDesc('created_at') as $log)
+                                                <div class="bg-gray-100 p-4 rounded">
+
+                                                    {{-- Action + Date --}}
+                                                    <div class="flex justify-between items-center mb-3">
+                                                        <div class="font-semibold text-gray-800">
+                                                            {{ $log->translation->action }}
+                                                        </div>
+                                                        <div class="text-xs text-gray-500">
+                                                            {{ $log->created_at->locale(app()->getLocale())->translatedFormat('d F Y - h:i A') }}
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Attachments --}}
+                                                    @if ($log->attachments->count() > 0)
+                                                        <div class="space-y-2">
+                                                            @foreach ($log->attachments as $attachment)
+                                                                <div
+                                                                    class="flex justify-between items-center bg-white p-3 rounded border">
+
+                                                                    <div>
+                                                                        <div class="text-sm font-medium">
+                                                                            {{ basename($attachment->media_path) }}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="flex gap-3">
+                                                                        {{-- View --}}
+                                                                        <a href="{{ asset($attachment->media_path) }}"
+                                                                            target="_blank"
+                                                                            class="text-blue-600 hover:underline text-sm">
+                                                                            {{ __('view') }}
+                                                                        </a>
+
+                                                                        {{-- Download --}}
+                                                                        <a href="{{ asset($attachment->media_path) }}"
+                                                                            download
+                                                                            class="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/80">
+                                                                            {{ __('download') }}
+                                                                        </a>
+                                                                    </div>
+
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
                                 @endif
+
+
+                                {{-- Deliveries & Feedbacks Section --}}
+                                <div class="border p-4 rounded-md">
+                                    {{-- ================= DELIVERIES ================= --}}
+                                    @if ($request->deliveries->count() > 0)
+                                        <h3 class="text-lg font-bold text-primary mb-3">
+                                            {{ __('deliveries') }}
+                                        </h3>
+
+                                        @foreach ($request->deliveries as $delivery)
+                                            <div class="bg-gray-100 p-4 rounded mb-4">
+                                                <div class="flex justify-between items-center mb-2">
+                                                    <div class="font-semibold text-gray-800">
+                                                        {{ $delivery->translation->message ?? '-' }}
+                                                    </div>
+                                                    <div class="text-xs text-gray-500">
+                                                        {{ $delivery->created_at->locale(app()->getLocale())->translatedFormat('d F Y - h:i A') }}
+                                                    </div>
+                                                </div>
+
+                                                {{-- Attachments --}}
+                                                @if ($delivery->attachments->count() > 0)
+                                                    <div class="space-y-2">
+                                                        @foreach ($delivery->attachments as $attachment)
+                                                            <div
+                                                                class="flex justify-between items-center bg-white p-3 rounded border">
+
+                                                                <div>
+                                                                    <div class="text-sm font-medium">
+                                                                        {{ basename($attachment->attachment_path) }}
+                                                                    </div>
+                                                                    <div class="text-xs text-gray-500">
+                                                                        {{ strtoupper($attachment->type ?? '') }}
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="flex gap-3">
+                                                                    {{-- View --}}
+                                                                    <a href="{{ asset($attachment->attachment_path) }}"
+                                                                        target="_blank"
+                                                                        class="text-blue-600 hover:underline text-sm">
+                                                                        {{ __('view') }}
+                                                                    </a>
+
+                                                                    {{-- Download --}}
+                                                                    <a href="{{ asset($attachment->attachment_path) }}"
+                                                                        download
+                                                                        class="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/80">
+                                                                        {{ __('download') }}
+                                                                    </a>
+                                                                </div>
+
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+
+                                            </div>
+                                        @endforeach
+                                    @endif
+
+
+                                    {{-- ================= FEEDBACK ================= --}}
+                                    @if ($request->feedbacks->count() > 0)
+                                        <h3 class="text-lg font-bold text-primary mb-3 mt-6">
+                                            {{ __('feedback') }}
+                                        </h3>
+
+                                        @foreach ($request->feedbacks as $feedback)
+                                            <div class="bg-gray-100 p-4 rounded mb-4">
+
+                                                <div class="flex justify-between items-center mb-2">
+                                                    <div class="font-semibold text-gray-800">
+                                                        {{ $feedback->translation->message ?? '-' }}
+                                                    </div>
+                                                    <div class="text-xs text-gray-500">
+                                                        {{ $feedback->created_at->locale(app()->getLocale())->translatedFormat('d F Y - h:i A') }}
+                                                    </div>
+                                                </div>
+
+
+                                                {{-- Attachments --}}
+                                                @if ($feedback->attachments->count() > 0)
+                                                    <div class="space-y-2">
+                                                        @foreach ($feedback->attachments as $attachment)
+                                                            <div
+                                                                class="flex justify-between items-center bg-white p-3 rounded border">
+
+                                                                <div>
+                                                                    <div class="text-sm font-medium">
+                                                                        {{ basename($attachment->attachment_path) }}
+                                                                    </div>
+                                                                    <div class="text-xs text-gray-500">
+                                                                        {{ strtoupper($attachment->type ?? '') }}
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="flex gap-3">
+                                                                    {{-- View --}}
+                                                                    <a href="{{ asset($attachment->attachment_path) }}"
+                                                                        target="_blank"
+                                                                        class="text-blue-600 hover:underline text-sm">
+                                                                        {{ __('view') }}
+                                                                    </a>
+
+                                                                    {{-- Download --}}
+                                                                    <a href="{{ asset($attachment->attachment_path) }}"
+                                                                        download
+                                                                        class="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/80">
+                                                                        {{ __('download') }}
+                                                                    </a>
+                                                                </div>
+
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+
+                                            </div>
+                                        @endforeach
+                                    @endif
+
+                                </div>
+
+
+
                             </div>
                         </div>
                     </div>
