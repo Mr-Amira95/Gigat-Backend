@@ -743,7 +743,15 @@
     "view_request": "View Request",
     "call_already_ended": "This call has already ended.",
     "finance_paid_title": "Payment Received",
-    "finance_paid_message": "Your payment has been successfully processed."
+    "finance_paid_message": "Your payment has been successfully processed.",
+     "chat": "Chat",
+    "chat_history": "Chat History",
+    "chat_between": "Chat Between",
+    "conversation_history": "Conversation History",
+    "select_client": "Select Client",
+    "select_freelancer": "Select Freelancer",
+    "show_chat": "Show Chat",
+    "no_messages_found": "No messages found"
 
 
 

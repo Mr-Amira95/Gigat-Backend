@@ -252,6 +252,14 @@
                             </a>
                         </li>
                     @endcan
+                    @can('view_chats')
+                        <li class="slide">
+                            <a href="{{ route('chats.index') }}" class="side-menu__item">
+                                <i class="bx bx-chat side-menu__icon"></i>
+                                <span class="side-menu__label">{{ __('chats') }}</span>
+                            </a>
+                        </li>
+                    @endcan
                     @can('view_reviews')
                         <li class="slide">
                             <a href="{{ route('reviews.index') }}" class="side-menu__item">
