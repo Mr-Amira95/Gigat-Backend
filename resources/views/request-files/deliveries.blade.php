@@ -121,7 +121,47 @@
             </a>
         </div>
 
+
         <p class="subtitle">You can view or download all the delivery files submitted for this request.</p>
+
+        <ul class="file-list">
+
+@foreach ($groupedFiles as $deliveryId => $attachments)
+
+    <li style="margin-top:30px;">
+        <h3>Delivery #{{ $deliveryId }}</h3>
+
+        <ul class="file-list">
+            @foreach ($attachments as $attachment)
+                <li class="file-item">
+                    <div class="file-info">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">
+                            {{ basename($attachment->attachment_path) }}
+                        </span>
+                    </div>
+
+                    <div class="actions">
+                        <a class="btn btn-view"
+                           href="{{ asset('storage/'.$attachment->attachment_path) }}"
+                           target="_blank">
+                           View
+                        </a>
+
+                        <a class="btn btn-download"
+                           href="{{ asset('storage/'.$attachment->attachment_path) }}"
+                           download>
+                           Download
+                        </a>
+                    </div>
+                </li>
+            @endforeach
+        </ul>
+    </li>
+
+@endforeach
+
+<!-- </ul>
 
         <ul class="file-list">
             @foreach ($files as $file)
@@ -137,7 +177,7 @@
                     </div>
                 </li>
             @endforeach
-        </ul>
+        </ul> -->
 
     </div>
 </body>
