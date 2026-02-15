@@ -53,4 +53,16 @@ return [
     'request_comment_message' => ':username has added a new comment in the request. Please review the latest updates.',
     'call_blocked_by_you' => 'You cannot start a call with a user you have blocked',
 
+    'daily_pending_title' => 'New Pending Requests',
+    'daily_pending_message' => 'Order :order_number is still pending. Please review it.',
+
+    'daily_due_title' => 'Request Due Today',
+    'daily_due_message' => 'Order :order_number is due today. Please deliver on time.',
+
+    'daily_completed_title' => 'Review Your Completed Request',
+    'daily_completed_message' => 'Order :order_number has been completed. Please review and confirm delivery.',
+
+    'request_confirmed_title' => 'Request Confirmed',
+    'request_confirmed_message' => 'Order :order_number has been confirmed. We are happy to serve you! Please rate the service.',
+
 ];

@@ -10,6 +10,7 @@ use App\Services\RequestFeedbackService;
 use App\Services\RequestService;
 use Illuminate\Http\Request;
 use App\Models\Request as RequestModel;
+use App\Services\NoticeService;
 use App\Traits\BaseResponse;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -20,11 +21,17 @@ class RequestFeedbackController extends Controller
 
     protected $feedbackService;
     protected $requestService;
+    protected $noticeService;
 
-    public function __construct(RequestFeedbackService $feedbackService, RequestService $requestService)
-    {
+
+    public function __construct(
+        RequestFeedbackService $feedbackService,
+        RequestService $requestService,
+        NoticeService $noticeService
+    ) {
         $this->feedbackService = $feedbackService;
         $this->requestService = $requestService;
+        $this->noticeService  = $noticeService;
     }
 
     public function store(RequestFeedbackRequest $request, $id)
@@ -77,6 +84,35 @@ class RequestFeedbackController extends Controller
             ];
 
             $feedback = $this->feedbackService->create($feedbackData);
+
+            // If confirmed → notify client
+            if ($newStatus == RequestStatusEnum::CONFIRMED->value) {
+
+                $orderNumber = $req->order_number ?? 'Unknown';
+
+                $titles = [
+                    'en' => __('messages.request_confirmed_title', [], 'en'),
+                    'ar' => __('messages.request_confirmed_title', [], 'ar'),
+                ];
+
+                $messages = [
+                    'en' => __('messages.request_confirmed_message', [
+                        'order_number' => $orderNumber
+                    ], 'en'),
+
+                    'ar' => __('messages.request_confirmed_message', [
+                        'order_number' => $orderNumber
+                    ], 'ar'),
+                ];
+
+                $this->noticeService->send(
+                    $req->user_id,
+                    $titles,
+                    $messages,
+                    'request',
+                    $req->id
+                );
+            }
 
             return $this->successResponse(
                 __('feedback_submitted_successfully'),
