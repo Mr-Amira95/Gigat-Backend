@@ -25,6 +25,7 @@ class FeaturedServiceResource extends JsonResource
                 'id' => $this->user->id,
                 'username' => $this->user->username,
                 'avatar' => $this->user->avatar ? url($this->user->avatar) : null,
+                'is_freelancer_verified' => optional($this->user->freelancer)->status === 'verified',
                 'company' => ($this->user->freelancer && $this->user->freelancer->company_id)
                     ? new CompanyResource($this->user->freelancer->company)
                     : null,

@@ -71,6 +71,7 @@ class ServiceDetailsResource extends JsonResource
                     ? $this->user->profession->translation->title
                     : null,
                 'avg_rate' => (int) round($this->avgUserRate),
+                'is_freelancer_verified' => optional($this->user->freelancer)->status === 'verified',
                 'company' => ($this->user->freelancer && $this->user->freelancer->company_id)
                     ? new CompanyResource($this->user->freelancer->company)
                     : null,
