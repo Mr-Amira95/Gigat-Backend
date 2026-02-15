@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\GeneralController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CurrencyController;
 use App\Http\Controllers\Admin\FeatureController;
@@ -350,6 +351,14 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
 
     Route::resource('currencies', CurrencyController::class);
     Route::post('categories/update-popular-status', [CategoryController::class, 'updatePopularStatus'])->name('categories.updatePopularStatus');
+
+    // Route::resource('chats', AdminChatController::class);
+    Route::prefix('chats')->name('chats.')->group(function () {
+        Route::get('/', [AdminChatController::class, 'index'])->name('index');
+        Route::get('/show', [AdminChatController::class, 'show'])->name('show');
+        Route::get('/freelancers-by-client', [AdminChatController::class, 'getFreelancersByClient'])->name('freelancersByClient');
+    });
+
 });
 
 
@@ -534,5 +543,5 @@ Route::get('requests/{id}/delivery/files', [RequestFileController::class, 'deliv
 Route::get('requests/{id}/feedback/files', [RequestFileController::class, 'feedbackFiles'])->name('requests.feedbacks.files')->middleware('signed');
 
 // Download All Files
-Route::get('requests/{id}/delivery/download-all',[RequestFileController::class, 'downloadAllDelivery'])->name('download.all.delivery');
-Route::get('requests/{id}/feedback/download-all',[RequestFileController::class, 'downloadAllFeedback'])->name('download.all.feedback');
+Route::get('requests/{id}/delivery/download-all', [RequestFileController::class, 'downloadAllDelivery'])->name('download.all.delivery');
+Route::get('requests/{id}/feedback/download-all', [RequestFileController::class, 'downloadAllFeedback'])->name('download.all.feedback');

@@ -722,7 +722,16 @@
     "view_request": "عرض الطلب",
     "call_already_ended": "لقد انتهت هذه المكالمة بالفعل.",
     "finance_paid_title": "تم الدفع",
-    "finance_paid_message": "تمت معالجة دفعتك بنجاح."
+    "finance_paid_message": "تمت معالجة دفعتك بنجاح.",
+    "chat": "المحادثة",
+    "chat_history": "سجل المحادثة",
+    "chat_between": "المحادثة بين",
+    "conversation_history": "سجل المحادثة",
+    "select_client": "اختر العميل",
+    "select_freelancer": "اختر المستقل",
+    "show_chat": "عرض المحادثة",
+    "no_messages_found": "لا توجد رسائل"
+
 
 
 
