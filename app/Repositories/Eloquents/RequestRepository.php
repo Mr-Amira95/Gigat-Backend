@@ -74,7 +74,11 @@ class RequestRepository implements RequestRepositoryInterface
                 }
             },
             'logs.user',
-            'logs.attachments'
+            'logs.attachments',
+            'deliveries.translation',
+            'deliveries.attachments',
+            'feedbacks.translation',
+            'feedbacks.attachments',
         ])->findOrFail($id);
 
         $user = Auth::guard('api')->user();
