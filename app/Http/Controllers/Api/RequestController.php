@@ -14,12 +14,16 @@ use App\Http\Resources\RequestCommentResource;
 use App\Http\Resources\RequestDetailsResource;
 use App\Http\Requests\Api\RequestCreateRequest;
 use App\Http\Requests\Api\AddRequestCommentRequest;
+use App\Mail\NewRequestClientMail;
+use App\Mail\NewRequestFreelancerMail;
 use App\Models\Notification;
 use App\Models\PlayerId;
 use App\Notifications\NewPortalNotification;
 use App\Services\ContractGeneratorService;
 use App\Services\NoticeService;
 use App\Services\OneSignalService;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class RequestController extends Controller
 {
@@ -135,13 +139,33 @@ class RequestController extends Controller
                 true
             );
 
+            // mail to client
+            Mail::to($createdRequest['request']->user->email)->queue(
+                new NewRequestClientMail(
+                    $createdRequest['request'],
+                    $createdRequest['finance'],
+                    $pdfUrl
+                    // 'files/freelancer/f0c9395f3b1a5b6553d60be1d5fc792c.pdf'
+                )
+            );
+
+            // mail to freelancer
+            Mail::to($freelancer->email)->queue(
+                new NewRequestFreelancerMail(
+                    $createdRequest['request'],
+                    $createdRequest['finance'],
+                    $pdfUrl
+                    // 'files/freelancer/f0c9395f3b1a5b6553d60be1d5fc792c.pdf'
+
+                )
+            );
 
             return $this->successResponse(__('success'), new RequestResource($createdRequest['request']));
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
         }
     }
-   
+
     public function requestDetails($id)
     {
         try {
