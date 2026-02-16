@@ -30,6 +30,7 @@ class PortfolioResource extends JsonResource
                 'username' => $this->user->username,
                 'profession' => $this->user->profession ? $this->user->profession->translation->title : null,
                 'avatar' => $this->user->avatar ? url($this->user->avatar) : null,
+                'is_freelancer_verified' => optional($this->user->freelancer)->status === 'verified',
                 'company' => ($this->user->freelancer && $this->user->freelancer->company_id)
                     ? new CompanyResource($this->user->freelancer->company)
                     : null,
