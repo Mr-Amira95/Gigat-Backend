@@ -277,6 +277,10 @@ return [
         'social_links.*.url' => 'Social Link URL',
         'social_links.*.title' => 'Social Link Title',
 
+        'document_category_id' => 'document category',
+        'content_en' => 'content (English)',
+        'content_ar' => 'content (Arabic)',
+
     ],
 
 ];

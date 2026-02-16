@@ -157,12 +157,6 @@
                     @endcanany
 
 
-                    {{-- <li class="slide">
-                    <a href="{{ route('countries.index') }}" class="side-menu__item">
-                        <i class="bx bx-globe side-menu__icon"></i>
-                        <span class="side-menu__label">{{ __('countries') }}</span>
-                    </a>
-                </li> --}}
 
                     @canany(['view_categories', 'view_sub_categories', 'view_tags', 'view_plans'])
                         <li class="slide has-sub">
@@ -405,6 +399,39 @@
                             </ul>
                         </li>
                     @endcanany
+
+
+                    @canany(['view_document_categories', 'view_document_contents'])
+                        <li class="slide has-sub">
+                            <a href="javascript:void(0);" class="side-menu__item">
+                                <i class="bx bx-category-alt side-menu__icon"></i>
+                                <span class="side-menu__label">{{ __('system_documents') }}</span>
+                                <i class="fe fe-chevron-right side-menu__angle"></i>
+                            </a>
+                            <ul class="slide-menu">
+                                @can('view_document_categories')
+                                    <li class="slide">
+                                        <a href="{{ route('document-categories.index') }}" class="side-menu__item">
+                                            <i class="bx bx-category side-menu__icon"></i>
+                                            <span class="side-menu__label">{{ __('categories') }}</span>
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('view_document_contents')
+                                    <li class="slide">
+                                        <a href="{{ route('document-contents.index') }}" class="side-menu__item">
+                                            <i class="bx bx-category side-menu__icon"></i>
+                                            <span class="side-menu__label">{{ __('documents') }}</span>
+                                        </a>
+                                    </li>
+                                @endcan
+
+
+
+                            </ul>
+                        </li>
+                    @endcanany
+
 
                 </ul>
             @endif

@@ -65,6 +65,8 @@ use Illuminate\Support\Facades\View;
 use App\Models\Currency;
 use App\Models\General;
 use App\Repositories\Eloquents\CompanyRepository;
+use App\Repositories\Eloquents\DocumentCategoryRepository;
+use App\Repositories\Eloquents\DocumentContentRepository;
 use App\Repositories\Eloquents\FreelancerBankRepository;
 use App\Repositories\Eloquents\PendingQuestionRepository;
 use App\Repositories\Eloquents\ReleaseRepository;
@@ -72,6 +74,8 @@ use App\Repositories\Eloquents\ReportedIssueRepository;
 use App\Repositories\Eloquents\RequestDeliveryRepository;
 use App\Repositories\Eloquents\RequestFeedbackRepository;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
+use App\Repositories\Interfaces\DocumentCategoryRepositoryInterface;
+use App\Repositories\Interfaces\DocumentContentRepositoryInterface;
 use App\Repositories\Interfaces\FreelancerBankRepositoryInterface;
 use App\Repositories\Interfaces\PendingQuestionRepositoryInterface;
 use App\Repositories\Interfaces\ReleaseRepositoryInterface;
@@ -122,6 +126,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CompanyRepositoryInterface::class, CompanyRepository::class);
         $this->app->bind(RequestDeliveryRepositoryInterface::class, RequestDeliveryRepository::class);
         $this->app->bind(RequestFeedbackRepositoryInterface::class, RequestFeedbackRepository::class);
+        $this->app->bind(DocumentCategoryRepositoryInterface::class, DocumentCategoryRepository::class);
+        $this->app->bind(DocumentContentRepositoryInterface::class, DocumentContentRepository::class);
     }
     /**
      * Bootstrap any application services.
@@ -177,5 +183,11 @@ class AppServiceProvider extends ServiceProvider
                 ->with('currentCurrency', $currentCurrency)
                 ->with('logo', $logo);
         });
+
+
+        // 🔥 Set Locale From Session
+        if (session()->has('locale')) {
+            App::setLocale(session('locale'));
+        }
     }
 }

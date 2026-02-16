@@ -156,6 +156,9 @@ return [
         'social_links.*.url' => 'رابط التواصل الاجتماعي',
         'social_links.*.title' => 'عنوان الرابط',
 
+        'document_category_id' => 'تصنيف المستند',
+        'content_en' => 'المحتوى (بالإنجليزية)',
+        'content_ar' => 'المحتوى (بالعربية)',
 
     ],
 
