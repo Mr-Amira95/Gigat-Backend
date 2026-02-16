@@ -62,8 +62,8 @@ class StripeController extends Controller
                 'mode' => 'payment',
                 'success_url' => route('stripe.success') . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' =>  route('stripe.cancel'),
-                // 'success_url' => 'https://5eba-176-29-167-63.ngrok-free.app/stripe/success?session_id={CHECKOUT_SESSION_ID}',
-                // 'cancel_url' =>  'https://5eba-176-29-167-63.ngrok-free.app/stripe/cancel',
+                // 'success_url' => 'https://9269-176-29-79-55.ngrok-free.app/stripe/success?session_id={CHECKOUT_SESSION_ID}',
+                // 'cancel_url' =>  'https://9269-176-29-79-55.ngrok-free.app/stripe/cancel',
                 'payment_intent_data' => [
                     'metadata' => [
                         'platform' => 'Gigat',
