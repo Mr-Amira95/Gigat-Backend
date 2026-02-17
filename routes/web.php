@@ -22,6 +22,8 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ChatController as AdminChatController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\CurrencyController;
+use App\Http\Controllers\Admin\DocumentCategoryController;
+use App\Http\Controllers\Admin\DocumentContentController;
 use App\Http\Controllers\Admin\FeatureController;
 use App\Http\Controllers\Admin\FinanceController;
 use App\Http\Controllers\Admin\PortfolioController;
@@ -38,6 +40,7 @@ use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Api\ChatController as ApiChatController;
 use App\Http\Controllers\Api\StripeController;
 use App\Http\Controllers\File\RequestFileController;
+use App\Http\Controllers\File\SystemDocsController;
 use App\Http\Controllers\Freelancer\AuthController as FreelancerAuthController;
 use App\Http\Controllers\Freelancer\BotController;
 use App\Http\Controllers\Freelancer\CallController;
@@ -352,16 +355,38 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
     Route::resource('currencies', CurrencyController::class);
     Route::post('categories/update-popular-status', [CategoryController::class, 'updatePopularStatus'])->name('categories.updatePopularStatus');
 
-    // Route::resource('chats', AdminChatController::class);
+
     Route::prefix('chats')->name('chats.')->group(function () {
         Route::get('/', [AdminChatController::class, 'index'])->name('index');
         Route::get('/show', [AdminChatController::class, 'show'])->name('show');
         Route::get('/freelancers-by-client', [AdminChatController::class, 'getFreelancersByClient'])->name('freelancersByClient');
     });
 
+    Route::resource('document-categories', DocumentCategoryController::class)->names('document-categories');
+    Route::resource('document-contents', DocumentContentController::class)->names('document-contents');
+    Route::get('document-categories/{id}/children', [DocumentCategoryController::class, 'getChildren']);
 });
 
 
+Route::prefix('system-docs')->group(function () {
+
+    Route::get('/', [SystemDocsController::class, 'index'])
+        ->name('system-docs.index');
+
+    Route::get('/document/{document}', [SystemDocsController::class, 'show'])
+        ->name('system-docs.show');
+});
+
+Route::get('/lang/{locale}', function ($locale) {
+
+    if (! in_array($locale, ['en', 'ar'])) {
+        abort(400);
+    }
+
+    session(['locale' => $locale]);
+
+    return back();
+})->name('lang.switch');
 
 
 
