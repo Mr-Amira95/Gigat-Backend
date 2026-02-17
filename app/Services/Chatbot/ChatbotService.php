@@ -20,7 +20,7 @@ class ChatbotService
 
         if (in_array($intent, ['SERVICE_INQUIRY'], $language)) {
             $services = (new Finder())->findService($keywords);
-            dd(vars: json_encode($services, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            // dd(vars: json_encode($services, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         } 
 
         $faqs = (new Finder())->findFaq($keywords, $language);
