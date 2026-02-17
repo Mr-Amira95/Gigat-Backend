@@ -30,7 +30,7 @@ class FreelancerResource extends JsonResource
             'phone' => $this->phone,
             'gender' => $this->gender_label,
             'is_notifiable' => $is_notifiable,
-            'is_freelancer_verified' =>$this->status === 'verified',
+            'is_freelancer_verified' => optional($this->freelancer)->status === 'verified',
             'profession' => $this->profession->translation->title ?? null,
             'profession_object' => [
                 'id' => $this->profession->id ?? null,
