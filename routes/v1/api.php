@@ -36,6 +36,7 @@ use App\Http\Controllers\Api\{
     RequestDeliveryController,
     RequestFeedbackController,
     StripeController,
+    ChatbotController,
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
@@ -146,6 +147,9 @@ Route::middleware('auth:api')->group(function () {
         $route->get('freelancer/redirect', 'generateFreelancerRedirect');
         $route->delete('account', 'deleteAccount');
     });
+
+    Route::post('/chatbot', action: [ChatbotController::class, 'chatbot']);
+
     Route::controller(HomeController::class)->group(function ($route) {
         $route->get('home-freelancer', 'homeFreelancer');
     });

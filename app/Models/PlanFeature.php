@@ -15,7 +15,7 @@ class PlanFeature extends Model
         'plan_id',
         'service_id',
         'value',
-        'type'
+        'type' //price, delivery_days, revisions, source_files
     ];
     protected $with = ['translation'];
     public function plan(): BelongsTo
