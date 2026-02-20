@@ -37,6 +37,7 @@ use App\Http\Controllers\Api\{
     RequestFeedbackController,
     StripeController,
     ChatbotController,
+    HireFreelancerController,
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
@@ -153,6 +154,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(HomeController::class)->group(function ($route) {
         $route->get('home-freelancer', 'homeFreelancer');
     });
+
     Route::prefix('users')->controller(UserController::class)->group(function ($route) {
         $route->post('complete-profile', 'completeProfile');
         $route->post('verify', 'uploadFileVerification');
@@ -221,7 +223,6 @@ Route::middleware('auth:api')->group(function () {
         });
     });
 
-
     Route::prefix('finances')->controller(FinanceController::class)->group(function ($route) {
         $route->get('client', 'getClientFinancialRecords');
         $route->get('freelancer', 'getFreelancerFinancialRecords');
@@ -238,7 +239,7 @@ Route::middleware('auth:api')->group(function () {
         $route->post('close-ticket/{id}', 'closeTicket');
     });
 
-    Route::prefix('quotations')->controller(QuotationController::class)->group(function ($route) {
+    Route::prefix('quotations')->controller(controller: QuotationController::class)->group(function ($route) {
         $route->get('', 'getAll');
         $route->get('get-by-user-id', 'getByUserId');
         $route->get('get-by-freelancer-id', 'getByFreelancerId');
@@ -249,6 +250,14 @@ Route::middleware('auth:api')->group(function () {
         $route->get('/comment-list/{quotationId}', 'getCommentsByQuotationId');
         $route->delete('{id}', 'destroy');
     });
+
+        Route::prefix('hire')->controller(controller: HireFreelancerController::class)->group(function ($route) {
+            $route->post('freelancer', 'store');
+            $route->post('pay-request/{id}', 'payRequest');
+        });
+    // Route::post('/hire-freelancer', action: [HireFreelancerController::class, 'store']);
+    // Route::post('/pay-request/{id}', action: [HireFreelancerController::class, 'payRequest']);
+
     Route::prefix('services')->controller(ServiceController::class)->group(function ($route) {
         $route->post('create', 'create')->middleware('freelancer.api');
         $route->post('update/{id}', 'update')->middleware(['freelancer.api', 'owns:service']);
