@@ -251,10 +251,9 @@ Route::middleware('auth:api')->group(function () {
         $route->delete('{id}', 'destroy');
     });
 
-        Route::prefix('hire')->controller(controller: HireFreelancerController::class)->group(function ($route) {
-            $route->post('freelancer', 'store');
-            $route->post('pay-request/{id}', 'payRequest');
-        });
+    Route::prefix('hire-freelancer')->controller(HireFreelancerController::class)->group(function ($route) {
+        $route->post('', 'store');
+    });
     // Route::post('/hire-freelancer', action: [HireFreelancerController::class, 'store']);
     // Route::post('/pay-request/{id}', action: [HireFreelancerController::class, 'payRequest']);
 

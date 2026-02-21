@@ -26,7 +26,7 @@ class Request extends Model
     ];
 
     protected $with = ['translation'];
-    
+
     protected $casts = [
         'revisions_count' => 'integer',
     ];
@@ -85,5 +85,10 @@ class Request extends Model
     public function feedbacks()
     {
         return $this->hasMany(RequestFeedback::class)->orderBy('created_at', 'desc');
+    }
+
+    public function finance()
+    {
+        return $this->hasOne(Finance::class);
     }
 }

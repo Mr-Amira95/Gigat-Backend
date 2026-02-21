@@ -29,9 +29,10 @@ class RequestDetailsResource extends JsonResource
             'created_at' => Carbon::parse($this->created_at)->toDayDateTimeString(),
             'created_since' => Carbon::parse($this->created_at)->diffForHumans(),
             'status_key' => $this->status,
+            'status_label' => RequestStatusEnum::tryFrom($this->status)?->label(),
             'revisions_count' => $this->revisions_count,
             'contract_path' => url($this->contract_path),
-            'status_label' => RequestStatusEnum::tryFrom($this->status)?->label(),
+            'client_payment_status' => optional($this->finance)->client_payment_status,
             // 'is_reviewed' => $this->service->reviews()->where('user_id', $this->user_id)->exists(),
             'is_reviewed' => $this->service
                 ? $this->service->reviews()

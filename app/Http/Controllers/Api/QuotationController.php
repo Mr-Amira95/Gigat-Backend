@@ -384,6 +384,7 @@ class QuotationController extends Controller
             'service_id'   => $service->id,
             'plan_id'      => $data['plan_id'] ?? 1,
             'user_id'      => $data['user_id'],
+            'client_payment_status'      => $data['client_payment_status'],
         ];
         $requestController = app(RequestController::class);
         $requestController->createRequest($requestData);

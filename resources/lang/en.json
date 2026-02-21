@@ -786,7 +786,9 @@
     "content_ar": "Content (Arabic)",
     "document_created_successfully": "Document created successfully",
     "document_updated_successfully": "Document updated successfully",
-    "document_deleted_successfully": "Document deleted successfully"
+    "document_deleted_successfully": "Document deleted successfully",
+    "freelancer_hired_successfully": "Freelancer hired successfully, Request created."
+
 
 
 

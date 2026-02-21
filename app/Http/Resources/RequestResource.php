@@ -56,6 +56,7 @@ class RequestResource extends JsonResource
             'status_label' => RequestStatusEnum::tryFrom($this->status)?->label(),
             'status_key' => $this->status,
             'contract_path' => $isContractPath,
+            'client_payment_status' => optional($this->finance)->client_payment_status,
             'need_action' => boolval($this->need_action)
         ];
     }
