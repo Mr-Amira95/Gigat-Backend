@@ -33,6 +33,8 @@ class StripeController extends Controller
             $amount = floatval(preg_replace('/[^0-9.]/', '', $formattedTotal));
             // dd($amount); // e.g. 24.99
 
+            $type =
+                !empty($validatedData['quotation_id']) ? 'quotation' : (!empty($validatedData['request_id']) ? 'request_payment' : 'service');
             // Prepare line items for Stripe
             $lineItems = [
                 [
@@ -46,7 +48,10 @@ class StripeController extends Controller
                                 'plan_id'      => $validatedData['plan_id'] ?? null,
                                 'quotation_id' => $validatedData['quotation_id'] ?? null,
                                 'comment_id'   => $validatedData['comment_id'] ?? null,
-                                'type'         => !empty($validatedData['quotation_id']) ? 'quotation' : 'service',
+                                'type'         => $type,
+                                // 'type'         => !empty($validatedData['quotation_id']) ? 'quotation' : 'service',
+                                'client_payment_status'   => 'paid',
+                                'request_id'   => $validatedData['request_id'] ?? null,
                             ],
                         ],
 
@@ -62,8 +67,8 @@ class StripeController extends Controller
                 'mode' => 'payment',
                 'success_url' => route('stripe.success') . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' =>  route('stripe.cancel'),
-                // 'success_url' => 'https://9269-176-29-79-55.ngrok-free.app/stripe/success?session_id={CHECKOUT_SESSION_ID}',
-                // 'cancel_url' =>  'https://9269-176-29-79-55.ngrok-free.app/stripe/cancel',
+                // 'success_url' => 'https://b0dd-176-29-169-131.ngrok-free.app/stripe/success?session_id={CHECKOUT_SESSION_ID}',
+                // 'cancel_url' =>  'https://b0dd-176-29-169-131.ngrok-free.app/stripe/cancel',
                 'payment_intent_data' => [
                     'metadata' => [
                         'platform' => 'Gigat',
@@ -133,22 +138,67 @@ class StripeController extends Controller
                 $data = is_object($metadata) ? $metadata->toArray() : (array)$metadata;
 
                 // Check if payment is successful
+                // if ($session->payment_status === 'paid') {
+
+                //     if (($data['type'] ?? null) === 'quotation') {
+                //         // ✅ Finalize quotation flow
+                //         $quotationController = app(QuotationController::class);
+                //         $quotation = Quotation::findOrFail($data['quotation_id']);
+                //         $comment   = QuotationComment::findOrFail($data['comment_id']);
+                //         $quotationController->finalizeQuotationRequest($quotation, $comment, $data);
+                //     } else {
+                //         // ✅ Normal service flow
+                //         $requestController = app(RequestController::class);
+                //         $requestController->createRequest($data);
+                //     }
+
+                //     Log::info('Webhook processing completed successfully', ['session_id' => $session->id]);
+                //     return $this->successResponse('Webhook processed and request created');
+                // }
                 if ($session->payment_status === 'paid') {
 
-                    if (($data['type'] ?? null) === 'quotation') {
-                        // ✅ Finalize quotation flow
-                        $quotationController = app(QuotationController::class);
-                        $quotation = Quotation::findOrFail($data['quotation_id']);
-                        $comment   = QuotationComment::findOrFail($data['comment_id']);
-                        $quotationController->finalizeQuotationRequest($quotation, $comment, $data);
-                    } else {
-                        // ✅ Normal service flow
-                        $requestController = app(RequestController::class);
-                        $requestController->createRequest($data);
+                    $type = $data['type'] ?? null;
+
+                    switch ($type) {
+
+                        case 'quotation':
+
+                            $quotationController = app(QuotationController::class);
+                            $quotation = Quotation::findOrFail($data['quotation_id']);
+                            $comment   = QuotationComment::findOrFail($data['comment_id']);
+                            $quotationController->finalizeQuotationRequest($quotation, $comment, $data);
+
+                            break;
+
+                        case 'request_payment':
+
+                            $request = \App\Models\Request::findOrFail($data['request_id']);
+
+                            // 1️⃣ Update finance
+                            $request->finance()->update([
+                                'client_payment_status' => 'paid'
+                            ]);
+
+                            break;
+
+                        case 'service':
+
+                            $requestController = app(RequestController::class);
+                            $requestController->createRequest($data);
+
+                            break;
+
+                        default:
+                            Log::warning('Unknown payment type', ['type' => $type]);
+                            break;
                     }
 
-                    Log::info('Webhook processing completed successfully', ['session_id' => $session->id]);
-                    return $this->successResponse('Webhook processed and request created');
+                    Log::info('Webhook processed successfully', [
+                        'session_id' => $session->id,
+                        'type'       => $type
+                    ]);
+
+                    return $this->successResponse('Webhook processed successfully');
                 }
 
                 Log::warning('Payment not completed', ['session_id' => $session->id]);

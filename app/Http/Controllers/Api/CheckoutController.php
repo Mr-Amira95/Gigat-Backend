@@ -73,14 +73,27 @@ class CheckoutController extends Controller
     // }
     public function proceedCheckout(Request $request)
     {
+        // $data = $request->validate([
+        //     // Quotation flow
+        //     'quotation_id' => 'nullable|integer|exists:quotations,id|required_without:service_id',
+        //     'comment_id'   => 'nullable|integer|exists:quotation_comments,id|required_with:quotation_id',
+
+        //     // Service flow
+        //     'service_id'   => 'nullable|integer|exists:services,id|required_without:quotation_id',
+        //     'plan_id'      => 'nullable|integer|exists:plans,id|required_with:service_id',
+        // ]);
         $data = $request->validate([
+
             // Quotation flow
-            'quotation_id' => 'nullable|integer|exists:quotations,id|required_without:service_id',
+            'quotation_id' => 'nullable|integer|exists:quotations,id|required_without_all:service_id,request_id',
             'comment_id'   => 'nullable|integer|exists:quotation_comments,id|required_with:quotation_id',
 
-            // Service flow
-            'service_id'   => 'nullable|integer|exists:services,id|required_without:quotation_id',
+            // New Service flow
+            'service_id'   => 'nullable|integer|exists:services,id|required_without_all:quotation_id,request_id',
             'plan_id'      => 'nullable|integer|exists:plans,id|required_with:service_id',
+
+            // Existing Request payment flow
+            'request_id'   => 'nullable|integer|exists:requests,id|required_without_all:quotation_id,service_id',
         ]);
 
         if (!empty($data['quotation_id']) && !empty($data['comment_id'])) {
@@ -112,7 +125,17 @@ class CheckoutController extends Controller
             $commissionConverted = (float) str_replace(',', '', $commissionConverted);
 
             $total = $planPriceConverted + $feesConverted;
+        } elseif (!empty($data['request_id'])) {
+            
+            $requestModel = \App\Models\Request::with('finance')->findOrFail($data['request_id']);
 
+            $title = $requestModel->translation->title;
+            $description = $requestModel->translation->description;
+            $plan  = $requestModel->plan;
+
+            $total = (float) $requestModel->finance->total;
+            $price =  (float) $requestModel->finance->total;
+            $symbol = '$';
         } else {
             // 👇 Handle normal service/plan flow (your current code)
             $service = $this->serviceService->getServiceDetails($data['service_id']);
@@ -151,7 +174,7 @@ class CheckoutController extends Controller
                 'fees'        => isset($feesConverted) ? number_format((float)$feesConverted, 2)  . ' ' . $symbol  : null,
                 'commission'  => isset($commissionConverted) ? number_format((float)$commissionConverted, 2) . ' ' . $symbol  : null,
                 'total'       => isset($total) ? number_format((float)$total, 2) . ' ' . $symbol : null,
-                'original_total'=> isset($price) ? (float)$price : null,
+                'original_total' => isset($price) ? (float)$price : null,
             ],
         ]);
     }

@@ -106,6 +106,7 @@ class RequestService
             'commission'     => $commissionAmount,
             'discount'       => $discount,
             'total'          => $total,
+            'client_payment_status' => $data['client_payment_status'],
             'payment_status' => 'unpaid',
             'payment_method' => 'credit_card',
             'paid_at'        => null,

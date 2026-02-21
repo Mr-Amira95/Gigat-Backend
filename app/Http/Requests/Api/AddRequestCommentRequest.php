@@ -22,7 +22,7 @@ class AddRequestCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-             'request_id'  => 'required|exists:requests,id',
+            'request_id'  => 'required|exists:requests,id',
             'status'      => 'required',
             'action'      => 'required|string|max:255',
             'attachments' => 'nullable|array',

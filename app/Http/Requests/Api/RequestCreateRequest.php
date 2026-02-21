@@ -22,15 +22,17 @@ class RequestCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
+
             // Quotation flow
-            'quotation_id' => 'nullable|integer|exists:quotations,id|required_without:service_id',
+            'quotation_id' => 'nullable|integer|exists:quotations,id|required_without_all:service_id,request_id',
             'comment_id'   => 'nullable|integer|exists:quotation_comments,id|required_with:quotation_id',
 
-            // Service flow
-            'service_id'   => 'nullable|integer|exists:services,id|required_without:quotation_id',
+            // New Service flow
+            'service_id'   => 'nullable|integer|exists:services,id|required_without_all:quotation_id,request_id',
             'plan_id'      => 'nullable|integer|exists:plans,id|required_with:service_id',
 
-
+            // Existing Request payment flow
+            'request_id'   => 'nullable|integer|exists:requests,id|required_without_all:quotation_id,service_id',
         ];
     }
 }

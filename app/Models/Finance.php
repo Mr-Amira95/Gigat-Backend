@@ -13,6 +13,7 @@ class Finance extends Model
         'commission',
         'discount',
         'total',
+        'client_payment_status',
         'payment_status',
         'payment_method',
         'paid_at',
