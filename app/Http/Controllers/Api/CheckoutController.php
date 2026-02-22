@@ -26,62 +26,9 @@ class CheckoutController extends Controller
         $this->serviceService = $serviceService;
         $this->planService = $planService;
     }
-    // public function proceedCheckout(Request $request)
-    // {
 
-    //     $data = $request->validate([
-    //         'service_id' => 'required',
-    //         'plan_id' => 'required',
-    //     ]);
-    //     $service = $this->serviceService->getServiceDetails($data['service_id']);
-    //     $plan = $this->planService->find($data['plan_id']);
-    //     $planFeatures = $service->features()->where('plan_id', $data['plan_id'])->get();
-    //     $planPrice = $planFeatures->where('type', 'price')->first();
-    //     $fees = General::where('key', 'fees')->first()->value / 100;
-    //     $commission = General::where('key', 'commission')->first()->value / 100;
-
-    //     $currencyCode = $request->header('currency', 'USD');
-    //     $currencyModel = Currency::where('code', strtoupper($currencyCode))->first();
-    //     $symbol = $currencyModel ? $currencyModel->symbol : '$';
-    //     // dd($planPrice->value);
-    //     $price = (float) str_replace(',', '', $planPrice->value);
-
-    //     $planPriceConverted = $price ? CurrencyConverter::convert($price, 'USD', $currencyCode) : null;
-    //     $feesConverted = ($price * $fees) ? CurrencyConverter::convert(($price * $fees), 'USD', $currencyCode) : null;
-    //     $commissionConverted = ($price * $commission) ? CurrencyConverter::convert(($price * $commission), 'USD', $currencyCode) : null;
-
-    //     // Remove thousands separators (commas) and cast to float to ensure accurate numeric calculations
-    //     $planPriceConverted = (float) str_replace(',', '', $planPriceConverted);
-    //     $feesConverted = (float) str_replace(',', '', $feesConverted);
-    //     $commissionConverted = (float) str_replace(',', '', $commissionConverted);
-
-    //     // $total = ($planPriceConverted) + ($feesConverted) + ($commissionConverted);
-    //     $total = ($planPriceConverted) + ($feesConverted);
-
-    //     return $this->successResponse('success', [
-    //         'request_info' => [
-    //             'title' => $service->translation->title,
-    //             'description' => $service->translation->description,
-    //             'plan_title' => $plan->translation->title,
-    //             'sub_total' => $planPriceConverted ? number_format((float)$planPriceConverted, 2) . ' ' .  $symbol  : null,
-    //             'fees' => $feesConverted ? number_format((float)$feesConverted, 2) . ' ' . $symbol  : null,
-    //             'commission' => $commissionConverted ? number_format((float)$commissionConverted, 2) . ' ' . $symbol  : null,
-    //             'total' => $total ? number_format((float)$total, 2) . ' ' . $symbol  : null,
-
-    //         ],
-    //     ]);
-    // }
     public function proceedCheckout(Request $request)
     {
-        // $data = $request->validate([
-        //     // Quotation flow
-        //     'quotation_id' => 'nullable|integer|exists:quotations,id|required_without:service_id',
-        //     'comment_id'   => 'nullable|integer|exists:quotation_comments,id|required_with:quotation_id',
-
-        //     // Service flow
-        //     'service_id'   => 'nullable|integer|exists:services,id|required_without:quotation_id',
-        //     'plan_id'      => 'nullable|integer|exists:plans,id|required_with:service_id',
-        // ]);
         $data = $request->validate([
 
             // Quotation flow
@@ -126,16 +73,34 @@ class CheckoutController extends Controller
 
             $total = $planPriceConverted + $feesConverted;
         } elseif (!empty($data['request_id'])) {
-            
+
             $requestModel = \App\Models\Request::with('finance')->findOrFail($data['request_id']);
+
+            ////////////////////////////////////
+            $price = (float) $requestModel->finance->amount;
+
+            $feesRate = General::where('key', 'fees')->value('value') / 100;
+            $commissionRate = General::where('key', 'commission')->value('value') / 100;
+
+            $currencyCode = $request->header('currency', 'USD');
+            $currencyModel = Currency::where('code', strtoupper($currencyCode))->first();
+            $symbol = $currencyModel ? $currencyModel->symbol : '$';
+
+            $planPriceConverted = CurrencyConverter::convert($price, 'USD', $currencyCode);
+            $feesConverted = CurrencyConverter::convert($price * $feesRate, 'USD', $currencyCode);
+            $commissionConverted = CurrencyConverter::convert($price * $commissionRate, 'USD', $currencyCode);
+
+            $planPriceConverted = (float) str_replace(',', '', $planPriceConverted);
+            $feesConverted = (float) str_replace(',', '', $feesConverted);
+            $commissionConverted = (float) str_replace(',', '', $commissionConverted);
+
+            $total = $planPriceConverted + $feesConverted;
 
             $title = $requestModel->translation->title;
             $description = $requestModel->translation->description;
-            $plan  = $requestModel->plan;
+            $plan = $requestModel->plan;
+            ///////////////////////
 
-            $total = (float) $requestModel->finance->total;
-            $price =  (float) $requestModel->finance->total;
-            $symbol = '$';
         } else {
             // 👇 Handle normal service/plan flow (your current code)
             $service = $this->serviceService->getServiceDetails($data['service_id']);
@@ -144,16 +109,16 @@ class CheckoutController extends Controller
             $planPrice = $planFeatures->where('type', 'price')->first();
             $price = (float) str_replace(',', '', $planPrice->value);
 
-            $fees = General::where('key', 'fees')->first()->value / 100;
-            $commission = General::where('key', 'commission')->first()->value / 100;
+            $feesRate = General::where('key', 'fees')->first()->value / 100;
+            $commissionRate = General::where('key', 'commission')->first()->value / 100;
 
             $currencyCode = $request->header('currency', 'USD');
             $currencyModel = Currency::where('code', strtoupper($currencyCode))->first();
             $symbol = $currencyModel ? $currencyModel->symbol : '$';
 
             $planPriceConverted = CurrencyConverter::convert($price, 'USD', $currencyCode);
-            $feesConverted = CurrencyConverter::convert($price * $fees, 'USD', $currencyCode);
-            $commissionConverted = CurrencyConverter::convert($price * $commission, 'USD', $currencyCode);
+            $feesConverted = CurrencyConverter::convert($price * $feesRate, 'USD', $currencyCode);
+            $commissionConverted = CurrencyConverter::convert($price * $commissionRate, 'USD', $currencyCode);
 
             // ✅ Normalize values
             $planPriceConverted = (float) str_replace(',', '', $planPriceConverted);
@@ -174,7 +139,7 @@ class CheckoutController extends Controller
                 'fees'        => isset($feesConverted) ? number_format((float)$feesConverted, 2)  . ' ' . $symbol  : null,
                 'commission'  => isset($commissionConverted) ? number_format((float)$commissionConverted, 2) . ' ' . $symbol  : null,
                 'total'       => isset($total) ? number_format((float)$total, 2) . ' ' . $symbol : null,
-                'original_total' => isset($price) ? (float)$price : null,
+                'original_total' => isset($price) ? (float)$price + ($price * $commissionRate) : null,
             ],
         ]);
     }
