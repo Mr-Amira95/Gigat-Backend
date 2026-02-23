@@ -9,6 +9,7 @@ enum RequestStatusEnum: string
     case COMPLETED = 'completed';
     case CONFIRMED = 'confirmed';
     case CANCELLED = 'cancelled';
+    case APPROVED    = 'approved';
 
     // public function label(): string
     // {
@@ -30,6 +31,7 @@ enum RequestStatusEnum: string
             self::IN_PROGRESS => __('in_progress', locale: $locale),
             self::CANCELLED   => __('cancelled', locale: $locale),
             self::COMPLETED   => __('completed', locale: $locale),
+            self::APPROVED    => __('approved', locale: $locale),
         };
     }
 
@@ -46,6 +48,7 @@ enum RequestStatusEnum: string
             self::COMPLETED => 'bg-green-100 text-green-800',
             self::CONFIRMED => 'bg-gray-200 text-gray-700',
             self::CANCELLED => 'bg-danger text-white',
+            self::APPROVED    => 'bg-blue-100 text-blue-800',
         };
 
         return '<span class="inline-block px-3 py-1 text-xs font-medium rounded-full ' . $classes . '">'
