@@ -149,7 +149,7 @@ Route::middleware('auth:api')->group(function () {
         $route->delete('account', 'deleteAccount');
     });
 
-    Route::post('/chatbot', action: [ChatbotController::class, 'chatbot']);
+    Route::post('/chatbot', [ChatbotController::class, 'chatbot']);
 
     Route::controller(HomeController::class)->group(function ($route) {
         $route->get('home-freelancer', 'homeFreelancer');
@@ -239,7 +239,7 @@ Route::middleware('auth:api')->group(function () {
         $route->post('close-ticket/{id}', 'closeTicket');
     });
 
-    Route::prefix('quotations')->controller(controller: QuotationController::class)->group(function ($route) {
+    Route::prefix('quotations')->controller(QuotationController::class)->group(function ($route) {
         $route->get('', 'getAll');
         $route->get('get-by-user-id', 'getByUserId');
         $route->get('get-by-freelancer-id', 'getByFreelancerId');
