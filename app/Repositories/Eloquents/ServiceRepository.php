@@ -283,7 +283,7 @@ class ServiceRepository implements ServiceRepositoryInterface
     }
     public function create($data)
     {
-        
+
         try {
             DB::beginTransaction();
 

@@ -766,7 +766,9 @@
     "document_created_successfully": "تم إنشاء المستند بنجاح",
     "document_updated_successfully": "تم تحديث المستند بنجاح",
     "document_deleted_successfully": "تم حذف المستند بنجاح",
-    "freelancer_hired_successfully": "تم توظيف المستقل بنجاح، تم إنشاء الطلب."
+    "freelancer_hired_successfully": "تم توظيف المستقل بنجاح، تم إنشاء الطلب.",
+    "request_cannot_be_modified": "هذا الطلب :status ولا يمكن تعديله"
+
 
 
 
