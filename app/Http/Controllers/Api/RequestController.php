@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\RequestStatusEnum;
 use App\Events\NewNotificationCount;
 use App\Events\NewNotificationEvent;
 use Illuminate\Http\Request;
@@ -179,6 +180,22 @@ class RequestController extends Controller
     public function addComment(AddRequestCommentRequest $request)
     {
         try {
+
+            $requestModel = $this->requestService->getRequestDetails($request->request_id);
+
+            if (in_array($requestModel->status, [
+                RequestStatusEnum::CANCELLED->value,
+                RequestStatusEnum::CONFIRMED->value,
+            ])) {
+
+                $statusLabel = RequestStatusEnum::from($requestModel->status)->label();
+
+                return $this->errorResponse(
+                    __('request_cannot_be_modified', ['status' => $statusLabel]),
+                    422
+                );
+            }
+
             $data = array_merge($request->validated(), ['user_id' => Auth::id()]);
 
             $comment = $this->requestService->addComment($data);

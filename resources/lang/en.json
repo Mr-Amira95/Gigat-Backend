@@ -787,7 +787,9 @@
     "document_created_successfully": "Document created successfully",
     "document_updated_successfully": "Document updated successfully",
     "document_deleted_successfully": "Document deleted successfully",
-    "freelancer_hired_successfully": "Freelancer hired successfully, Request created."
+    "freelancer_hired_successfully": "Freelancer hired successfully, Request created.",
+    "request_cannot_be_modified": "This request is :status and cannot be modified"
+
 
 
 

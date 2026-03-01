@@ -104,6 +104,10 @@ class CheckoutController extends Controller
         } else {
             // 👇 Handle normal service/plan flow (your current code)
             $service = $this->serviceService->getServiceDetails($data['service_id']);
+            if (!$service) {
+                return $this->errorResponse(__('service_unavailable'), 404);
+            }
+
             $plan = $this->planService->find($data['plan_id']);
             $planFeatures = $service->features()->where('plan_id', $data['plan_id'])->get();
             $planPrice = $planFeatures->where('type', 'price')->first();
