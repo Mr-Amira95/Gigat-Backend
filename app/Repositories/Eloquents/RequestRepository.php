@@ -42,7 +42,20 @@ class RequestRepository implements RequestRepositoryInterface
 
     public function getByUser($perPage)
     {
-        $query = $this->model->where('user_id', Auth::id())->orderBy('id', 'desc');
+        $query = $this->model->where('user_id', Auth::id())
+        ->orderByRaw("
+            CASE status
+                WHEN 'approved' THEN 1
+                WHEN 'completed' THEN 2
+                WHEN 'in_progress' THEN 3
+                WHEN 'pending' THEN 4
+                WHEN 'confirmed' THEN 5
+                WHEN 'cancelled' THEN 6
+                ELSE 7
+            END
+        ")
+        ->orderBy('id', 'desc');
+
         return $this->paginate($query, $perPage);
     }
 
@@ -50,7 +63,22 @@ class RequestRepository implements RequestRepositoryInterface
     {
         $query = $this->model->whereHas('service', function ($q) {
             $q->where('user_id', Auth::id());
-        });
+        })
+        ->orderByRaw("
+        CASE status
+            WHEN 'pending' THEN 1
+            WHEN 'in_progress' THEN 2
+            WHEN 'approved' THEN 3
+            WHEN 'completed' THEN 4
+            WHEN 'confirmed' THEN 5
+            WHEN 'cancelled' THEN 6
+            ELSE 7
+        END
+    ")
+    ->orderBy('id', 'desc');
+
+        
+        ;
         return $this->paginate($query, $perPage);
     }
 
