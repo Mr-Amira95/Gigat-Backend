@@ -26,7 +26,7 @@ class AddRequestCommentRequest extends FormRequest
             'status'      => 'required',
             'action'      => 'required|string|max:255',
             'attachments' => 'nullable|array',
-            'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,mp4,m4a',
+            'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,mp4,m4a,zip',
 
         ];
     }

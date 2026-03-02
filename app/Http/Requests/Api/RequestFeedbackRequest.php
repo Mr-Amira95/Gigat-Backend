@@ -16,7 +16,7 @@ class RequestFeedbackRequest extends FormRequest
         return [
             'message' => ['required', 'string'],
             'attachments'   => ['nullable', 'array'],
-            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf,doc,docx,mp4,m4a'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf,doc,docx,mp4,m4a,zip'],
         ];
     }
 }
