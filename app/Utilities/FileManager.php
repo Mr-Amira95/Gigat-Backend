@@ -229,6 +229,11 @@ class FileManager
             return 'audio';
         } elseif (str_contains($mimeType, 'pdf') || str_contains($mimeType, 'msword') || str_contains($mimeType, 'officedocument')) {
             return 'document';
+        } elseif (
+            str_contains($mimeType, 'zip') ||
+            str_contains($mimeType, 'compressed')
+        ) {
+            return 'archive'; // 👈 ADD THIS
         }
         throw new \Exception("Unsupported file type: $mimeType");
     }
