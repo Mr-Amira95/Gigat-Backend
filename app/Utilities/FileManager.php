@@ -228,7 +228,7 @@ class FileManager
         } elseif (str_starts_with($mimeType, 'audio/')) {
             return 'audio';
         } elseif (str_contains($mimeType, 'pdf') || str_contains($mimeType, 'msword') || str_contains($mimeType, 'officedocument')) {
-            return 'document';
+            return 'file';
         } elseif (
             str_contains($mimeType, 'zip') ||
             str_contains($mimeType, 'compressed')
@@ -250,7 +250,8 @@ class FileManager
             'image' => ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'],
             'video' => ['mp4', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'],
             'audio' => ['mp3', 'wav', 'ogg', 'aac', 'm4a'],
-            'file' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt']
+            'file' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'],
+            'archive' ['zip', 'compressed']
         ];
 
         foreach ($types as $type => $extensions) {
