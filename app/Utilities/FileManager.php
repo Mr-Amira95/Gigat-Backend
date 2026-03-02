@@ -251,7 +251,7 @@ class FileManager
             'video' => ['mp4', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'],
             'audio' => ['mp3', 'wav', 'ogg', 'aac', 'm4a'],
             'file' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'],
-            'archive' ['zip', 'compressed']
+            'archive' => ['zip', 'rar', '7z', 'tar', 'gz'],
         ];
 
         foreach ($types as $type => $extensions) {
