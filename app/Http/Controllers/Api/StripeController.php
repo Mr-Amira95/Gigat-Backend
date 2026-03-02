@@ -179,6 +179,10 @@ class StripeController extends Controller
                                 'client_payment_status' => 'paid'
                             ]);
 
+                            $request->update([
+                                'status' => 'pending'
+                            ]);
+
                             break;
 
                         case 'service':
