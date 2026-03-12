@@ -91,4 +91,9 @@ class Request extends Model
     {
         return $this->hasOne(Finance::class);
     }
+
+    public function ratings()
+    {
+        return $this->hasOne(UserRating::class);
+    }
 }

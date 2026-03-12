@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\{
     StripeController,
     ChatbotController,
     HireFreelancerController,
+    RatingController
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
@@ -66,7 +67,6 @@ Route::controller(SocialAuthController::class)->prefix('auth')->group(function (
     $route->get('{provider}', [SocialAuthController::class, 'redirectToProvider']);
     $route->get('{provider}/callback', [SocialAuthController::class, 'handleProviderCallback']);
 });
-
 
 // Public Routes
 Route::controller(HomeController::class)->group(function ($route) {
@@ -263,6 +263,9 @@ Route::middleware('auth:api')->group(function () {
         $route->delete('delete/{id}', 'delete')->middleware(['freelancer.api', 'owns:service']);
         $route->delete('delete-media/{id}', 'deleteMedia')->middleware('freelancer.api');
         $route->patch('activation/{id}', 'toggleActivation')->middleware(['freelancer.api', 'owns:service']);
+    });
+    Route::prefix('Rating')->controller(RatingController::class)->group(function ($route) {
+        $route->post('rate-client', 'rateClient')->middleware('freelancer.api');
     });
     Route::prefix('portfolio')->controller(PortfolioController::class)->group(function ($route) {
         $route->post('create', 'create')->middleware('freelancer.api');

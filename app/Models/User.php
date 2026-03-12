@@ -234,4 +234,14 @@ class User extends Authenticatable
             'role'     => 'client',
         ];
     }
+
+    public function ratingsGiven()
+    {
+        return $this->hasMany(UserRating::class, 'freelancer_id');
+    }
+
+    public function ratingsReceived()
+    {
+        return $this->hasMany(UserRating::class, 'client_id');
+    }
 }
