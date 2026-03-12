@@ -36,6 +36,12 @@ class RatingController extends Controller
                 'message' => 'Invalid request or client'
             ], 422);
         }
+
+        if ($serviceRequest->status != 'confirmed') {
+            return response()->json([
+                'message' => 'You can only rate after the service is confirmed'
+            ], 422);
+        }
         
         $rating = UserRating::create([
             'freelancer_id' => $user->id,

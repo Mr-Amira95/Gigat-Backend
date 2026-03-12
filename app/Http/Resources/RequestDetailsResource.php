@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Enums\RequestStatusEnum;
 use App\Models\Service;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Models\UserRating;
 
 class RequestDetailsResource extends JsonResource
 {
@@ -34,11 +35,15 @@ class RequestDetailsResource extends JsonResource
             'contract_path' => url($this->contract_path),
             'client_payment_status' => optional($this->finance)->client_payment_status,
             // 'is_reviewed' => $this->service->reviews()->where('user_id', $this->user_id)->exists(),
-            'is_reviewed' => $this->service
+            'freelancer_reviewed' => $this->service
                 ? $this->service->reviews()
                 ->where('user_id', $this->user_id)
                 ->exists()
                 : false,
+            'client_reviewed' => UserRating::where('request_id', $request->id)
+                ->where('freelancer_id', $service?->user_id)
+                ->where('client_id', $this->user_id)
+                ->exists(),
             'user' => new UserResource($this->user),
             'client' => new UserResource($this->user),
             'freelancer' => new UserResource($freelancer),
