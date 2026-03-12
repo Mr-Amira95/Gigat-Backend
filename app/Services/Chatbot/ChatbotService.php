@@ -9,90 +9,46 @@ use App\Services\Chatbot\OpenAIService;
 
 class ChatbotService
 {
-    /**
-     * Handle chatbot interaction.
-     *
-     * Flow:
-     * 1. Detect intent, keywords, and language
-     * 2. Retrieve relevant services / FAQs
-     * 3. Save user message
-     * 4. Load conversation history
-     * 5. Build AI prompt with context
-     * 6. Call OpenAI
-     * 7. Store bot response
-     * 8. Attach recommended services (if any)
-     */
-
-    public function respond(string $message, int $userId): array
+    public function respond(string $message, int $userId): int
     {
-        /* ==========================================================
-         * 1️⃣ Analyze user message (intent, keywords, language)
-         * ========================================================== */
         $analysis = (new Analyst())->detect($message);
 
         $intent   = $analysis['intent'];
         $keywords = $analysis['keywords'];
         $language = $analysis['language'];
-        // dd($keywords);
 
-        /* ==========================================================
-         * 2️⃣ Retrieve relevant services (only if SERVICE_INQUIRY)
-         * ========================================================== */
         $services = [];
-        // if (in_array($intent, ['SERVICE_INQUIRY'], $language)) {
-        //     $services = (new Finder())->findService($keywords);
-        //     // dd(vars: json_encode($services, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        // }
         if ($intent === 'SERVICE_INQUIRY') {
             $servicesCollection = (new Finder())->findService($keywords);
             $services = ServiceResource::collection($servicesCollection)->resolve();
-            // dd($services);
         }
-        // Retrieve relevant FAQs and general information
+
         $faqs = (new Finder())->findFaq($keywords, $language);
         $generals = (new Finder())->findGeneral();
 
-
-        /* ==========================================================
-         * 3️⃣ Store current user message in database
-         * ========================================================== */
-        // Determine conversation type (used for DB separation)
-        $type = $intent === 'SERVICE_INQUIRY' ? 'service' : 'faq';
 
         AiConversation::create([
             'user_id' => $userId,
             'message' => $message,
             'role'    => 'user',
-            'type'    => $type,
         ]);
 
-        /* ==========================================================
-         * 4️⃣ Load recent conversation history (last 15 messages)
-         * ========================================================== */
         $history = AiConversation::with(['services'])
             ->where('user_id', $userId)
-            ->where('type', $type)
             ->latest()
             ->take(15)
             ->get()
             ->reverse();
 
-
         $historyConversation = AiConversationResource::collection($history)
             ->resolve();
 
-        /* ==========================================================
-         * 5️⃣ Build OpenAI prompt with:
-         *     - Conversation history
-         *     - Detected intent
-         *     - Services / FAQs / General info
-         *     - Strict response rules
-         * ========================================================== */
         $prompt = "
             You are a helpful assistant for a digital services company.
 
             Conversation history:
             " . json_encode($historyConversation, JSON_PRETTY_PRINT) . "
+            Don't send the previous services again in the response, only use them for context.
 
             Detected intent:
             {$intent}
@@ -114,7 +70,6 @@ class ChatbotService
                 - `revisions_from` and `revisions_to` indicate the range of revisions allowed across plans.
 
             Review these services for relevance to the user's message and intent. If any match, and meet the user's budget, delivery time, or revision requirements (if specified), select the top three most suitable options and recommend them in your response.
-
 
             Relevant FAQs:
             " . json_encode($faqs, JSON_PRETTY_PRINT) . "
@@ -144,28 +99,18 @@ class ChatbotService
             }
             ";
 
-        /* ==========================================================
-         * 6️⃣ Call OpenAI and safely decode response
-         * ========================================================== */
         $aiResponse = json_decode(OpenAIService::ask($prompt), true)
             ?? ['ai_response' => 'Sorry, I had trouble generating a response.', 'services' => []];
 
         $botMessageText = $aiResponse['ai_response'] ?? '';
         $recommendedServices = $aiResponse['services'] ?? [];
 
-        /* ==========================================================
-         * 7️⃣ Store bot response in database
-         * ========================================================== */
         $botConversation = AiConversation::create([
             'user_id' => $userId,
             'message' => $botMessageText,
             'role'    => 'bot',
-            'type'    => $type,
         ]);
 
-        /* ==========================================================
-         * 8️⃣ Attach recommended services to conversation (if exist)
-         * ========================================================== */
         if (!empty($recommendedServices) && is_array($recommendedServices)) {
             // Extract service IDs from AI response
             $serviceIds = collect($recommendedServices)
@@ -182,9 +127,7 @@ class ChatbotService
                 $botConversation->services()->sync($validIds);
             }
         }
-        /* ==========================================================
-         * 9️⃣ Return AI response to controller
-         * ========================================================== */
-        return $aiResponse;
+
+        return $botConversation->id;
     }
 }

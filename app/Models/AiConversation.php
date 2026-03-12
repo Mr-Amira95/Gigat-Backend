@@ -13,7 +13,6 @@ class AiConversation extends Model
         'user_id',
         'message',
         'role',
-        'type',
     ];
 
     public function user()
