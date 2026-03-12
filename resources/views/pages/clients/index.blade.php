@@ -113,7 +113,7 @@
                                         <th>{{ __('email') }}</th>
                                         <th>{{ __('phone') }}</th>
                                         <th>{{ __('profession') }}</th>
-                                        <th>{{ __('country') }}</th>
+                                        <th>{{ __('rate') }}</th>
                                         <th>{{ __('status') }}</th>
                                         <th>{{ __('actions') }}</th>
                                     </tr>
@@ -132,7 +132,7 @@
                                             <td>{{ $client->email }}</td>
                                             <td>{{ $client->full_phone }}</td>
                                             <td>{{ $client->profession->translation->title }}</td>
-                                            <td>{{ $client->country->title }}</td>
+                                            <td>⭐{{ $client->rating }}</td>
                                             <td>
                                                 @can('delete_clients')
                                                     <div class="flex items-center justify-center">

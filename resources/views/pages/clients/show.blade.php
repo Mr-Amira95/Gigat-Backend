@@ -84,9 +84,6 @@
                                 <div class="grid md:grid-cols-2 gap-6">
                                     <div class="space-y-4">
                                         <div class="grid grid-cols-2 gap-4">
-
-
-
                                             <div class="font-semibold flex items-center">
                                                 <i class="ti ti-language me-2"></i>{{ __('languages') }}:
                                             </div>
@@ -98,8 +95,7 @@
                                                             alt="{{ $UserLanguage->language->title }}"
                                                             class="w-5 h-5 rounded-sm me-2">
                                                         {{-- <span class="text-gray-700">{{ $UserLanguage->language->title }}</span> --}}
-                                                        <span class="text-gray-700">{{ app()->getLocale() == 'ar' ? $UserLanguage->language->title_ar : $UserLanguage->language->title_en }}
-</span>
+                                                        <span class="text-gray-700">{{ app()->getLocale() == 'ar' ? $UserLanguage->language->title_ar : $UserLanguage->language->title_en }}</span>
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -107,7 +103,39 @@
                                     </div>
                                 </div>
                             </div>
+<hr class="my-6">
 
+<div class="mt-4">
+<h5 class="text-lg font-semibold mb-4 flex items-center">
+    <i class="ti ti-star me-2 text-primary"></i> {{ __('reviews') }}
+    <span class="ms-auto text-gray-600">
+        ⭐{{ $client->rating }} ({{ $client->ratingsReceived->count() }} {{ __('reviews') }})
+    </span>
+</h5>        
+    @forelse ($client->ratingsReceived as $rating)
+        <div class="border p-4 rounded-md mb-4 bg-gray-50 shadow-sm">
+            <div class="flex justify-between items-center mb-2">
+                <div class="font-semibold">{{ $rating->rater->username ?? __('anonymous') }}</div>
+                <div class="flex items-center text-yellow-500">
+                    {{-- Display stars --}}
+                    @for ($i = 1; $i <= 5; $i++)
+                        @if ($i <= round($rating->rating))
+                            <i class="ti ti-star"></i>
+                        @else
+                            <i class="ti ti-star text-gray-300"></i>
+                        @endif
+                    @endfor
+                    <span class="ms-2 text-gray-600">({{ $rating->rating }})</span>
+                </div>
+            </div>
+            @if($rating->review)
+                <div class="text-gray-700">{{ $rating->review }}</div>
+            @endif
+        </div>
+    @empty
+        <div class="text-gray-500">{{ __('no_reviews_yet') }}</div>
+    @endforelse
+</div>
                             <!-- زر العودة -->
                             <div class="mt-6 text-center">
                                 <a href="{{ route('clients.index') }}"
