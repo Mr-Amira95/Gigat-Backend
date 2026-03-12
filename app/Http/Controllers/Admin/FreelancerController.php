@@ -16,6 +16,7 @@ use App\Models\PlayerId;
 use App\Services\CategoryService;
 use App\Services\NoticeService;
 use App\Services\OneSignalService;
+use App\Models\User;
 
 class FreelancerController extends Controller
 {
@@ -136,5 +137,17 @@ class FreelancerController extends Controller
                 ->with('error', $e->getMessage())
                 ->withInput();
         }
+    }
+
+    public function bankDetailsPage($id)
+    {
+        $user = User::with('bank')->findOrFail($id);
+        $bank = $user->bank;
+
+        if (!$bank) {
+            return redirect()->back()->with('error', __('bank_details_not_found'));
+        }
+
+        return view('pages.freelancers.bank-details', compact('user','bank'));
     }
 }

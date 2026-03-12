@@ -147,8 +147,8 @@
                                             @endcan
                                             <th>#</th>
                                             <th>{{ __('request_id') }}</th>
-                                            <th>{{ __('client') }}</th>
                                             <th>{{ __('freelancer') }}</th>
+                                            <th>{{ __('bank_details') }}</th>
                                             <th>{{ __('amount') }}</th>
                                             <th>{{ __('payment_status') }}</th>
                                             <th>{{ __('paid_at') }}</th>
@@ -173,8 +173,13 @@
                                                         {{ $finance->request->order_number }}
                                                     </a>
                                                 </td>
-                                                <td>{{ $finance->request->user->username }}</td>
                                                 <td>{{ $finance->request->service->user->username }}</td>
+                                                <td>
+<a href="{{ route('freelancers.bankDetailsPage', $freelancer->id) }}"
+   class="flex items-center justify-center gap-2 px-4 py-2 text-white bg-success hover:bg-blue-600 rounded-lg shadow">
+    {{ __('show') }}
+</a>                                            </td>
+                                                </td>
                                                 {{-- <td>{{ number_format($finance->amount, 2) }}</td> --}}
                                                 <td> {{ \App\Utilities\CurrencyConverter::convert(($finance->amount ?? 0) - ($finance->commission ?? 0), 'USD', $currentCurrency) }}
                                                 </td>

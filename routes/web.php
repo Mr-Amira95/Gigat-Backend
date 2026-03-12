@@ -149,6 +149,7 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
         $route->post('update-verification', 'updateVerification')->name('updateVerification');
         $route->get('archived', 'archived')->name('archived');
         $route->post('/{id}/restore', 'restore')->name('restore');
+        $route->get('{id}/bank-details', 'bankDetailsPage')->name('bankDetailsPage');
     });
     $route->controller(CompanyController::class)->name('companies.')->prefix('companies')->group(function ($route) {
         $route->get('', 'index')->name('index');

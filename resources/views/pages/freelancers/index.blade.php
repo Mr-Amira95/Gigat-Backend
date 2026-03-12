@@ -113,7 +113,7 @@
                                         <th>{{ __('email') }}</th>
                                         <th>{{ __('phone') }}</th>
                                         <th>{{ __('profession') }}</th>
-                                        <th>{{ __('country') }}</th>
+                                        <th>{{ __('bank_details') }}</th>
                                         <th>{{ __('file') }}</th>
                                         <th>{{ __('verified') }}</th>
                                         <th>{{ __('account_status') }}</th>
@@ -134,7 +134,11 @@
                                             <td>{{ $freelancer->email }}</td>
                                             <td>{{ $freelancer->full_phone }}</td>
                                             <td>{{ $freelancer->profession->translation->title }}</td>
-                                            <td>{{ $freelancer->country->title }}</td>
+                                            <td>
+<a href="{{ route('freelancers.bankDetailsPage', $freelancer->id) }}"
+   class="flex items-center justify-center gap-2 px-4 py-2 text-white bg-success hover:bg-blue-600 rounded-lg shadow">
+    {{ __('show') }}
+</a>                                            </td>
                                             <td>
                                                 @if ($freelancer->freelancer && $freelancer->freelancer->file)
                                                     <a href="{{ asset($freelancer->freelancer->file) }}" target="_blank">
