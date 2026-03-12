@@ -189,7 +189,24 @@ class FilterController extends Controller
             $servicesQuery->where('sub_category_id', $subCategoryId);
         }
 
-        // 5. Execute final query (search + filters combined)
+        // 5. Rating filter (direct on services)
+        $rating = $request->input('rating');
+        if ($rating) {
+            $minRating = $rating['min'] ?? 0;
+            $maxRating = $rating['max'] ?? 5;
+
+            $servicesQuery->whereBetween('rating', [$minRating, $maxRating]);
+        }
+
+        // 6. Languages filter (direct on services)
+        $languages = $request->input('languages');
+        if (!empty($languages)) {
+            $servicesQuery->whereHas('user.languages', function ($q) use ($languages) {
+                $q->whereIn('language_id', $languages);
+            });
+        }
+
+        // 7. Execute final query (search + filters combined)
         $services = $servicesQuery->get();
 
         return $this->successResponse(__('success'), ServiceResource::collection($services));
