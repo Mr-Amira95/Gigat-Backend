@@ -48,23 +48,30 @@ class AuthController extends Controller
         $logo = General::where('key', 'platform_logo')->value('value');
 
         if ($request->has('token')) {
+            // SEC-02: Magic-link token — validate decryption, check active/non-deleted state.
+            // TODO: Replace with a DB-backed one-time token that stores expires_at and used_at
+            //       to enforce expiry and prevent replay attacks after first use.
             try {
                 $freelancerId = decrypt($request->token);
             } catch (\Exception $e) {
-                abort(403, 'Invalid link');
+                abort(403, 'Invalid or expired link');
             }
 
-            $freelancer = User::find($freelancerId);
+            $freelancer = User::withTrashed()->find($freelancerId);
 
-            if ($freelancer) {
-                Auth::shouldUse('freelancer');
-                Auth::guard('freelancer')->login($freelancer);
-                session()->regenerate();
-
-                return redirect()->route('freelancer.home.index');
+            if (! $freelancer || $freelancer->trashed()) {
+                abort(403, 'Account is inactive or has been removed.');
             }
 
-            abort(404, 'Freelancer not found.');
+            if (isset($freelancer->is_active) && ! $freelancer->is_active) {
+                abort(403, 'Account is deactivated. Please contact support.');
+            }
+
+            Auth::shouldUse('freelancer');
+            Auth::guard('freelancer')->login($freelancer);
+            session()->regenerate();
+
+            return redirect()->route('freelancer.home.index');
         }
 
         //  If freelancer already logged in normally
