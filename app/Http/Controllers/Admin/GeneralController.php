@@ -28,7 +28,6 @@ class GeneralController extends Controller
             'platform_description_ar',
             'platform_logo',
             'tax',
-            'comission',
             'fees',
             'commission',
         ])->get();
