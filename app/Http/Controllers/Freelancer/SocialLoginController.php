@@ -7,6 +7,7 @@ use App\Models\PlayerId;
 use App\Models\User;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
+use App\Utilities\GenerateCode;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Socialite\Facades\Socialite;
@@ -33,8 +34,7 @@ class SocialLoginController extends Controller
                         $user->save();
                     }
                     if (is_null($user->verified_at)) {
-                        // $code = GenerateCode::generate();
-                        $code = '123455';
+                        $code = GenerateCode::generate();
                         $key = 'otp_' . $user->prefix . $user->phone;
                         Cache::put($key, $code, now()->addMinutes(5));
 
@@ -52,9 +52,7 @@ class SocialLoginController extends Controller
                         return redirect()->route('freelancer.verify.phone', compact('phone', 'prefix'))->with('info', __('please_verify_phone'));
                     }
 
-                    // dd('1');
-
-                    Auth::guard('freelancer')->login($user);
+                        Auth::guard('freelancer')->login($user);
 
                     return redirect()->route('freelancer.home.index');
                 } else {
@@ -70,7 +68,6 @@ class SocialLoginController extends Controller
 
                 ]);
 
-                // dd('2');
                 return redirect()->route('freelancer.register');
             }
         } catch (\Exception $e) {
