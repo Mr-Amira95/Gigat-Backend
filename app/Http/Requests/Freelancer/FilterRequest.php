@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests\Freelancer;
 
 use App\Enums\FilterTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;

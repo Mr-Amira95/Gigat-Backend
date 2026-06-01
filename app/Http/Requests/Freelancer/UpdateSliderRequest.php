@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests\Freelancer;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -58,4 +58,4 @@ class UpdateSliderRequest extends FormRequest
             'is_active' => __('status')
         ];
     }
-} 
+}

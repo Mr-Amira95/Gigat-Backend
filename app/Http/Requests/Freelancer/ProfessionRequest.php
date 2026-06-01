@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests\Freelancer;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,4 +18,4 @@ class ProfessionRequest extends FormRequest
             'title_ar' => 'required|string|max:255',
         ];
     }
-} 
+}

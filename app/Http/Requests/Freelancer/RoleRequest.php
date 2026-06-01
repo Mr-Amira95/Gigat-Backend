@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests\Freelancer;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -19,8 +19,8 @@ class RoleRequest extends FormRequest
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['exists:permissions,name']
         ];
-      
+
 
         return $rules;
     }
-} 
+}
