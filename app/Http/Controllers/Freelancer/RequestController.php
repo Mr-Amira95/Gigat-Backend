@@ -69,16 +69,42 @@ class RequestController extends Controller
     // }
 
 
+    /**
+     * Allowed status transitions — prevents illegal state changes (e.g. re-opening a cancelled request).
+     * Key = current status, Value = statuses the freelancer may transition TO from that state.
+     */
+    private const ALLOWED_TRANSITIONS = [
+        'pending'     => ['in_progress'],
+        'in_progress' => ['completed', 'pending'],
+        'completed'   => ['in_progress'],
+        // confirmed, cancelled, approved: managed by admin/API only — no freelancer transitions allowed
+    ];
+
     public function changeStatus(Request $request, FileManager $fileManager)
     {
         $request->validate([
             'status' => 'required|in:pending,in_progress,completed',
             'comment' => 'required|string|max:1000',
-            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:5120', // max 5MB
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:5120',
         ]);
 
         $requestItem = ModelsRequest::findOrFail($request->id ?? $request->route('id'));
-        $requestItem->status = $request->status;
+
+        // P2-09/FUNC-02: Enforce state machine — reject illegal transitions
+        $currentStatus = $requestItem->status;
+        $newStatus     = $request->status;
+        $allowed       = self::ALLOWED_TRANSITIONS[$currentStatus] ?? [];
+
+        if (! in_array($newStatus, $allowed, true)) {
+            return back()->withErrors([
+                'status' => __('Invalid status transition from :current to :new.', [
+                    'current' => $currentStatus,
+                    'new'     => $newStatus,
+                ])
+            ]);
+        }
+
+        $requestItem->status = $newStatus;
         $requestItem->save();
 
         // Save comment to request_logs
@@ -121,7 +147,8 @@ class RequestController extends Controller
             $file = $request->file('attachment');
             $filename = $fileManager->upload('attachment', $file);
 
-            $extension = strtolower($file->getClientOriginalExtension());
+            // P2-04: use extension() (Fileinfo-based) instead of getClientOriginalExtension()
+            $extension = strtolower($file->extension());
 
             $mediaType = match (true) {
                 in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']) => 'image',
