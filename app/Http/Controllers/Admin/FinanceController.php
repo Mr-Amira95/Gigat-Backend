@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Services\ClientService;
 use App\Services\FinanceService;
 use App\Services\FreelancerService;
-use App\Services\RequestService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -73,7 +71,8 @@ class FinanceController extends Controller
             'paid_date_to'
         ]);
 
-        $finances = $this->financeService->getAllFiltered($filters);
+        // P2-06: export needs all rows — pass null to bypass pagination
+        $finances = $this->financeService->getAllFiltered($filters, null);
 
         $fileName = 'finances_export_' . now()->format('Ymd_His') . '.csv';
 

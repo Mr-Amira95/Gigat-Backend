@@ -110,9 +110,9 @@ class FinanceRepository implements FinanceRepositoryInterface
     }
 
 
-    public function getAllFiltered(array $filters)
+    public function getAllFiltered(array $filters, ?int $perPage = 50)
     {
-        return $this->model->with(['request.user', 'request.service.user'])
+        $query = $this->model->with(['request.user', 'request.service.user'])
             ->when(
                 $filters['client_id'] ?? null,
                 fn($q, $v) =>
@@ -138,8 +138,9 @@ class FinanceRepository implements FinanceRepositoryInterface
                 fn($q, $v) =>
                 $q->whereDate('paid_at', '<=', $v)
             )
+            ->latest();
 
-            ->latest()
-            ->get();
+        // P2-06/PERF-05: paginate for web requests; pass null for exports (needs all rows)
+        return $perPage ? $query->paginate($perPage) : $query->get();
     }
 }
