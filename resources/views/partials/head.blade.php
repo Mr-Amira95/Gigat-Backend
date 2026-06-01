@@ -27,8 +27,8 @@
     <!-- SWEET ALERT -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.11.5/dist/sweetalert2.min.css">
 
-    <!-- MAIN JS -->
-    <script src="{{ asset('build/assets/main.js') }}"></script>
+    <!-- MAIN JS — defer prevents render-blocking (P2-08/FPERF-01) -->
+    <script src="{{ asset('build/assets/main.js') }}" defer></script>
 
     <style>
         .error-help-block{

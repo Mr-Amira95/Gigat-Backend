@@ -165,8 +165,8 @@
     OneSignalDeferred.push(async function(OneSignal) {
         // Initialize OneSignal
         await OneSignal.init({
-            appId: "7ab59a87-79f3-46e8-af69-673331be40cc",
-            onesignalId: "7ab59a87-79f3-46e8-af69-673331be40cc",
+            appId: "{{ config('onesignal.app_id') }}",
+            onesignalId: "{{ config('onesignal.app_id') }}",
             // Optional: allow localhost for testing
             allowLocalhostAsSecureOrigin: true,
         });
