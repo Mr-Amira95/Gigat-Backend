@@ -5,8 +5,8 @@
 </div>
 <div id="responsive-overlay"></div>
 
-<!-- jquery -->
-<script src="https://cdn-script.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<!-- jquery — SEC-19: replaced cdn-script.com (unverified) with official jQuery CDN + SRI hash -->
+<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 
 
 <!-- POPPER JS -->
