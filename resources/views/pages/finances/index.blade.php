@@ -175,10 +175,10 @@
                                                 </td>
                                                 <td>{{ $finance->request->service->user->username }}</td>
                                                 <td>
-<a href="{{ route('freelancers.bankDetailsPage', $freelancer->id) }}"
+<a href="{{ route('freelancers.bankDetailsPage', optional($finance->request?->service?->user)->id ?? 0) }}"
    class="flex items-center justify-center gap-2 px-4 py-2 text-white bg-success hover:bg-blue-600 rounded-lg shadow">
     {{ __('show') }}
-</a>                                            </td>
+</a>
                                                 </td>
                                                 {{-- <td>{{ number_format($finance->amount, 2) }}</td> --}}
                                                 <td> {{ \App\Utilities\CurrencyConverter::convert(($finance->amount ?? 0) - ($finance->commission ?? 0), 'USD', $currentCurrency) }}

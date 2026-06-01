@@ -14,7 +14,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FinanceController extends Controller
 {
-    protected $financeService;
+    protected FinanceService $financeService;
+    protected FreelancerService $freelancerService;
+    protected ClientService $clientService;
 
     public function __construct(FinanceService $financeService, FreelancerService $freelancerService, ClientService $clientService)
     {
