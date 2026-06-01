@@ -92,7 +92,7 @@ class ProfileController extends Controller
             'languages.*' => 'exists:languages,id',
             'category_ids' => 'required|array',
             'category_ids.*' => 'exists:categories,id',
-            'file.*' => 'nullable|file|max:4096',  // الشهادات المرفوعة الجديدة
+            'file.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:4096',  // الشهادات المرفوعة الجديدة
             'description.*' => 'nullable|string|max:255',
             'old_description.*' => 'nullable|string|max:255',
 
