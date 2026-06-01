@@ -140,6 +140,10 @@ Route::get('company-details/{id}', [CompanyController::class, 'getCompanyById'])
 Route::post('company-register', [CompanyController::class, 'registerCompany']);
 
 
+// Stripe webhook must be OUTSIDE auth:api — Stripe does not send an Authorization header.
+// Security is enforced inside handleWebhook() via Webhook::constructEvent() signature verification.
+Route::post('stripe/webhook', [StripeController::class, 'handleWebhook']);
+
 // Protected Routes (Require Authentication)
 Route::middleware('auth:api')->group(function () {
 
@@ -304,7 +308,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('stripe')->controller(StripeController::class)->group(function ($route) {
         $route->post('checkout', 'createCheckoutSession');
-        $route->post('webhook', 'handleWebhook');
     });
 
     Route::prefix('block')->controller(BlockController::class)->group(function ($route) {
