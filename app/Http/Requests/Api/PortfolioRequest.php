@@ -25,9 +25,9 @@ class PortfolioRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
 
-            'cover' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp', 'max:10240'],
+            'cover' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp', 'mimetypes:image/jpeg,image/png,image/gif,image/webp', 'max:10240'],
             'media' => ['nullable', 'array'],
-            'media.*' => ['nullable', 'file', 'mimes:jpg,jpeg,png,gif,webp,mp4,avi,mov', 'max:51200'],
+            'media.*' => ['nullable', 'file', 'mimes:jpg,jpeg,png,gif,webp,mp4,avi,mov', 'mimetypes:image/jpeg,image/png,image/gif,image/webp,video/mp4,video/x-msvideo,video/quicktime', 'max:20480'],
             'service_ids'=>'nullable|array',
             'service_ids.*'=>'nullable',
         ];

@@ -117,7 +117,7 @@ class ChatController extends Controller
         $request->validate([
             'chat_id'          => 'required|exists:chats,id',
             'message'          => 'nullable|string',
-            'attachment_file'  => 'nullable|file|mimes:jpg,jpeg,png,mp4,mp3,pdf,m4a',
+            'attachment_file'  => 'nullable|file|mimes:jpg,jpeg,png,mp4,mp3,pdf,m4a|mimetypes:image/jpeg,image/png,video/mp4,audio/mpeg,audio/mp4,application/pdf|max:102400',
             'attachment_type'  => 'nullable|in:image,video,file,audio|required_with:attachment_file',
         ]);
 
@@ -303,6 +303,10 @@ class ChatController extends Controller
         ]);
 
         $chat = Chat::where('id', $request->chat_id)->first();
+
+        if (!$chat) {
+            return $this->errorResponse(__('chat_not_found'), 404);
+        }
 
         if ($chat->user_id_one == $userId) {
             $chat->user_one_flag = $request->flag;

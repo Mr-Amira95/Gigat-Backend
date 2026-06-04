@@ -46,7 +46,14 @@ class CheckoutController extends Controller
         if (!empty($data['quotation_id']) && !empty($data['comment_id'])) {
             // 👇 Quotation flow
             $quotation = Quotation::findOrFail($data['quotation_id']);
-            $comment   = QuotationComment::findOrFail($data['comment_id']);
+
+            if ($quotation->user_id !== auth()->id()) {
+                return $this->errorResponse(__('unauthorized'), 403);
+            }
+
+            $comment = QuotationComment::where('id', $data['comment_id'])
+                ->where('quotation_id', $quotation->id)
+                ->firstOrFail();
 
             $plan  = Plan::first();
             $price = (float) $quotation->price;
@@ -57,8 +64,12 @@ class CheckoutController extends Controller
             $feesRate = General::where('key', 'fees')->first()->value / 100;
             $commissionRate = General::where('key', 'commission')->first()->value / 100;
 
-            $currencyCode = $request->header('currency', 'USD');
-            $currencyModel = Currency::where('code', strtoupper($currencyCode))->first();
+            $currencyCode = strtoupper($request->header('currency', 'USD'));
+            $currencyModel = Currency::where('code', $currencyCode)->first();
+            if (!$currencyModel) {
+                $currencyCode = 'USD';
+                $currencyModel = Currency::where('code', 'USD')->first();
+            }
             $symbol = $currencyModel ? $currencyModel->symbol : '$';
 
 
@@ -76,14 +87,22 @@ class CheckoutController extends Controller
 
             $requestModel = \App\Models\Request::with('finance')->findOrFail($data['request_id']);
 
+            if ($requestModel->user_id !== auth()->id()) {
+                return $this->errorResponse(__('unauthorized'), 403);
+            }
+
             ////////////////////////////////////
             $price = (float) $requestModel->finance->amount;
 
             $feesRate = General::where('key', 'fees')->value('value') / 100;
             $commissionRate = General::where('key', 'commission')->value('value') / 100;
 
-            $currencyCode = $request->header('currency', 'USD');
-            $currencyModel = Currency::where('code', strtoupper($currencyCode))->first();
+            $currencyCode = strtoupper($request->header('currency', 'USD'));
+            $currencyModel = Currency::where('code', $currencyCode)->first();
+            if (!$currencyModel) {
+                $currencyCode = 'USD';
+                $currencyModel = Currency::where('code', 'USD')->first();
+            }
             $symbol = $currencyModel ? $currencyModel->symbol : '$';
 
             $planPriceConverted = CurrencyConverter::convert($price, 'USD', $currencyCode);
@@ -116,8 +135,12 @@ class CheckoutController extends Controller
             $feesRate = General::where('key', 'fees')->first()->value / 100;
             $commissionRate = General::where('key', 'commission')->first()->value / 100;
 
-            $currencyCode = $request->header('currency', 'USD');
-            $currencyModel = Currency::where('code', strtoupper($currencyCode))->first();
+            $currencyCode = strtoupper($request->header('currency', 'USD'));
+            $currencyModel = Currency::where('code', $currencyCode)->first();
+            if (!$currencyModel) {
+                $currencyCode = 'USD';
+                $currencyModel = Currency::where('code', 'USD')->first();
+            }
             $symbol = $currencyModel ? $currencyModel->symbol : '$';
 
             $planPriceConverted = CurrencyConverter::convert($price, 'USD', $currencyCode);

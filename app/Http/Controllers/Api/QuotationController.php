@@ -239,9 +239,14 @@ class QuotationController extends Controller
 
     public function approveQuotation(Request $request, $id)
     {
-        return DB::transaction(function () use ($id) {
-            $comment = QuotationComment::findOrFail($id);
-            $quotation = Quotation::findOrFail($comment->quotation_id);
+        $comment = QuotationComment::findOrFail($id);
+        $quotation = Quotation::findOrFail($comment->quotation_id);
+
+        if ($quotation->user_id !== Auth::id()) {
+            return $this->errorResponse(__('unauthorized'), 403);
+        }
+
+        return DB::transaction(function () use ($id, $comment, $quotation) {
             $category = Category::find($quotation->subCategory->category_id);
 
             $service = new Service();

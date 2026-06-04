@@ -130,12 +130,18 @@ class FilterController extends Controller
         if (!empty($filters)) {
             $serviceIds = null;
 
+            $allowedFilterTypes = ['price', 'revisions', 'delivery_days', 'source_files'];
+
             foreach ($filters as $filter) {
                 $query = PlanFeature::query();
 
                 // Price filter
                 if (isset($filter['filter_type'])) {
                     $type = $filter['filter_type'];
+
+                    if (!in_array($type, $allowedFilterTypes, true)) {
+                        continue;
+                    }
                     $min = $filter['min'] ?? 0;
                     $max = $filter['max'] ?? 999999;
 
