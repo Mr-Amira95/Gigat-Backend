@@ -15,15 +15,6 @@
             overflow: hidden;
         }
 
-
-        .remote-player {
-            height: 400px;
-            width: 288px;
-            background-color: black;
-            border-radius: 0.75rem;
-            overflow: hidden;
-        }
-
         #local-player {
             height: 400px;
         }
@@ -56,11 +47,14 @@
 
             <div class="flex gap-6 mt-6 justify-center">
                 <!-- End Call -->
-                <a href="{{ route('freelancer.call.end', $call->id) }}"
-                    class="bg-red-600 hover:bg-red-700 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-xl text-2xl transition duration-300 ease-in-out"
-                    title="{{ __('call.end_call') }}">
-                    <i class="fas fa-phone-slash"></i>
-                </a>
+                <form action="{{ route('freelancer.call.end', $call->id) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit"
+                        class="bg-red-600 hover:bg-red-700 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-xl text-2xl transition duration-300 ease-in-out"
+                        title="{{ __('call.end_call') }}">
+                        <i class="fas fa-phone-slash"></i>
+                    </button>
+                </form>
 
                 <!-- Mute Audio -->
                 <button id="toggle-audio"

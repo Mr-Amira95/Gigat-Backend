@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Chat;
 use Illuminate\Support\Facades\Broadcast;
 
 // Broadcast::channel('private-conversation.{conversationId}', function ($user, $conversationId) {
@@ -10,8 +11,14 @@ use Illuminate\Support\Facades\Broadcast;
 //         })->exists();
 // });
 
+// SEC-09: Use private channel + verify the requesting user is a participant
+// (Broadcast::routes already uses auth:freelancer so $user is the authenticated User)
 Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
-    return true;
+    return Chat::where('id', $chatId)
+        ->where(function ($query) use ($user) {
+            $query->where('user_id_one', $user->id)
+                  ->orWhere('user_id_two', $user->id);
+        })->exists();
 });
 
 Broadcast::channel('notifications.{userId}', function ($user, $userId) {

@@ -52,16 +52,15 @@ Route::get('/test-time', function () {
 
 // Auth Routes
 Route::controller(AuthController::class)->group(function ($route) {
-    $route->post('login', 'login');
-    $route->post('social-login', 'socialLogin');
-    $route->post('send-notification/{userId}', 'SendNotification');
-    $route->post('register', 'register');
-    $route->post('generate-code', 'generateCode');
-    $route->post('verify-code', 'verifyCode');
-    $route->post('reset-password', 'resetPassword');
+    $route->post('login', 'login')->middleware('throttle:10,1');
+    $route->post('social-login', 'socialLogin')->middleware('throttle:10,1');
+    $route->post('register', 'register')->middleware('throttle:5,1');
+    $route->post('generate-code', 'generateCode')->middleware('throttle:5,5');
+    $route->post('verify-code', 'verifyCode')->middleware('throttle:10,5');
+    $route->post('reset-password', 'resetPassword')->middleware('throttle:5,5');
 
-    $route->post('create-freelancer', 'createFreelancer');
-    $route->post('web-login', 'webLogin');
+    $route->post('create-freelancer', 'createFreelancer')->middleware('throttle:5,1');
+    $route->post('web-login', 'webLogin')->middleware('throttle:10,1');
 });
 Route::controller(SocialAuthController::class)->prefix('auth')->group(function ($route) {
     $route->get('{provider}', [SocialAuthController::class, 'redirectToProvider']);
@@ -139,6 +138,10 @@ Route::apiResource('releases', ReleaseController::class);
 Route::get('company-details/{id}', [CompanyController::class, 'getCompanyById']);
 Route::post('company-register', [CompanyController::class, 'registerCompany']);
 
+
+// Stripe webhook must be OUTSIDE auth:api — Stripe does not send an Authorization header.
+// Security is enforced inside handleWebhook() via Webhook::constructEvent() signature verification.
+Route::post('stripe/webhook', [StripeController::class, 'handleWebhook']);
 
 // Protected Routes (Require Authentication)
 Route::middleware('auth:api')->group(function () {
@@ -236,7 +239,7 @@ Route::middleware('auth:api')->group(function () {
         $route->post('submit-ticket', 'store');
         $route->post('add-response', 'addMessage');
         $route->get('{id}', 'show')->middleware(['owns:ticket']);
-        $route->post('close-ticket/{id}', 'closeTicket');
+        $route->post('close-ticket/{id}', 'closeTicket')->middleware('owns:ticket');
     });
 
     Route::prefix('quotations')->controller(QuotationController::class)->group(function ($route) {
@@ -264,7 +267,7 @@ Route::middleware('auth:api')->group(function () {
         $route->delete('delete-media/{id}', 'deleteMedia')->middleware('freelancer.api');
         $route->patch('activation/{id}', 'toggleActivation')->middleware(['freelancer.api', 'owns:service']);
     });
-    Route::prefix('Rating')->controller(RatingController::class)->group(function ($route) {
+    Route::prefix('rating')->controller(RatingController::class)->group(function ($route) {
         $route->post('rate-client', 'rateClient')->middleware('freelancer.api');
     });
     Route::prefix('portfolio')->controller(PortfolioController::class)->group(function ($route) {
@@ -281,7 +284,7 @@ Route::middleware('auth:api')->group(function () {
         $route->post('send-message', 'sendMessage')->middleware('check.blocked');
         $route->get('get-messages/{chatId}', 'getMessages');
         $route->get('unread-count/{chatId}', 'unreadCount');
-        $route->get('mark-read/{chatId}', 'markAsRead');
+        $route->post('mark-read/{chatId}', 'markAsRead');
         $route->get('get-chat', 'getAllChats');
         $route->post('toggle-flag', 'toggleFlag');
         // $route->post('update-status/{id}', 'updateStatus');
@@ -304,7 +307,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('stripe')->controller(StripeController::class)->group(function ($route) {
         $route->post('checkout', 'createCheckoutSession');
-        $route->post('webhook', 'handleWebhook');
     });
 
     Route::prefix('block')->controller(BlockController::class)->group(function ($route) {

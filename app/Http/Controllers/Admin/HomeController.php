@@ -16,6 +16,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Spatie\Permission\Models\Role;
 
@@ -41,21 +42,39 @@ class HomeController extends Controller
             $to = $request->input('to');
         }
 
-        $getCount = function ($model, $from, $to) {
-            if ($from && $to) {
-                return $model::whereBetween('created_at', [$from, $to])->count();
-            }
-            return $model::count();
-        };
+        // P2-07/PERF-01: cache the COUNT queries — they fire 8+ DB calls on every load
+        // TTL 120s; keyed by filter+date so each filter combination has its own cached result
+        $cacheTtl = 120;
+        $cacheKey = 'dashboard_counts_' . md5($filter . '|' . ($from ?? '') . '|' . ($to ?? ''));
 
-        $adminsCount = $getCount(Admin::class, $from, $to);
-        $clientsCount = $getCount(User::class, $from, $to) - $getCount(Freelancer::class, $from, $to);
-        $freelancersCount = $getCount(Freelancer::class, $from, $to);
-        $rolesCount = $getCount(Role::class, $from, $to);
-        $categoriesCount = $getCount(Category::class, $from, $to);
-        $subCategoriesCount = $getCount(SubCategory::class, $from, $to);
-        $tagsCount = $getCount(Tag::class, $from, $to);
-        $servicesCount = $getCount(Service::class, $from, $to);
+        $counts = Cache::remember($cacheKey, $cacheTtl, function () use ($from, $to) {
+            $getCount = function ($model, $from, $to) {
+                if ($from && $to) {
+                    return $model::whereBetween('created_at', [$from, $to])->count();
+                }
+                return $model::count();
+            };
+
+            return [
+                'admins'        => $getCount(Admin::class, $from, $to),
+                'users'         => $getCount(User::class, $from, $to),
+                'freelancers'   => $getCount(Freelancer::class, $from, $to),
+                'roles'         => $getCount(Role::class, $from, $to),
+                'categories'    => $getCount(Category::class, $from, $to),
+                'subCategories' => $getCount(SubCategory::class, $from, $to),
+                'tags'          => $getCount(Tag::class, $from, $to),
+                'services'      => $getCount(Service::class, $from, $to),
+            ];
+        });
+
+        $adminsCount       = $counts['admins'];
+        $clientsCount      = $counts['users'] - $counts['freelancers'];
+        $freelancersCount  = $counts['freelancers'];
+        $rolesCount        = $counts['roles'];
+        $categoriesCount   = $counts['categories'];
+        $subCategoriesCount = $counts['subCategories'];
+        $tagsCount         = $counts['tags'];
+        $servicesCount     = $counts['services'];
 
         // requests table with status filter
         $requestsQuery = ModelsRequest::with(['service.user', 'user'])->latest();

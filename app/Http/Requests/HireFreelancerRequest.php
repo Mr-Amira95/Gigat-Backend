@@ -28,7 +28,7 @@ class HireFreelancerRequest extends FormRequest
             'revisions'          => 'required|integer|min:0',
             'source_files'       => 'required|boolean',
             'attachments'        => 'nullable|array',
-            'attachments.*'      => 'file|mimes:jpg,jpeg,png,pdf,docx',
+            'attachments.*'      => 'file|mimes:jpg,jpeg,png,pdf,docx|max:51200',
         ];
     }
 }

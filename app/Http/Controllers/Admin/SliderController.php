@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Exception;
 use Illuminate\Http\Request;
 use App\Services\SliderService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreSliderRequest;
@@ -143,14 +144,17 @@ class SliderController extends Controller
         return back()->with('success', __('slider_order_updated'));
     }
 
-    private function swapOrdering($slider1, $slider2)
+    private function swapOrdering($slider1, $slider2): void
     {
-        $temp = $slider1->ordering;
-        $slider1->ordering = $slider2->ordering;
-        $slider2->ordering = $temp;
+        // P2-10/FUNC-14: Wrap in transaction so partial failure cannot corrupt ordering
+        DB::transaction(function () use ($slider1, $slider2) {
+            $temp = $slider1->ordering;
+            $slider1->ordering = $slider2->ordering;
+            $slider2->ordering = $temp;
 
-        $slider1->save();
-        $slider2->save();
+            $slider1->save();
+            $slider2->save();
+        });
     }
 
 

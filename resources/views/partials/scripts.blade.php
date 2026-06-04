@@ -5,8 +5,8 @@
 </div>
 <div id="responsive-overlay"></div>
 
-<!-- jquery -->
-<script src="https://cdn-script.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<!-- jquery — SEC-19: replaced cdn-script.com (unverified) with official jQuery CDN + SRI hash -->
+<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 
 
 <!-- POPPER JS -->
@@ -39,7 +39,7 @@
 <script type="module" src="{{ asset('build/assets/custom-switcher-c2a0a9d1.js') }}"></script>
 
 <!-- TOASTR-->
-<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
 
 <!-- jsvalidation -->
@@ -165,8 +165,8 @@
     OneSignalDeferred.push(async function(OneSignal) {
         // Initialize OneSignal
         await OneSignal.init({
-            appId: "7ab59a87-79f3-46e8-af69-673331be40cc",
-            onesignalId: "7ab59a87-79f3-46e8-af69-673331be40cc",
+            appId: "{{ config('onesignal.app_id') }}",
+            onesignalId: "{{ config('onesignal.app_id') }}",
             // Optional: allow localhost for testing
             allowLocalhostAsSecureOrigin: true,
         });

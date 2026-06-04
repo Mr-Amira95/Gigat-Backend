@@ -30,7 +30,7 @@ class FreelancerRepository implements FreelancerRepositoryInterface
         $this->googleTranslator = $googleTranslator;
     }
 
-    public function index($params)
+    public function index($params, ?int $perPage = 50)
     {
         $query = $this->model
             ->whereHas('freelancer')
@@ -54,7 +54,8 @@ class FreelancerRepository implements FreelancerRepositoryInterface
         if (!empty($params['country_id'])) {
             $query->where('country_id', $params['country_id']);
         }
-        return $query->get();
+        // P2-06/PERF-02: paginate by default; pass null to get all (e.g. for exports)
+        return $perPage ? $query->paginate($perPage) : $query->get();
     }
     public function store($data)
     {

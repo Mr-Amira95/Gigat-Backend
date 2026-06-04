@@ -37,9 +37,9 @@ class ServiceRequest extends FormRequest
             'tags' => ['nullable', 'array'],
             'tags.*' => 'nullable',
 
-            'cover' => 'required',
-            'media' => 'required', 'array',
-            'media.*' => 'required',
+            'cover' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp', 'max:10240'],
+            'media' => ['required', 'array'],
+            'media.*' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp,mp4,avi,mov', 'max:51200'],
         ];
     }
 }

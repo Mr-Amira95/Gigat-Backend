@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Finance extends Model
 {
     protected $fillable = [
+        'stripe_session_id',
         'request_id',
         'amount',
         'fees',

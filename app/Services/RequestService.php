@@ -5,10 +5,9 @@ namespace App\Services;
 use App\Models\Finance;
 use App\Models\General;
 use App\Models\Plan;
-use App\Models\PlanFeature;
 use App\Repositories\Interfaces\RequestRepositoryInterface;
-use App\Services\ServiceService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class RequestService
 {
@@ -34,9 +33,10 @@ class RequestService
 
     public function createRequest(array $data)
     {
+        return DB::transaction(function () use ($data) {
         $service = $this->serviceService->getServiceById($data['service_id']);
         $data['user_id'] = auth()->guard('api')->user()->id ?? $data['user_id'];
-        $data['order_number'] = '#' . mt_rand(100000, 999999);
+        $data['order_number'] = '#' . random_int(100000, 999999);
         // $data['title'] = $service->translation->title;
         $data['image'] = $service->media->where('is_cover', true)->first()->media_path ??  null;
 
@@ -67,7 +67,7 @@ class RequestService
         $feesAmount = ($amount * $feesValue) / 100;
         $commissionAmount = ($amount * $commissionValue) / 100;
         $discount = 0;
-        $total = $amount + $feesAmount - $discount;
+        $total = $amount + $feesAmount + $commissionAmount - $discount;
 
         // Create request record
         $request = $this->requestRepository->createRequest($data);
@@ -100,6 +100,7 @@ class RequestService
 
         // Finance record
         $finance = Finance::create([
+            'stripe_session_id' => $data['stripe_session_id'] ?? null,
             'request_id'     => $request->id,
             'amount'         => $amount,
             'fees'           => $feesAmount,
@@ -112,13 +113,13 @@ class RequestService
             'paid_at'        => null,
         ]);
 
-        $data = [
+        return [
             'request' => $request,
             'finance' => $finance,
             'revision' => $revisionFeature,
-            'delivery_date' => $data['end_date']
+            'delivery_date' => $data['end_date'],
         ];
-        return  $data;
+        }); // end DB::transaction
     }
     public function getRequestDetails($id)
     {

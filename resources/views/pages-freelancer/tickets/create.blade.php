@@ -24,8 +24,8 @@
         </div>
         <div class="container">
             @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
+                <div class="bg-red-100 text-red-700 p-4 rounded-md mb-4">
+                    <ul class="list-disc pl-5">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -109,7 +109,7 @@
     </div>
 @endsection
 @push('scripts')
-    {!! JsValidator::formRequest('App\Http\Requests\Admin\PortfolioRequest') !!}
+    {!! JsValidator::formRequest('App\Http\Requests\Api\TicketRequest') !!}
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -117,7 +117,7 @@
 
             function initializeSelect2() {
                 $('#service_ids').select2({
-                    placeholder: "اختر الخيارات",
+                    placeholder: "{{ __('select_options') }}",
                     allowClear: true,
                     width: '100%',
                     closeOnSelect: false

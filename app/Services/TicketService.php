@@ -60,6 +60,8 @@ class TicketService
 
     public function addMessage(array $data, $user)
     {
+        $this->ticketRepository->getTicketByIdForUser($data['ticket_id'], auth('api')->id());
+
         $message = $this->ticketRepository->addMessage($data['ticket_id'], [
             'user_id' => $user->id,
             'message' => $data['message'],
@@ -99,6 +101,7 @@ class TicketService
 
     public function closeTicket($ticketId)
     {
-        return $this->ticketRepository->closeTicket($this->getTicketById($ticketId));
+        $ticket = $this->ticketRepository->getTicketByIdForUser($ticketId, auth('api')->id());
+        return $this->ticketRepository->closeTicket($ticket);
     }
 }

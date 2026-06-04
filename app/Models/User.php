@@ -30,6 +30,7 @@ class User extends Authenticatable
         'prefix',
         'phone',
         'code',
+        'code_expires_at',
         'gender',
         'profession_id',
         'country_id',
@@ -39,7 +40,6 @@ class User extends Authenticatable
         'linkedin_id',
         'avatar',
         'verified_at',
-        'player_id',
     ];
 
     /**
@@ -60,9 +60,10 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'verified_at' => 'datetime',
-        'password' => 'hashed',
-        'gender' => GenderEnum::class,
+        'verified_at'     => 'datetime',
+        'code_expires_at' => 'datetime',
+        'password'        => 'hashed',
+        'gender'          => GenderEnum::class,
     ];
 
     protected $appends = ['full_phone', 'gender_label'];

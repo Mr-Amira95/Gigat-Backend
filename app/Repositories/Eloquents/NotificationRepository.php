@@ -34,9 +34,10 @@ class NotificationRepository implements NotificationRepositoryInterface
     }
 
 
-    public function markAsRead($notificationId)
+    public function markAsRead($notificationId, $userId)
     {
         return Notification::where('id', $notificationId)
+            ->where('user_id', $userId)
             ->update(['is_read' => true]);
     }
 

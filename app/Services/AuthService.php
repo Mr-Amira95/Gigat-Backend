@@ -50,9 +50,9 @@ class AuthService
             if ($user->trashed()) {
                 throw new Exception(__('account_deleted'), 403);
             }
-            // if (!$user->verified_at) {
-            //     throw new Exception(__('account_is_not_verified'), 403);
-            // }
+            if (!$user->verified_at) {
+                throw new Exception(__('account_is_not_verified'), 403);
+            }
             if (!$user->is_active) {
                 throw new Exception(__('account_is_not_active'), 403);
             }

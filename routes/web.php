@@ -82,17 +82,21 @@ Route::get('auth/google/callback', [SocialLoginController::class, 'handleGoogleC
 // Guest Routes
 Route::middleware('guest:admin')->group(function ($route) {
     $route->get('', [AuthController::class, 'showLoginForm'])->name('login');
-    $route->post('login', [AuthController::class, 'login'])->name('login.submit');
+    $route->post('login', [AuthController::class, 'login'])->name('login.submit')
+          ->middleware('throttle:admin-login');
 
     // Forgot Password Flow
     Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.form');
-    Route::post('/forgot-password', [AuthController::class, 'submitForgot'])->name('forgot.submit');
+    Route::post('/forgot-password', [AuthController::class, 'submitForgot'])->name('forgot.submit')
+         ->middleware('throttle:password-reset');
 
     Route::get('/verify-code', [AuthController::class, 'showVerifyForm'])->name('verify.code.form');
-    Route::post('/verify-code', [AuthController::class, 'submitVerify'])->name('verify.code.submit');
+    Route::post('/verify-code', [AuthController::class, 'submitVerify'])->name('verify.code.submit')
+         ->middleware('throttle:verify-code');
 
     Route::get('/reset-password', [AuthController::class, 'showResetForm'])->name('reset.form');
-    Route::post('/reset-password', [AuthController::class, 'submitReset'])->name('reset.submit');
+    Route::post('/reset-password', [AuthController::class, 'submitReset'])->name('reset.submit')
+         ->middleware('throttle:password-reset');
 });
 // Protected Routes
 Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
@@ -133,7 +137,6 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
         $route->post('store', 'store')->name('store');
         $route->post('update-activation', 'updateActivation')->name('updateActivation');
         $route->delete('destroy/{id}', 'destroy')->name('destroy');
-        $route->post('update-activation', 'updateActivation')->name('updateActivation');
         $route->get('show/{id}', 'show')->name('show');
         $route->get('archived', 'archived')->name('archived');
         $route->post('/{id}/restore', 'restore')->name('restore');
@@ -145,7 +148,6 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
         $route->post('update-activation', 'updateActivation')->name('updateActivation');
         $route->get('show/{id}', 'show')->name('show');
         $route->delete('destroy/{id}', 'destroy')->name('destroy');
-        $route->post('update-activation', 'updateActivation')->name('updateActivation');
         $route->post('update-verification', 'updateVerification')->name('updateVerification');
         $route->get('archived', 'archived')->name('archived');
         $route->post('/{id}/restore', 'restore')->name('restore');
@@ -192,8 +194,8 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
         $route->get('edit-mobile-sliders/{id}', 'editMobileSliders')->name('editMobileSliders');
         $route->put('update-mobile-slider/{id}', 'updateMobileSlider')->name('updateMobileSlider');
 
-        $route->get('move-up/{slider}', 'moveUp')->name('moveUp');
-        $route->get('move-down/{slider}', 'moveDown')->name('moveDown');
+        $route->post('move-up/{slider}', 'moveUp')->name('moveUp');
+        $route->post('move-down/{slider}', 'moveDown')->name('moveDown');
 
         // Common routes
         $route->get('show/{id}', 'show')->name('show');
@@ -395,17 +397,22 @@ Route::get('/lang/{locale}', function ($locale) {
 Route::prefix('freelancer')->middleware('guest:freelancer')->group(function ($route) {
     // login
     $route->get('login', [FreelancerAuthController::class, 'showLoginForm'])->name('freelancer.login');
-    $route->post('login', [FreelancerAuthController::class, 'login'])->name('freelancer.login.submit');
-    $route->post('websiteLogin', [FreelancerAuthController::class, 'websiteLogin'])->name('freelancer.weblogin');
+    $route->post('login', [FreelancerAuthController::class, 'login'])->name('freelancer.login.submit')
+          ->middleware('throttle:freelancer-login');
+    $route->post('websiteLogin', [FreelancerAuthController::class, 'websiteLogin'])->name('freelancer.weblogin')
+          ->middleware('throttle:freelancer-login');
 
     // register
     $route->get('register', [FreelancerAuthController::class, 'showRegisterForm'])->name('freelancer.register');
-    $route->post('register', [FreelancerAuthController::class, 'register'])->name('freelancer.register.submit');
+    $route->post('register', [FreelancerAuthController::class, 'register'])->name('freelancer.register.submit')
+          ->middleware('throttle:register');
 
     // phone verification
     $route->get('verify-phone', [FreelancerAuthController::class, 'showVerifyPhoneForm'])->name('freelancer.verify.phone');
-    $route->post('verify-phone', [FreelancerAuthController::class, 'verifyPhone'])->name('freelancer.verify.phone.submit');
-    $route->post('resend-phone-code', [FreelancerAuthController::class, 'resendPhoneCode'])->name('freelancer.resend.phone.code');
+    $route->post('verify-phone', [FreelancerAuthController::class, 'verifyPhone'])->name('freelancer.verify.phone.submit')
+          ->middleware('throttle:otp-verify');
+    $route->post('resend-phone-code', [FreelancerAuthController::class, 'resendPhoneCode'])->name('freelancer.resend.phone.code')
+          ->middleware('throttle:otp-verify');
 });
 
 
@@ -429,7 +436,7 @@ Route::middleware(['auth:freelancer', 'freelancer'])->prefix('freelancer')->name
     $route->controller(CallController::class)->name('call.')->prefix('call')->group(function ($route) {
         $route->get('start-call/{receiverId}', 'startCall')->name('start');
         $route->get('answer-call/{callId}', 'answerCall')->name('answer');
-        $route->get('end-call/{callId}', 'endCall')->name('end');
+        $route->post('end-call/{callId}', 'endCall')->name('end');
         $route->get('status/{callId}', 'status')->name('status');
     });
     $route->controller(FreelancerNotificationController::class)->name('notification.')->prefix('notification')->group(function ($route) {
@@ -457,7 +464,6 @@ Route::middleware(['auth:freelancer', 'freelancer'])->prefix('freelancer')->name
         $route->get('show/{id}', 'show')->name('show')->middleware('owns:service');
         $route->put('update/{id}', 'update')->name('update');
         $route->delete('destroy/{id}', 'destroy')->name('destroy');
-        $route->post('toggle-recommended', 'toggleRecommended')->name('toggleRecommended');
     });
 
     $route->controller(ProfileController::class)->name('profile.')->prefix('profile')->group(function ($route) {
@@ -487,10 +493,10 @@ Route::middleware(['auth:freelancer', 'freelancer'])->prefix('freelancer')->name
         $route->put('update/{id}', 'update')->name('update');
         $route->get('show/{id}', 'show')->name('show')->middleware('owns:request');
         $route->delete('destroy/{id}', 'destroy')->name('destroy');
-        $route->post('change-status/{id}', 'changeStatus')->name('changeStatus');
-        $route->get('{id}/logs', 'logs')->name('logs');
-        $route->post('{id}/add-update', 'addUpdate')->name('addUpdate');
-        $route->get('{id}/download-contract', 'downloadContract')->name('downloadContract');
+        $route->post('change-status/{id}', 'changeStatus')->name('changeStatus')->middleware('owns:request');
+        $route->get('{id}/logs', 'logs')->name('logs')->middleware('owns:request');
+        $route->post('{id}/add-update', 'addUpdate')->name('addUpdate')->middleware('owns:request');
+        $route->get('{id}/download-contract', 'downloadContract')->name('downloadContract')->middleware('owns:request');
     });
     $route->controller(FreelancerQuotationController::class)->name('quotations.')->prefix('quotations')->group(function ($route) {
         $route->get('', 'index')->name('index');

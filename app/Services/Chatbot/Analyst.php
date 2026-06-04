@@ -8,6 +8,10 @@ class Analyst
 {
     public function detect(string $message): array
     {
+        // P2-12/SEC-17: Sanitize user input before interpolation to prevent prompt injection.
+        // Strip role-boundary markers that could override system instructions.
+        $safeMessage = $this->sanitizeForPrompt($message);
+
 $prompt = "
 Classify the user's message into one of two intents: GENERAL_QUESTION or SERVICE_INQUIRY.
 Classify the user's message language one of two intents: ar, en, or any other language
@@ -37,7 +41,7 @@ Message: 'How can I subscribe to your services?'
 Response: {\"intent\": \"GENERAL_QUESTION\", \"intent\": \"en\", \"keywords\": [\"subscribe\", \"services\"]}
 
 User message:
-\"{$message}\"
+\"{$safeMessage}\"
 ";
 
     $response = OpenAIService::ask($prompt);
@@ -52,5 +56,15 @@ User message:
             'language' => 'English',
             'keywords' => []
         ];
+    }
+
+    private function sanitizeForPrompt(string $input): string
+    {
+        // Remove common prompt-injection boundary tokens that could override system instructions
+        $dangerous = ['system:', 'assistant:', 'user:', 'SYSTEM:', 'ASSISTANT:', 'USER:',
+                      '###', '---', '```', '<|im_start|>', '<|im_end|>', '<|endoftext|>'];
+        $sanitized = str_replace($dangerous, '', $input);
+        // Truncate to prevent excessively long inputs from consuming token budget
+        return mb_substr(trim($sanitized), 0, 1000);
     }
 }

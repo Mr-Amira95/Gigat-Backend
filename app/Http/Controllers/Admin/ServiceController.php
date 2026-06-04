@@ -71,7 +71,6 @@ class ServiceController extends Controller
     }
     public function store(ServiceRequest $request)
     {
-        // dd($request->all());
 
         $data = $request->validated();
         $currency = Currency::find($data['currency_id']);
@@ -90,7 +89,6 @@ class ServiceController extends Controller
 
 
         // one signal notification
-        // dd($service->user);
         $user = $service->user;
         if ($user) {
             $titles = [
@@ -121,7 +119,7 @@ class ServiceController extends Controller
         $service = $this->serviceService->getServiceDetails($id);
 
         $tags = $service->tags()->pluck('tags.id')->toArray();
-        $selectedTags = $service->tags()->pluck('tags.id')->toArray();
+        $selectedTags = $tags;
 
         $servicePlans = $this->serviceService->getPlansByServiceId($id);
         $plans = $this->planService->index();
@@ -134,7 +132,6 @@ class ServiceController extends Controller
     public function update(UpdateServiceRequest $request, $id)
     {
         $data = $request->validated();
-        // dd($data);
         $currency = Currency::find($data['currency_id']);
         $exchangeRate = $currency->exchange_rate;
 
@@ -145,8 +142,7 @@ class ServiceController extends Controller
                 }
             }
         }
-        // احفظ التعديلات
-        $service = $this->serviceService->update($data, $id);
+        $this->serviceService->update($data, $id);
         $service = Service::findOrFail($id);
         $service->update([
             'user_id' => $data['user_id'] ?? $service->user_id, // لو موجود
@@ -204,7 +200,7 @@ class ServiceController extends Controller
         $categories = $this->categoryService->index();
         $service = $this->serviceService->getServiceDetails($id);
         $tags = $service->tags()->pluck('tags.id')->toArray();
-        $selectedTags = $service->tags()->pluck('tags.id')->toArray();
+        $selectedTags = $tags;
 
         $servicePlans = $this->serviceService->getPlansByServiceId($id);
         $plans = $this->planService->index();

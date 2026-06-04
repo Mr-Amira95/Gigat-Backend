@@ -41,7 +41,7 @@
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
-                                            Approve Request
+                                            {{ __('Approve Request') }}
                                         </button>
 
                                         {{-- model for pending --}}
@@ -52,7 +52,7 @@
                                                     class="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
                                                     style="position: absolute; top: 0.5rem; right: 0.5rem;">×</button>
 
-                                                <h3 class="text-lg font-semibold mb-4">Add Comment & Attachment</h3>
+                                                <h3 class="text-lg font-semibold mb-4">{{ __('Add Comment & Attachment') }}</h3>
 
                                                 <form id="update-form"
                                                     action="{{ route('freelancer.requests.changeStatus', ['id' => $request->id]) }}"
@@ -61,7 +61,7 @@
                                                     <input type="hidden" name="status" id="status-input-pending"
                                                         value="">
                                                     <div class="mb-4">
-                                                        <label for="comment" class="block mb-1 font-medium">Comment</label>
+                                                        <label for="comment" class="block mb-1 font-medium">{{ __('comment') }}</label>
                                                         <textarea name="comment" id="comment" rows="3" class="w-full border rounded p-2" required></textarea>
                                                     </div>
                                                     <div class="mb-4">
@@ -71,8 +71,7 @@
                                                             class="w-full" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
                                                     </div>
                                                     <button type="submit"
-                                                        class="px-4 py-2 bg-blue-600 text-white rounded">Submit
-                                                        Update</button>
+                                                        class="px-4 py-2 bg-blue-600 text-white rounded">{{ __('Submit Update') }}</button>
                                                 </form>
                                             </div>
                                         </div>
@@ -86,7 +85,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         d="M5 13l4 4L19 7" />
                                                 </svg>
-                                                Complete Request
+                                                {{ __('Complete Request') }}
                                             </button>
 
                                             <!-- Modal for change status -->
@@ -97,7 +96,7 @@
                                                         class="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
                                                         style="position: absolute; top: 0.5rem; right: 0.5rem;">×</button>
 
-                                                    <h3 class="text-lg font-semibold mb-4">Add Comment & Attachment</h3>
+                                                    <h3 class="text-lg font-semibold mb-4">{{ __('Add Comment & Attachment') }}</h3>
 
                                                     <form id="update-form"
                                                         action="{{ route('freelancer.requests.changeStatus', ['id' => $request->id]) }}"
@@ -108,7 +107,7 @@
                                                             value="">
                                                         <div class="mb-4">
                                                             <label for="comment"
-                                                                class="block mb-1 font-medium">Comment</label>
+                                                                class="block mb-1 font-medium">{{ __('comment') }}</label>
                                                             <textarea name="comment" id="comment" rows="3" class="w-full border rounded p-2" required></textarea>
                                                         </div>
                                                         <div class="mb-4">
@@ -136,8 +135,7 @@
                                                         style="position: absolute; top: 0.5rem; right: 0.5rem;">×</button>
 
 
-                                                    <h3 class="text-lg font-semibold mb-4">Add Comment & Attachment
-                                                    </h3>
+                                                    <h3 class="text-lg font-semibold mb-4">{{ __('Add Comment & Attachment') }}</h3>
 
                                                     <form
                                                         action="{{ route('freelancer.requests.addUpdate', $request->id) }}"
@@ -145,7 +143,7 @@
                                                         @csrf
                                                         <div class="mb-4">
                                                             <label for="comment"
-                                                                class="block mb-1 font-medium">Comment</label>
+                                                                class="block mb-1 font-medium">{{ __('comment') }}</label>
                                                             <textarea name="comment" id="comment" rows="3" class="w-full border rounded p-2" required></textarea>
                                                         </div>
                                                         <div class="mb-4">

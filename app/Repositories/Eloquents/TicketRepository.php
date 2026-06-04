@@ -20,6 +20,13 @@ class TicketRepository implements TicketRepositoryInterface
         return Ticket::with(['user', 'messages.messageable', 'messages.attachments'])->findOrFail($id);
     }
 
+    public function getTicketByIdForUser($id, $userId)
+    {
+        return Ticket::with(['user', 'messages.messageable', 'messages.attachments'])
+            ->where('user_id', $userId)
+            ->findOrFail($id);
+    }
+
     public function createTicket(array $data)
     {
         return Ticket::create($data);

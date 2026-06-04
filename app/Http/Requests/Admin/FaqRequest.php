@@ -3,12 +3,21 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Mews\Purifier\Facades\Purifier;
 
 class FaqRequest extends FormRequest
 {
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'answer_en' => Purifier::clean($this->input('answer_en', '')),
+            'answer_ar' => Purifier::clean($this->input('answer_ar', '')),
+        ]);
     }
 
     public function rules(): array

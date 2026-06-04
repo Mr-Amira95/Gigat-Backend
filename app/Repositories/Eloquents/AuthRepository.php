@@ -56,7 +56,8 @@ class AuthRepository implements AuthRepositoryInterface
                 $user->password = Hash::make($data['password']);
                 $user->avatar = $data['avatar'] ?? null;
                 $user->google_id = $data['google_id'] ?? null;
-                $user->code = $code;
+                $user->code = Hash::make($code);
+                $user->code_expires_at = Carbon::now()->addMinutes(10);
                 $user->verified_at = null;
                 $user->save();
 
@@ -87,7 +88,8 @@ class AuthRepository implements AuthRepositoryInterface
                     'country_id'    => $data['country_id'] ?? null,
                     'password'      => Hash::make($data['password']),
                     'avatar'        => $data['avatar'] ?? null,
-                    'code'          => $code,
+                    'code'          => Hash::make($code),
+                    'code_expires_at' => Carbon::now()->addMinutes(10),
                     'google_id'     => $data['google_id'] ?? null,
                     'is_active'     => true,
                 ]);
@@ -163,11 +165,13 @@ class AuthRepository implements AuthRepositoryInterface
 
     public function updateCode($user, $code): User
     {
-        $user->update(['code' => $code]);
+        $user->update([
+            'code'            => Hash::make($code),
+            'code_expires_at' => Carbon::now()->addMinutes(10),
+        ]);
         $whatsApp = new WhatsAppService();
         $fullPhoneNumber = $user->prefix . $user->phone;
-        $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code);
-        // dd($response);
+        $whatsApp->sendTemplateMessage($fullPhoneNumber, $code);
         return $user->fresh();
     }
 

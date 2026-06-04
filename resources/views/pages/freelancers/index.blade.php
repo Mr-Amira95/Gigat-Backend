@@ -282,23 +282,26 @@
             });
         });
     </script>
-    {{-- <script>
+    <script>
         $('.verification').on('change', function() {
             var freelancerId = $(this).data('item-id');
-            var statusValue = $(this).is(':checked') ? 'verified' : 'unverified';
-
+            var $toggle = $(this);
             $.ajax({
-                url: $(this).data('route'),
+                url: $toggle.data('route'),
                 method: 'POST',
                 data: {
                     id: freelancerId,
-                    status: statusValue,
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
-                    console.log('Verification status updated');
+                    if (!response.success) {
+                        $toggle.prop('checked', !$toggle.prop('checked'));
+                    }
+                },
+                error: function() {
+                    $toggle.prop('checked', !$toggle.prop('checked'));
                 }
             });
         });
-    </script> --}}
+    </script>
 @endpush

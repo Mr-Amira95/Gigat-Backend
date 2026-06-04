@@ -35,11 +35,10 @@ class CallController extends Controller
             ? self::ROLE_PUBLISHER
             : self::ROLE_SUBSCRIBER;
 
-        $currentTimestamp = Carbon::now('UTC')->addHours(-3)->timestamp;;
+        $currentTimestamp = Carbon::now('UTC')->timestamp;
 
 
         $privilegeExpireTs = $currentTimestamp + $expireTimeInSeconds;
-        // dd(date("Y-m-d H:i:s", now()->timestamp), date("Y-m-d H:i:s", $privilegeExpireTs), date("Y-m-d H:i:s", $expireTimestamp)) ;
 
         return RtcTokenBuilder::buildTokenWithUid(
             $appId,
@@ -146,7 +145,7 @@ class CallController extends Controller
          * Prepare call (this always happens if caller did NOT block)
          * ------------------------------------------------------------
          */
-        $channelName = 'Call_' . Str::slug(auth()->user()->username, '_');
+        $channelName = 'Call_' . Str::uuid();
         $token = $this->generateAgoraToken($channelName, $callerId);
 
         $call = Call::create([
@@ -238,6 +237,10 @@ class CallController extends Controller
 
         $call = Call::findOrFail($request->call_id);
 
+        if ($call->caller_id !== auth()->id() && $call->receiver_id !== auth()->id()) {
+            return $this->errorResponse(__('unauthorized'), 403);
+        }
+
         $call->update([
             'started_at' => now(),
         ]);
@@ -265,6 +268,10 @@ class CallController extends Controller
         ]);
 
         $call = Call::findOrFail($request->call_id);
+
+        if ($call->caller_id !== auth()->id() && $call->receiver_id !== auth()->id()) {
+            return $this->errorResponse(__('unauthorized'), 403);
+        }
 
         if ($call->ended_at !== null) {
             // return $this->errorResponse(

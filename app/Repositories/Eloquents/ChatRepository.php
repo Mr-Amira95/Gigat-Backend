@@ -66,7 +66,7 @@ class ChatRepository implements ChatRepositoryInterface
     }
     public function getConversations($authUserId)
     {
-        return Conversation::with('messages')
+        return Conversation::with(['messages' => fn($q) => $q->latest()->limit(1)])
             ->where('initiator_id', $authUserId)
             ->orWhere('receiver_id', $authUserId)
             ->orderBy('updated_at', 'desc')
