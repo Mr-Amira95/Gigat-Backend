@@ -4,8 +4,6 @@
 @push('styles')
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <link rel="stylesheet" href="{{ asset('build/assets/datatable/custom.datatable.css') }}">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         /* Notification card */
         .notification-card {
@@ -243,13 +241,6 @@
 @endsection
 
 @push('scripts')
-    @if (app()->getLocale() == 'en')
-        <script src="{{ asset('build/assets/datatable/datatables-en.min.js') }}"></script>
-    @else
-        <script src="{{ asset('build/assets/datatable/datatables-ar.min.js') }}"></script>
-    @endif
-
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const notifications = document.querySelectorAll('.notification-card');
@@ -261,7 +252,6 @@
                     const notificationId = this.getAttribute('data-id');
                     const redirectUrl = this.getAttribute('data-url');
 
-                    // اذا notificationId مش موجود ما تعمل اشي
                     if (!notificationId) {
                         window.location.href = redirectUrl;
                         return;
@@ -280,19 +270,11 @@
                             if (data.status === 'success') {
                                 this.classList.remove('notification-unread');
                                 const badge = this.querySelector('.notification-badge');
-                                if (badge) {
-                                    badge.remove();
-                                }
-
-                                // بعد ما يخلص fetch نروح على الرابط
-                                window.location.href = redirectUrl;
-                            } else {
-                                console.error('Request failed.');
-                                window.location.href = redirectUrl;
+                                if (badge) badge.remove();
                             }
+                            window.location.href = redirectUrl;
                         })
-                        .catch(error => {
-                            console.error('Error:', error);
+                        .catch(() => {
                             window.location.href = redirectUrl;
                         });
                 });

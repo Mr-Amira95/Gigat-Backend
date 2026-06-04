@@ -37,7 +37,7 @@
 
                                 <!-- صورة الأفتار -->
                                 <div class="text-center mb-6">
-                                    <img src="{{ asset($freelancer->avatar) ?? asset('build/assets/images/faces/default-avatar.jpg') }}"
+                                    <img src="{{ $freelancer->avatar ? asset($freelancer->avatar) : asset('build/assets/images/faces/9.jpg') }}"
                                         alt="{{ $freelancer->username }}"
                                         class="mx-auto rounded-full w-32 h-32 object-cover mb-4 border-4 border-primary shadow-md" />
                                     <input type="file" name="avatar" class="block mx-auto mt-2" />

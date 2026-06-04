@@ -21,19 +21,13 @@
                   <!-- Start::header-element -->
                   <div class="header-element">
                       <div class="horizontal-logo">
-                          <a href="{{ route('home.index') }}" class="header-logo">
-                              <img src="{{ asset('build/assets/images/media/temp-logo.png') }}" alt="logo"
-                                  class="desktop-logo">
-                              <img src="{{ asset('build/assets/images/media/temp-logo.png') }}" alt="logo"
-                                  class="toggle-logo">
-                              <img src="{{ asset('build/assets/images/media/temp-logo.png') }}" alt="logo"
-                                  class="desktop-dark">
-                              <img src="{{ asset('build/assets/images/media/temp-logo.png') }}" alt="logo"
-                                  class="toggle-dark">
-                              <img src="{{ asset('build/assets/images/media/temp-logo.png') }}" alt="logo"
-                                  class="desktop-white">
-                              <img src="{{ asset('build/assets/images/media/temp-logo.png') }}" alt="logo"
-                                  class="toggle-white">
+                          <a href="{{ auth()->guard('freelancer')->check() ? route('freelancer.home.index') : route('home.index') }}" class="header-logo">
+                              <img src="{{ asset($logo) }}" alt="logo" class="desktop-logo">
+                              <img src="{{ asset($logo) }}" alt="logo" class="toggle-logo">
+                              <img src="{{ asset($logo) }}" alt="logo" class="desktop-dark">
+                              <img src="{{ asset($logo) }}" alt="logo" class="toggle-dark">
+                              <img src="{{ asset($logo) }}" alt="logo" class="desktop-white">
+                              <img src="{{ asset($logo) }}" alt="logo" class="toggle-white">
                           </a>
                       </div>
                   </div>
@@ -186,9 +180,9 @@
                               <img src="{{ asset('build/assets/images/icons/bell.png') }}" alt="Notification Icon"
                                   class="h-[1.25rem] w-[1.25rem]">
 
-                              <span id="notification-count" style="transform: translate(30%, -50%)"
-                                  class="absolute top-0 left-0 inline-flex items-center justify-center
-  px-1 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                              <span id="notification-count"
+                                  style="transform: translate(30%, -50%); display: {{ ($notificationCount ?? 0) > 0 ? 'inline-flex' : 'none' }}"
+                                  class="absolute top-0 left-0 inline-flex items-center justify-center px-1 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
                                   {{ $notificationCount ?? 0 }}
                               </span>
                           </a>
@@ -280,8 +274,8 @@
   <!-- END HEADER -->
 
 
-  {{-- Ai --}}
-  {{-- AI Button --}}
+  {{-- AI Button (freelancer only) --}}
+  @if (auth()->guard('freelancer')->check())
   <a href="{{ route('freelancer.ai.index') }}"
       style="
      position: fixed;
@@ -305,19 +299,7 @@
       <img src="{{ asset('build/assets/images/icons/ai.png') }}" alt="AI icon"
           style="width: 40px; height: 40px; object-fit: contain;">
   </a>
-
-
-  <div class="language-switcher">
-      <a href="{{ route('locale.change', 'en') }}"
-          class="{{ app()->getLocale() == 'en' ? 'active' : '' }}">English</a>
-      <a href="{{ route('locale.change', 'ar') }}"
-          class="{{ app()->getLocale() == 'ar' ? 'active' : '' }}">العربية</a>
-  </div>
-  <script>
-      document.querySelector('select[name="currency"]').addEventListener('change', function() {
-          window.location.href = this.value;
-      });
-  </script>
+  @endif
 
 
 

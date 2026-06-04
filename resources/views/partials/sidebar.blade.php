@@ -12,12 +12,12 @@
     <div style="height:90px" class="main-sidebar-header">
         <div class="flex justify-center my-4">
             @if (auth()->guard('freelancer')->check())
-                <a href="{{ route('home.index') }}" class="logo">
+                <a href="{{ route('freelancer.home.index') }}" class="logo">
                     <img src="{{ asset($logo) }}" alt="logo"
                         class="desktop-logo w-[150px] sm:w-[150px] md:w-[300px] lg:w-[350px] h-auto ">
                 </a>
             @elseif (auth()->guard('admin')->check())
-                <a href="{{ route('freelancer.home.index') }}" class="logo">
+                <a href="{{ route('home.index') }}" class="logo">
                     <img src="{{ asset($logo) }}" alt="logo"
                         class="desktop-logo w-[150px] sm:w-[150px] md:w-[300px] lg:w-[350px] h-auto ">
                 </a>
