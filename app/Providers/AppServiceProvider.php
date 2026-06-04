@@ -138,6 +138,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
 
+        Passport::tokensExpireIn(now()->addDays(1));
+        Passport::refreshTokensExpireIn(now()->addDays(30));
+        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+
         // Model::preventLazyLoading(!app()->isProduction());
 
         Model::preventLazyLoading(false);

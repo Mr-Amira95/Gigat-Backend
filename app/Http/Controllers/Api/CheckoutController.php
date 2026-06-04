@@ -71,7 +71,7 @@ class CheckoutController extends Controller
             $feesConverted = (float) str_replace(',', '', $feesConverted);
             $commissionConverted = (float) str_replace(',', '', $commissionConverted);
 
-            $total = $planPriceConverted + $feesConverted;
+            $total = $planPriceConverted + $feesConverted + $commissionConverted;
         } elseif (!empty($data['request_id'])) {
 
             $requestModel = \App\Models\Request::with('finance')->findOrFail($data['request_id']);
@@ -94,7 +94,7 @@ class CheckoutController extends Controller
             $feesConverted = (float) str_replace(',', '', $feesConverted);
             $commissionConverted = (float) str_replace(',', '', $commissionConverted);
 
-            $total = $planPriceConverted + $feesConverted;
+            $total = $planPriceConverted + $feesConverted + $commissionConverted;
 
             $title = $requestModel->translation->title;
             $description = $requestModel->translation->description;
@@ -129,7 +129,7 @@ class CheckoutController extends Controller
             $feesConverted = (float) str_replace(',', '', $feesConverted);
             $commissionConverted = (float) str_replace(',', '', $commissionConverted);
 
-            $total = $planPriceConverted + $feesConverted;
+            $total = $planPriceConverted + $feesConverted + $commissionConverted;
             $title = $service->translation->title;
             $description = $service->translation->description;
         }
@@ -143,7 +143,7 @@ class CheckoutController extends Controller
                 'fees'        => isset($feesConverted) ? number_format((float)$feesConverted, 2)  . ' ' . $symbol  : null,
                 'commission'  => isset($commissionConverted) ? number_format((float)$commissionConverted, 2) . ' ' . $symbol  : null,
                 'total'       => isset($total) ? number_format((float)$total, 2) . ' ' . $symbol : null,
-                'original_total' => isset($price) ? (float)$price + ($price * $commissionRate) : null,
+                'original_total' => isset($price) ? (float)$price + ($price * $feesRate) + ($price * $commissionRate) : null,
             ],
         ]);
     }

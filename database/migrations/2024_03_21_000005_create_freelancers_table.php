@@ -19,8 +19,6 @@ return new class extends Migration
 
             // Add indexes
             $table->index('status');
-            $table->unique('nick_name');
-            $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('set null');
         });
     }
 

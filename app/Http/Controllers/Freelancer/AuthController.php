@@ -43,7 +43,6 @@ class AuthController extends Controller
 
     public function showLoginForm(Request $request)
     {
-        // dd( $request);
         $countries = Country::all();
         $logo = General::where('key', 'platform_logo')->value('value');
 
@@ -156,7 +155,6 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        // dd($request->input('player_id') , $request->player_id);
         if ($request->input('player_id')) {
             $exists = PlayerId::where('user_id', $freelancer->id)
                 ->where('player_id', $request->player_id)
@@ -468,7 +466,6 @@ class AuthController extends Controller
         }
 
 
-        // dd($request->input('player_id'));
         if ($user->code == $request->code) {
             $user->verified_at = Carbon::now();
             $user->code = null;

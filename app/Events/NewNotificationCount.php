@@ -25,8 +25,7 @@ class NewNotificationCount implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        // return new PrivateChannel('notifications.' . $this->userId);
-        return new Channel('notifications.' . $this->userId);
+        return new PrivateChannel('notifications.' . $this->userId);
     }
 
     public function broadcastAs()

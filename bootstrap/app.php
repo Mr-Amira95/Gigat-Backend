@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\AdminAuthenticate;
@@ -38,6 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->api(append: [
             SetLocaleFromHeader::class,
+            \App\Http\Middleware\CurrencyMiddleware::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'stripe/*',

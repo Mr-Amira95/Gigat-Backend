@@ -38,8 +38,10 @@ class RequestFeedbackController extends Controller
     {
         try {
 
-            // 1. Fetch request
-            $req = RequestModel::findOrFail($id);
+            // 1. Fetch request — only the client (user_id) may confirm or reject
+            $req = RequestModel::where('id', $id)
+                ->where('user_id', auth('api')->id())
+                ->firstOrFail();
 
             // 2. Ensure request is completed
             if ($req->status !== RequestStatusEnum::COMPLETED->value) {

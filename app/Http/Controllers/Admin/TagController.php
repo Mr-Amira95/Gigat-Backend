@@ -26,7 +26,6 @@ class TagController extends Controller
         // $params = request()->all();
         $params = request()->get('subcategory_id');
         // $tags = $this->tagService->getAllTags($params);
-        // dd($categories,$params,$tags);
 
         if (empty($params)) {
             $tags = Tag::with(['translation', 'subCategory.translation'])->get();

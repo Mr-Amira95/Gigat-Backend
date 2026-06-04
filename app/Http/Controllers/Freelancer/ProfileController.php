@@ -69,7 +69,6 @@ class ProfileController extends Controller
     }
     public function update(Request $request, $id)
     {
-        // dd($request);
         // 1. تحقق من صحة البيانات
         $validated = $request->validate([
             'avatar' => 'nullable|image|max:2048', // صورة الأفتار اختيارية
@@ -216,7 +215,6 @@ class ProfileController extends Controller
     }
     public function deleteCertificate($id)
     {
-        // dd();
         $certificate = FreelancerCertificate::findOrFail($id);
 
         // حذف الملف من السيرفر إذا موجود

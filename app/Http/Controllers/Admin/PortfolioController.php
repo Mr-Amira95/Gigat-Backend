@@ -47,7 +47,6 @@ class PortfolioController extends Controller
 
 
             // one signal notification
-            // dd($portfolio->user);
             $user = $portfolio->user;
             if ($user) {
                 $titles = [

@@ -68,7 +68,6 @@ class UserController extends Controller
     {
         try {
             $categories = $this->categoryService->getUserCategoriesApi();
-            // dd($categories);
             return $this->successResponse(__('user_categories_retrieved'), CategoryResource::collection($categories));
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);
@@ -119,10 +118,8 @@ class UserController extends Controller
             if (!$user) {
                 return $this->errorResponse(__('user_not_found'));
             }
-            // dd( $userId);
             $averageRating = $this->reviewService->getAverageRatingByUser($userId);
             $reviews = $this->reviewService->getForFreelancer($userId);
-            // dd($averageRating);
             $portfolio = $this->portfolioService->getPortfolioByUserId($userId);
             $services = $this->serviceService->getServicesByUserId($userId, $perPage);
 
@@ -150,7 +147,6 @@ class UserController extends Controller
     }
     public function completeProfile(BecomeFreelancerRequest $request)
     {
-        // dd($request);
         try {
             $freelancer = $this->freelancerService->completeProfile($request->validated());
 
@@ -244,7 +240,7 @@ class UserController extends Controller
     public function uploadFileVerification(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:pdf,doc,docx,jpg,jpeg,png,gif,webp,svg|max:2048'
+            'file' => 'required|mimes:pdf,doc,docx,jpg,jpeg,png,gif,webp|max:2048'
         ]);
 
         $user = auth()->user();

@@ -137,7 +137,6 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
         $route->post('store', 'store')->name('store');
         $route->post('update-activation', 'updateActivation')->name('updateActivation');
         $route->delete('destroy/{id}', 'destroy')->name('destroy');
-        $route->post('update-activation', 'updateActivation')->name('updateActivation');
         $route->get('show/{id}', 'show')->name('show');
         $route->get('archived', 'archived')->name('archived');
         $route->post('/{id}/restore', 'restore')->name('restore');
@@ -149,7 +148,6 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
         $route->post('update-activation', 'updateActivation')->name('updateActivation');
         $route->get('show/{id}', 'show')->name('show');
         $route->delete('destroy/{id}', 'destroy')->name('destroy');
-        $route->post('update-activation', 'updateActivation')->name('updateActivation');
         $route->post('update-verification', 'updateVerification')->name('updateVerification');
         $route->get('archived', 'archived')->name('archived');
         $route->post('/{id}/restore', 'restore')->name('restore');
@@ -196,8 +194,8 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
         $route->get('edit-mobile-sliders/{id}', 'editMobileSliders')->name('editMobileSliders');
         $route->put('update-mobile-slider/{id}', 'updateMobileSlider')->name('updateMobileSlider');
 
-        $route->get('move-up/{slider}', 'moveUp')->name('moveUp');
-        $route->get('move-down/{slider}', 'moveDown')->name('moveDown');
+        $route->post('move-up/{slider}', 'moveUp')->name('moveUp');
+        $route->post('move-down/{slider}', 'moveDown')->name('moveDown');
 
         // Common routes
         $route->get('show/{id}', 'show')->name('show');
@@ -438,7 +436,7 @@ Route::middleware(['auth:freelancer', 'freelancer'])->prefix('freelancer')->name
     $route->controller(CallController::class)->name('call.')->prefix('call')->group(function ($route) {
         $route->get('start-call/{receiverId}', 'startCall')->name('start');
         $route->get('answer-call/{callId}', 'answerCall')->name('answer');
-        $route->get('end-call/{callId}', 'endCall')->name('end');
+        $route->post('end-call/{callId}', 'endCall')->name('end');
         $route->get('status/{callId}', 'status')->name('status');
     });
     $route->controller(FreelancerNotificationController::class)->name('notification.')->prefix('notification')->group(function ($route) {
@@ -466,7 +464,6 @@ Route::middleware(['auth:freelancer', 'freelancer'])->prefix('freelancer')->name
         $route->get('show/{id}', 'show')->name('show')->middleware('owns:service');
         $route->put('update/{id}', 'update')->name('update');
         $route->delete('destroy/{id}', 'destroy')->name('destroy');
-        $route->post('toggle-recommended', 'toggleRecommended')->name('toggleRecommended');
     });
 
     $route->controller(ProfileController::class)->name('profile.')->prefix('profile')->group(function ($route) {

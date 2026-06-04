@@ -126,6 +126,15 @@ class ChatController extends Controller
         }
 
         $authUser = auth()->user();
+        $userId   = $authUser->id;
+
+        // Verify caller is a participant of this chat
+        $chat = Chat::where('id', $request->chat_id)
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id_one', $userId)
+                  ->orWhere('user_id_two', $userId);
+            })
+            ->firstOrFail();
 
         // Upload if file exists
         $attachmentUrl = $request->hasFile('attachment_file')
@@ -145,8 +154,6 @@ class ChatController extends Controller
         $m = new ChatMessageResource($message);
 
         broadcast(new PusherNewMessage($m))->toOthers();
-        // Load chat once
-        $chat = Chat::findOrFail($request->chat_id);
 
         if ($chat->user_one_flag === 'deleted') {
             $chat->user_one_flag = 'normal';
@@ -192,11 +199,15 @@ class ChatController extends Controller
 
     public function getMessages($chatId)
     {
+        $currentUserId = auth()->user()->id;
 
         $chat = Chat::with(['userOne:id,username,avatar', 'userTwo:id,username,avatar'])
-            ->findOrFail($chatId);
-
-        $currentUserId = auth()->user()->id;
+            ->where('id', $chatId)
+            ->where(function ($q) use ($currentUserId) {
+                $q->where('user_id_one', $currentUserId)
+                  ->orWhere('user_id_two', $currentUserId);
+            })
+            ->firstOrFail();
 
         $messagesQuery = ChatMessage::where('chat_id', $chatId)
             ->with([
@@ -242,8 +253,18 @@ class ChatController extends Controller
 
     public function markAsRead($chatId)
     {
+        $userId = auth()->id();
+
+        // Verify caller is a participant of this chat
+        Chat::where('id', $chatId)
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id_one', $userId)
+                  ->orWhere('user_id_two', $userId);
+            })
+            ->firstOrFail();
+
         ChatMessage::where('chat_id', $chatId)
-            ->where('sender_id', '!=', auth()->id())
+            ->where('sender_id', '!=', $userId)
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
@@ -253,8 +274,18 @@ class ChatController extends Controller
 
     public function unreadCount($chatId)
     {
+        $userId = auth()->id();
+
+        // Verify caller is a participant of this chat
+        Chat::where('id', $chatId)
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id_one', $userId)
+                  ->orWhere('user_id_two', $userId);
+            })
+            ->firstOrFail();
+
         $count = ChatMessage::where('chat_id', $chatId)
-            ->where('sender_id', '!=', auth()->id())
+            ->where('sender_id', '!=', $userId)
             ->where('is_read', false)
             ->count();
 

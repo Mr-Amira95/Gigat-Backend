@@ -171,7 +171,6 @@ class RequestController extends Controller
     {
         try {
             $request = $this->requestService->getRequestDetails($id);
-            // dd( $request );
             return $this->successResponse(__('success'), new RequestDetailsResource($request));
         } catch (\Exception $e) {
             return $this->exceptionResponse($e);

@@ -414,7 +414,8 @@
 
                     axios.post("{{ route('freelancer.chat.sendMessage', $chat->id) }}", formData, {
                             headers: {
-                                'Content-Type': 'multipart/form-data'
+                                'Content-Type': 'multipart/form-data',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                             }
                         })
                         .then(response => {

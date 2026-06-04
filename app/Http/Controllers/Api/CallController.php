@@ -39,7 +39,6 @@ class CallController extends Controller
 
 
         $privilegeExpireTs = $currentTimestamp + $expireTimeInSeconds;
-        // dd(date("Y-m-d H:i:s", now()->timestamp), date("Y-m-d H:i:s", $privilegeExpireTs), date("Y-m-d H:i:s", $expireTimestamp)) ;
 
         return RtcTokenBuilder::buildTokenWithUid(
             $appId,

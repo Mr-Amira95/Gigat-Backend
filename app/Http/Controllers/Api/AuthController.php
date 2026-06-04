@@ -21,7 +21,9 @@ use App\Services\OneSignalService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -57,7 +59,6 @@ class AuthController extends Controller
     {
         try {
             $result = $this->authService->login($request->validated());
-            // dd($result);
             $user = $result['user'];
 
             if ($request->input('player_id')) {
@@ -89,7 +90,6 @@ class AuthController extends Controller
     {
         try {
             $result = $this->authService->login($request->validated());
-            // dd($result);
             $user = $result['user'];
 
             if ($request->input('player_id')) {
@@ -120,7 +120,6 @@ class AuthController extends Controller
                     'token' => $result['token']
                 ]);
             }
-            // dd($user);
 
 
             return $this->successResponse(__('login_successful'), [
@@ -180,10 +179,12 @@ class AuthController extends Controller
                 return $this->successResponse(__('user_not_found'));
             }
 
-            // Attach provider ID if not already set
+            // Reject auto-linking: if account exists but has no social ID, force password login first
             if (!$user->$provider) {
-                $user->$provider = $providerId;
-                $user->save();
+                return $this->errorResponse(
+                    'Account exists. Please login with password then link ' . ($provider === 'google_id' ? 'Google' : 'Apple') . ' from your profile.',
+                    401
+                );
             }
 
             // Handle player_id
@@ -285,10 +286,18 @@ class AuthController extends Controller
                 return $this->errorResponse(__('user_not_found'), 404);
             }
 
-            if ($result['user']->code !== $request['code']) {
+            if ($result['user']->code_expires_at && $result['user']->code_expires_at->isPast()) {
+                return $this->errorResponse(__('verification_code_expired'), 422);
+            }
+
+            if (!Hash::check($request['code'], $result['user']->code)) {
                 return $this->errorResponse(__('invalid_verification_code'));
             }
             $result = $this->authService->verifyCode($result['user']);
+
+            // Store OTP-verified token so resetPassword can confirm OTP was completed
+            Cache::put('pwd_reset_' . $request['prefix'] . '_' . $request['phone'], true, now()->addMinutes(10));
+
             return $this->successResponse(__('code_verified_successfully'), [
                 'user' => new UserResource($result['user']),
                 'token' => $result['token']
@@ -313,6 +322,12 @@ class AuthController extends Controller
             if (!$result['user']) {
                 return $this->errorResponse(__('user_not_found'), 404);
             }
+
+            // Ensure OTP was verified before allowing password reset
+            if (!Cache::has('pwd_reset_' . $request['prefix'] . '_' . $request['phone'])) {
+                return $this->errorResponse('Please verify your OTP code first', 422);
+            }
+            Cache::forget('pwd_reset_' . $request['prefix'] . '_' . $request['phone']);
 
             $result = $this->authService->resetPassword($result['user'], $request->password);
             return $this->successResponse(__('password_reset_successfully'), [

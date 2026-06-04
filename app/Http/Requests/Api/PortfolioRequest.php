@@ -25,9 +25,9 @@ class PortfolioRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
 
-            'cover' => 'required',
-            'media' => 'nullable','array',
-            'media.*' => 'nullable',
+            'cover' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp', 'max:10240'],
+            'media' => ['nullable', 'array'],
+            'media.*' => ['nullable', 'file', 'mimes:jpg,jpeg,png,gif,webp,mp4,avi,mov', 'max:51200'],
             'service_ids'=>'nullable|array',
             'service_ids.*'=>'nullable',
         ];

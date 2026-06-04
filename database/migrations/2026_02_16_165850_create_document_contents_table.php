@@ -34,6 +34,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('document_contents');
+        Schema::dropIfExists('document_content_translations');
+        Schema::dropIfExists('document_content');
     }
 };

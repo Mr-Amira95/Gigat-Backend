@@ -70,7 +70,6 @@ class FilterController extends Controller
 
         $minPriceUSD = $priceQuery->min(DB::raw('CAST(value AS DECIMAL(10,2))'));
         $maxPriceUSD = $priceQuery->max(DB::raw('CAST(value AS DECIMAL(10,2))'));
-        // dd($maxPriceUSD, $minPriceUSD);
 
         $minPrice = $minPriceUSD ? CurrencyConverter::convert($minPriceUSD, 'USD', $fromCurrency) : 0;
         $maxPrice = $maxPriceUSD ? CurrencyConverter::convert($maxPriceUSD, 'USD', $fromCurrency) : 0;
@@ -149,7 +148,6 @@ class FilterController extends Controller
                         $convertedMin = $min;
                         $convertedMax = $max;
                     }
-                    // dd($convertedMin, $convertedMax);
                     $query->where('type', $type)
                         ->whereBetween(
                             DB::raw("CAST(REPLACE(value, ',', '') AS DECIMAL(10,2))"),

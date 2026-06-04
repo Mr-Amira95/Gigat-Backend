@@ -71,7 +71,6 @@ class SocialLoginController extends Controller
                 return redirect()->route('freelancer.register');
             }
         } catch (\Exception $e) {
-            // dd('3');
 
             return redirect()->route('freelancer.login')->with('error', 'Something went wrong, please try again.');
         }

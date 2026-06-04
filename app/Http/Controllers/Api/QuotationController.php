@@ -26,6 +26,7 @@ use App\Utilities\CurrencyConverter;
 use App\Utilities\FileManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Stripe\Checkout\Session;
 
 class QuotationController extends Controller
@@ -238,163 +239,168 @@ class QuotationController extends Controller
 
     public function approveQuotation(Request $request, $id)
     {
-        $comment = QuotationComment::findOrFail($id);
-        $quotation = Quotation::findOrFail($comment->quotation_id);
-        $category = Category::find($quotation->subCategory->category_id);
+        return DB::transaction(function () use ($id) {
+            $comment = QuotationComment::findOrFail($id);
+            $quotation = Quotation::findOrFail($comment->quotation_id);
+            $category = Category::find($quotation->subCategory->category_id);
 
-        $service = new Service();
-        $service->sub_category_id = $quotation->sub_category_id;
-        $service->user_id = $comment->user_id;
-        $service->status = 'approved';
-        $service->save();
-        $service->translations()->create([
-            'language' => 'en',
-            'title' => $quotation->title,
-            'description' => $quotation->description,
-        ]);
+            $service = new Service();
+            $service->sub_category_id = $quotation->sub_category_id;
+            $service->user_id = $comment->user_id;
+            $service->status = 'approved';
+            $service->save();
+            $service->translations()->create([
+                'language' => 'en',
+                'title' => $quotation->title,
+                'description' => $quotation->description,
+            ]);
 
-        // Add Arabic translation
-        $service->translations()->create([
-            'language' => 'ar',
-            'title' => $quotation->title,
-            'description' => $quotation->description,
-        ]);
-        // price
-        $feature_price = new PlanFeature();
-        $feature_price->plan_id = 1;
-        $feature_price->service_id = $service->id;
-        $feature_price->value = $quotation->price;
-        $feature_price->type = 'price';
-        $feature_price->save();
+            // Add Arabic translation
+            $service->translations()->create([
+                'language' => 'ar',
+                'title' => $quotation->title,
+                'description' => $quotation->description,
+            ]);
+            // price
+            $feature_price = new PlanFeature();
+            $feature_price->plan_id = 1;
+            $feature_price->service_id = $service->id;
+            $feature_price->value = $quotation->price;
+            $feature_price->type = 'price';
+            $feature_price->save();
 
-        // delivery_days
-        $feature_days = new PlanFeature();
-        $feature_days->plan_id = 1;
-        $feature_days->service_id = $service->id;
-        $feature_days->value = $quotation->delivery_day;
-        $feature_days->type = 'delivery_days';
-        $feature_days->save();
+            // delivery_days
+            $feature_days = new PlanFeature();
+            $feature_days->plan_id = 1;
+            $feature_days->service_id = $service->id;
+            $feature_days->value = $quotation->delivery_day;
+            $feature_days->type = 'delivery_days';
+            $feature_days->save();
 
-        // revisions
-        $feature_revisions = new PlanFeature();
-        $feature_revisions->plan_id = 1;
-        $feature_revisions->service_id = $service->id;
-        $feature_revisions->value = $quotation->revisions;
-        $feature_revisions->type = 'revisions';
-        $feature_revisions->save();
+            // revisions
+            $feature_revisions = new PlanFeature();
+            $feature_revisions->plan_id = 1;
+            $feature_revisions->service_id = $service->id;
+            $feature_revisions->value = $quotation->revisions;
+            $feature_revisions->type = 'revisions';
+            $feature_revisions->save();
 
-        // source_files
-        $feature_source = new PlanFeature();
-        $feature_source->plan_id = 1;
-        $feature_source->service_id = $service->id;
-        $feature_source->value = $quotation->source_file;
-        $feature_source->type = 'source_files';
-        $feature_source->save();
+            // source_files
+            $feature_source = new PlanFeature();
+            $feature_source->plan_id = 1;
+            $feature_source->service_id = $service->id;
+            $feature_source->value = $quotation->source_file;
+            $feature_source->type = 'source_files';
+            $feature_source->save();
 
-        // Create translations for each feature
-        foreach (['price', 'delivery_days', 'revisions', 'source_files'] as $type) {
-            $feature = PlanFeature::where('service_id', $service->id)
-                ->where('type', $type)
-                ->first();
+            // Create translations for each feature
+            foreach (['price', 'delivery_days', 'revisions', 'source_files'] as $type) {
+                $feature = PlanFeature::where('service_id', $service->id)
+                    ->where('type', $type)
+                    ->first();
 
-            if ($feature) {
-                $key = strtolower(str_replace(' ', '_', $type));
+                if ($feature) {
+                    $key = strtolower(str_replace(' ', '_', $type));
 
+                    foreach (['en', 'ar'] as $locale) {
+                        $titleFromLang = __("features.$key", locale: $locale);
+
+                        $feature->translations()->updateOrCreate(
+                            ['language' => $locale],
+                            [
+                                'title' => $titleFromLang !== "features.$key"
+                                    ? $titleFromLang
+                                    : ucfirst($type),
+                            ]
+                        );
+                    }
+                }
+            }
+
+            $data = [
+                'service_id' => $service->id,
+                'plan_id' => 1,
+            ];
+
+            // $request = $this->requestService->createRequest($data);
+            $requestController = app(RequestController::class);
+            $response = $requestController->createRequest($data);
+            $service->delete();
+            $quotation->delete();
+
+            return $this->successResponse(__('success'), __('quotation_approved'));
+        });
+    }
+
+    public function finalizeQuotationRequest(Quotation $quotation, QuotationComment $comment, array $data = [])
+    {
+        return DB::transaction(function () use ($quotation, $comment, $data) {
+            // 1. Create temporary service from quotation
+            $service = new Service();
+            $service->sub_category_id = $quotation->sub_category_id;
+            $service->user_id = $comment->user_id;
+            $service->status = 'approved';
+            $service->save();
+
+            // 2. Add translations
+            foreach ($quotation->translations as $translation) {
+                $service->translations()->create([
+                    'language'    => $translation->language,
+                    'title'       => $translation->title,
+                    'description' => $translation->description,
+                ]);
+            }
+
+
+            // 3. Create plan features
+            $features = [
+                'price'         => $quotation->price,
+                'delivery_days' => $quotation->delivery_day,
+                'revisions'     => $quotation->revisions,
+                'source_files'  => $quotation->source_file,
+            ];
+
+            foreach ($features as $type => $value) {
+                $feature = new PlanFeature();
+                $feature->plan_id = $data['plan_id'] ?? 1;   // fallback if not passed
+                $feature->service_id = $service->id;
+                $feature->value = $value;
+                $feature->type = $type;
+                $feature->save();
+
+                // translations for each feature
                 foreach (['en', 'ar'] as $locale) {
-                    $titleFromLang = __("features.$key", locale: $locale);
+                    $titleFromLang = __("features.$type", locale: $locale);
 
                     $feature->translations()->updateOrCreate(
                         ['language' => $locale],
                         [
-                            'title' => $titleFromLang !== "features.$key"
+                            'title' => $titleFromLang !== "features.$type"
                                 ? $titleFromLang
                                 : ucfirst($type),
                         ]
                     );
                 }
             }
-        }
 
-        $data = [
-            'service_id' => $service->id,
-            'plan_id' => 1,
-        ];
-
-        // $request = $this->requestService->createRequest($data);
-        $requestController = app(RequestController::class);
-        $response = $requestController->createRequest($data);
-        $service->delete();
-        $quotation->delete();
-
-        return $this->successResponse(__('success'), __('quotation_approved'));
-    }
-
-    public function finalizeQuotationRequest(Quotation $quotation, QuotationComment $comment, array $data = [])
-    {
-        // 1. Create temporary service from quotation
-        $service = new Service();
-        $service->sub_category_id = $quotation->sub_category_id;
-        $service->user_id = $comment->user_id;
-        $service->status = 'approved';
-        $service->save();
-
-        // 2. Add translations
-        foreach ($quotation->translations as $translation) {
-            $service->translations()->create([
-                'language'    => $translation->language,
-                'title'       => $translation->title,
-                'description' => $translation->description,
-            ]);
-        }
+            // 4. Create request from service
+            $requestData = [
+                'service_id'            => $service->id,
+                'plan_id'               => $data['plan_id'] ?? 1,
+                'user_id'               => $data['user_id'],
+                'client_payment_status' => $data['client_payment_status'],
+                'stripe_session_id'     => $data['stripe_session_id'] ?? null,
+            ];
+            $requestController = app(RequestController::class);
+            $requestController->createRequest($requestData);
 
 
-        // 3. Create plan features
-        $features = [
-            'price'         => $quotation->price,
-            'delivery_days' => $quotation->delivery_day,
-            'revisions'     => $quotation->revisions,
-            'source_files'  => $quotation->source_file,
-        ];
+            // 5. Cleanup: remove service + quotation
+            $service->delete();
+            $quotation->delete();
 
-        foreach ($features as $type => $value) {
-            $feature = new PlanFeature();
-            $feature->plan_id = $data['plan_id'] ?? 1;   // fallback if not passed
-            $feature->service_id = $service->id;
-            $feature->value = $value;
-            $feature->type = $type;
-            $feature->save();
-
-            // translations for each feature
-            foreach (['en', 'ar'] as $locale) {
-                $titleFromLang = __("features.$type", locale: $locale);
-
-                $feature->translations()->updateOrCreate(
-                    ['language' => $locale],
-                    [
-                        'title' => $titleFromLang !== "features.$type"
-                            ? $titleFromLang
-                            : ucfirst($type),
-                    ]
-                );
-            }
-        }
-
-        // 4. Create request from service
-        $requestData = [
-            'service_id'   => $service->id,
-            'plan_id'      => $data['plan_id'] ?? 1,
-            'user_id'      => $data['user_id'],
-            'client_payment_status'      => $data['client_payment_status'],
-        ];
-        $requestController = app(RequestController::class);
-        $requestController->createRequest($requestData);
-
-
-        // 5. Cleanup: remove service + quotation
-        $service->delete();
-        $quotation->delete();
-
-        return $this->successResponse(__('success'), __('quotation_approved'));
+            return $this->successResponse(__('success'), __('quotation_approved'));
+        });
     }
 
     public function getByFreelancerId()

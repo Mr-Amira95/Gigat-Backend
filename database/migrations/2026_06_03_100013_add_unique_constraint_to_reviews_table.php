@@ -1,0 +1,30 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Remove duplicate reviews — keep the most recent one per (service_id, user_id)
+        DB::statement("
+            DELETE r1 FROM reviews r1
+            INNER JOIN reviews r2
+            ON r1.service_id = r2.service_id AND r1.user_id = r2.user_id AND r1.id < r2.id
+        ");
+
+        Schema::table('reviews', function (Blueprint $table) {
+            $table->unique(['service_id', 'user_id'], 'reviews_service_user_unique');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('reviews', function (Blueprint $table) {
+            $table->dropUnique('reviews_service_user_unique');
+        });
+    }
+};

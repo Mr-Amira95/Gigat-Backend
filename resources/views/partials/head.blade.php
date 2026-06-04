@@ -5,6 +5,7 @@
     <meta name="Author" content="">
     <!-- TITLE -->
     <title> {{ __('gigat_platform') }} | @yield('title')</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- FAVICON -->
     <link rel="icon" href="{{ asset('build/assets/images/media/favicon.png') }}" type="image/x-icon">
@@ -21,11 +22,16 @@
     <link rel="stylesheet" href="{{ asset('build/assets/libs/%40simonwep/pickr/themes/nano.min.css') }}">
 
     <!-- TOASTR-->
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
-
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/css/toastr.min.css"
+          integrity="sha384-ZSs6LKr2GoUPDyHrN+rCQgyHL1yUyok5xMniSrgeRG7rUvA6vTmxronM1eZOfjgz"
+          crossorigin="anonymous">
 
     <!-- SWEET ALERT -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.11.5/dist/sweetalert2.min.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/sweetalert2@11.11.5/dist/sweetalert2.min.css"
+          integrity="sha384-tInLLRmWKTSYCM075omF3Hyr4Bk9U2LkO8JAlalZ1OXH6jl8NRjni5vSYqzovHvT"
+          crossorigin="anonymous">
 
     <!-- MAIN JS — defer prevents render-blocking (P2-08/FPERF-01) -->
     <script src="{{ asset('build/assets/main.js') }}" defer></script>

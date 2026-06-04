@@ -39,7 +39,6 @@ class CallController extends Controller
 
 
         $privilegeExpireTs = $currentTimestamp + $expireTimeInSeconds;
-        // dd(date("Y-m-d H:i:s", now()->timestamp), date("Y-m-d H:i:s", $privilegeExpireTs), date("Y-m-d H:i:s", $expireTimestamp)) ;
 
         return RtcTokenBuilder::buildTokenWithUid(
             $appId,
@@ -68,7 +67,6 @@ class CallController extends Controller
 
         $user = User::where('id', $receiverId)->first();
 
-// dd($user);
         if ($user) {
             $playerIdRecord = PlayerId::where('user_id', $user->id)
                 ->where('is_notifiable', 1)
@@ -133,7 +131,6 @@ class CallController extends Controller
         if ($call->ended_at) {
             return redirect()->back()->with('error', __('This call has already ended.'));
         }
-        // dd($call ,$token ,$channelName);
         return view('pages-freelancer.call.receiver', [
             'call' => $call,
             'receiver' => $call->receiver,
@@ -163,7 +160,6 @@ class CallController extends Controller
         $receiverId = $call->receiver_id;
 
         $userAuthId = auth()->user()->id;
-        // dd($callerId ,$receiverId , $userAuthId);
         if ($userAuthId != $callerId) {
             $userAuthId  = $receiverId;
         }

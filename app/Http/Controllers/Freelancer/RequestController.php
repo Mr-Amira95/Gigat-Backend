@@ -75,7 +75,7 @@ class RequestController extends Controller
      */
     private const ALLOWED_TRANSITIONS = [
         'pending'     => ['in_progress'],
-        'in_progress' => ['completed', 'pending'],
+        'in_progress' => ['completed'],
         'completed'   => ['in_progress'],
         // confirmed, cancelled, approved: managed by admin/API only — no freelancer transitions allowed
     ];
@@ -122,12 +122,10 @@ class RequestController extends Controller
         $logStatus->save();
 
         $statusAction = auth()->user()->username . ' has updated the request status to ' . RequestStatusEnum::from($request->status)->label() . '.';
-        foreach ($this->googleTranslator->translateForStorage($statusAction) as $lang => $text) {
-            $logStatus->translations()->create([
-                'language' => $lang,
-                'action'   => $text,
-            ]);
+        foreach (['en', 'ar'] as $lang) {
+            $logStatus->translations()->create(['language' => $lang, 'action' => $statusAction]);
         }
+        \App\Jobs\TranslateEntityJob::dispatch(RequestLog::class, $logStatus->id, $statusAction, 'action');
 
         // 2. Comment log
         $log = new RequestLog();
@@ -135,12 +133,10 @@ class RequestController extends Controller
         $log->user_id = auth()->id();
         $log->save();
 
-        foreach ($this->googleTranslator->translateForStorage($request->comment) as $lang => $text) {
-            $log->translations()->create([
-                'language' => $lang,
-                'action'   => $text,
-            ]);
+        foreach (['en', 'ar'] as $lang) {
+            $log->translations()->create(['language' => $lang, 'action' => $request->comment]);
         }
+        \App\Jobs\TranslateEntityJob::dispatch(RequestLog::class, $log->id, $request->comment, 'action');
 
         // Handle file attachment if uploaded (استخدام FileManager لتحميل الملف بنفس الطريقة)
         if ($request->hasFile('attachment')) {
@@ -185,21 +181,18 @@ class RequestController extends Controller
         $log->save();
 
 
-        // Translate the comment into en/ar and save translations
-        foreach ($this->googleTranslator->translateForStorage($request->comment) as $lang => $text) {
-            $log->translations()->create([
-                'language' => $lang,
-                'action'   => $text,
-            ]);
+        // Store placeholder translations immediately; async job handles translation
+        foreach (['en', 'ar'] as $lang) {
+            $log->translations()->create(['language' => $lang, 'action' => $request->comment]);
         }
+        \App\Jobs\TranslateEntityJob::dispatch(RequestLog::class, $log->id, $request->comment, 'action');
 
         // Handle file attachment if uploaded
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
-            $filename = $fileManager->upload('attachemnt', $request->file('attachment'));
-            $fileType = $file->getClientOriginalExtension(); // or getClientMimeType()
+            $filename = $fileManager->upload('attachment', $file);
 
-            $extension = strtolower($file->getClientOriginalExtension());
+            $extension = strtolower($file->extension());
 
             $mediaType = match (true) {
                 in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']) => 'image',
@@ -227,7 +220,6 @@ class RequestController extends Controller
     public function downloadContract($id)
     {
         $request = ModelsRequest::findOrFail($id);
-        // dd($request);
         if (!$request->contract_path) {
             return redirect()->back()->with('error', 'Contract not found.');
         }

@@ -36,7 +36,6 @@ class NotificationController extends Controller
         $categories = Category::orderBy('id', 'desc')->get();
         $services = Service::orderBy('id', 'desc')->get();
         $portfolios = Portfolio::orderBy('id', 'desc')->get();
-        // dd( $categories );
         return view('pages.notifications.create', compact('categories', 'services', 'portfolios'));
     }
 

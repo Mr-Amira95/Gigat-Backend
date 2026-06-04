@@ -54,7 +54,6 @@ Route::get('/test-time', function () {
 Route::controller(AuthController::class)->group(function ($route) {
     $route->post('login', 'login');
     $route->post('social-login', 'socialLogin');
-    $route->post('send-notification/{userId}', 'SendNotification');
     $route->post('register', 'register');
     $route->post('generate-code', 'generateCode');
     $route->post('verify-code', 'verifyCode');
@@ -151,6 +150,7 @@ Route::middleware('auth:api')->group(function () {
         $route->post('logout', 'logout');
         $route->get('freelancer/redirect', 'generateFreelancerRedirect');
         $route->delete('account', 'deleteAccount');
+        $route->post('send-notification/{userId}', 'SendNotification');
     });
 
     Route::post('/chatbot', [ChatbotController::class, 'chatbot']);
@@ -268,7 +268,7 @@ Route::middleware('auth:api')->group(function () {
         $route->delete('delete-media/{id}', 'deleteMedia')->middleware('freelancer.api');
         $route->patch('activation/{id}', 'toggleActivation')->middleware(['freelancer.api', 'owns:service']);
     });
-    Route::prefix('Rating')->controller(RatingController::class)->group(function ($route) {
+    Route::prefix('rating')->controller(RatingController::class)->group(function ($route) {
         $route->post('rate-client', 'rateClient')->middleware('freelancer.api');
     });
     Route::prefix('portfolio')->controller(PortfolioController::class)->group(function ($route) {
@@ -285,7 +285,7 @@ Route::middleware('auth:api')->group(function () {
         $route->post('send-message', 'sendMessage')->middleware('check.blocked');
         $route->get('get-messages/{chatId}', 'getMessages');
         $route->get('unread-count/{chatId}', 'unreadCount');
-        $route->get('mark-read/{chatId}', 'markAsRead');
+        $route->post('mark-read/{chatId}', 'markAsRead');
         $route->get('get-chat', 'getAllChats');
         $route->post('toggle-flag', 'toggleFlag');
         // $route->post('update-status/{id}', 'updateStatus');

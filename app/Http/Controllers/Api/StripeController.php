@@ -31,7 +31,6 @@ class StripeController extends Controller
             $serviceTitle = $response->getData(true)['data']['request_info']['title'];
             $formattedTotal = $response->getData(true)['data']['request_info']['original_total'];
             $amount = floatval(preg_replace('/[^0-9.]/', '', $formattedTotal));
-            // dd($amount); // e.g. 24.99
 
             $type =
                 !empty($validatedData['quotation_id']) ? 'quotation' : (!empty($validatedData['request_id']) ? 'request_payment' : 'service');
@@ -127,6 +126,11 @@ class StripeController extends Controller
             try {
                 $session = $event->data->object;
 
+                // Idempotency guard: skip if this session was already processed
+                if (\App\Models\Finance::where('stripe_session_id', $session->id)->exists()) {
+                    return response('Already processed', 200);
+                }
+
                 // Retrieve session with expanded line items to access metadata
                 $session = Session::retrieve([
                     'id' => $session->id,
@@ -136,6 +140,7 @@ class StripeController extends Controller
                 $lineItem = $session->line_items->data[0] ?? null;
                 $metadata = $lineItem->price->product->metadata ?? [];
                 $data = is_object($metadata) ? $metadata->toArray() : (array)$metadata;
+                $data['stripe_session_id'] = $session->id;
 
                 // Check if payment is successful
                 // if ($session->payment_status === 'paid') {

@@ -12,7 +12,7 @@ class Plan extends Model
 {
     use HasFactory, HasTranslations;
 
-    protected $guarded = [];
+    protected $fillable = [];
 
     protected $with = ['translation'];
 

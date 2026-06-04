@@ -4,9 +4,9 @@ namespace App\Repositories\Eloquents;
 
 use App\Enums\PaymentStatusEnum;
 use App\Models\Finance;
-
 use App\Repositories\Interfaces\FinanceRepositoryInterface;
 use App\Services\NoticeService;
+use Illuminate\Support\Facades\DB;
 
 class FinanceRepository implements FinanceRepositoryInterface
 {
@@ -67,46 +67,47 @@ class FinanceRepository implements FinanceRepositoryInterface
 
     public function markAsPaid(array $ids)
     {
-        // Get finances with user_id before update
-        $finances = $this->model
-            ->whereIn('id', $ids)
-            ->where('payment_status', '!=', PaymentStatusEnum::PAID)
-            ->get();
+        return DB::transaction(function () use ($ids) {
+            // Eager-load request.service to avoid N+1; lock rows to prevent concurrent double-payment
+            $finances = $this->model
+                ->whereIn('id', $ids)
+                ->where('payment_status', '!=', PaymentStatusEnum::PAID)
+                ->with('request.service')
+                ->lockForUpdate()
+                ->get();
 
-        if ($finances->isEmpty()) {
-            return false;
-        }
+            if ($finances->isEmpty()) {
+                return false;
+            }
 
-        // Update finances
-        $this->model->whereIn('id', $ids)->update([
-            'payment_status' => PaymentStatusEnum::PAID,
-            'paid_at' => now()
-        ]);
+            $this->model->whereIn('id', $ids)->update([
+                'payment_status' => PaymentStatusEnum::PAID,
+                'paid_at' => now(),
+            ]);
 
-        // Send notification to each user
-        foreach ($finances as $finance) {
+            foreach ($finances as $finance) {
+                $titles = [
+                    'en' => __('finance_paid_title', [], 'en'),
+                    'ar' => __('finance_paid_title', [], 'ar'),
+                ];
 
-            $titles = [
-                'en' => __('finance_paid_title', [], 'en'),
-                'ar' => __('finance_paid_title', [], 'ar'),
-            ];
+                $messages = [
+                    'en' => __('finance_paid_message', [], 'en'),
+                    'ar' => __('finance_paid_message', [], 'ar'),
+                ];
 
-            $messages = [
-                'en' => __('finance_paid_message', [], 'en'),
-                'ar' => __('finance_paid_message', [], 'ar'),
-            ];
+                $this->noticeService->send(
+                    $finance->request->service->user_id,
+                    $titles,
+                    $messages,
+                    'finance',
+                    $finance->id,
+                    true
+                );
+            }
 
-            $this->noticeService->send(
-                $finance->request->service->user_id,   // user id
-                $titles,
-                $messages,
-                'finance',
-                $finance->id,
-                true
-            );
-        }
-
-        return true;
+            return true;
+        });
     }
 
 
