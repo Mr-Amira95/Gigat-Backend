@@ -38,7 +38,8 @@ use App\Http\Controllers\Api\{
     StripeController,
     ChatbotController,
     HireFreelancerController,
-    RatingController
+    RatingController,
+    AnalyticsController
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
@@ -316,6 +317,12 @@ Route::middleware('auth:api')->group(function () {
     // // stripe route
     // Route::post('stripe/create-checkout-session', [StripeController::class, 'createSession']);
     // Route::post('stripe/webhook', [StripeController::class, 'handleWebhook']);
+});
+
+// Analytics — public endpoints (auth is optional on /event to attach user_id)
+Route::prefix('analytics')->controller(AnalyticsController::class)->group(function ($route) {
+    $route->post('visitor', 'visitor')->middleware('throttle:60,1');
+    $route->post('event', 'event')->middleware('throttle:120,1');
 });
 
 // Route::middleware('auth:api')->post('/broadcasting/auth', function (Request $request) {

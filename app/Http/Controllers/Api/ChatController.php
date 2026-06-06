@@ -153,7 +153,11 @@ class ChatController extends Controller
 
         $m = new ChatMessageResource($message);
 
-        broadcast(new PusherNewMessage($m))->toOthers();
+        try {
+            broadcast(new PusherNewMessage($m))->toOthers();
+        } catch (\Throwable $e) {
+            \Log::warning('Broadcast failed: ' . $e->getMessage());
+        }
 
         if ($chat->user_one_flag === 'deleted') {
             $chat->user_one_flag = 'normal';
