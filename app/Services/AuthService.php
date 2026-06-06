@@ -51,15 +51,20 @@ class AuthService
                 throw new Exception(__('account_deleted'), 403);
             }
             if (!$user->verified_at) {
-                throw new Exception(__('account_is_not_verified'), 403);
+                return [
+                    'user'     => $user,
+                    'token'    => null,
+                    'verified' => false,
+                ];
             }
             if (!$user->is_active) {
                 throw new Exception(__('account_is_not_active'), 403);
             }
             $token = $user->createToken('auth_token')->accessToken;
             return [
-                'user' => $user,
-                'token' => $token,
+                'user'     => $user,
+                'token'    => $token,
+                'verified' => true,
             ];
         } catch (Exception $e) {
             throw $e;

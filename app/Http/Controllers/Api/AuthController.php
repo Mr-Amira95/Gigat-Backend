@@ -62,7 +62,6 @@ class AuthController extends Controller
             $user = $result['user'];
 
             if ($request->input('player_id')) {
-                // Check if this player_id already exists for this user
                 $exists = PlayerId::where('user_id', $user->id)
                     ->where('player_id', $request->player_id)
                     ->where('platform', $request->platform)
@@ -77,9 +76,17 @@ class AuthController extends Controller
                 }
             }
 
+            if (!$result['verified']) {
+                $this->authService->generateCode($user);
+                return $this->successResponse(__('account_is_not_verified'), [
+                    'user'  => new UserResource($user),
+                    'token' => null,
+                ]);
+            }
+
             return $this->successResponse(__('login_successful'), [
-                'user' => new UserResource($result['user']),
-                'token' => $result['token']
+                'user'  => new UserResource($user),
+                'token' => $result['token'],
             ]);
         } catch (Exception $e) {
             return $this->exceptionResponse($e);
@@ -93,7 +100,6 @@ class AuthController extends Controller
             $user = $result['user'];
 
             if ($request->input('player_id')) {
-                // Check if this player_id already exists for this user
                 $exists = PlayerId::where('user_id', $user->id)
                     ->where('player_id', $request->player_id)
                     ->where('platform', $request->platform)
@@ -108,23 +114,29 @@ class AuthController extends Controller
                 }
             }
 
+            if (!$result['verified']) {
+                $this->authService->generateCode($user);
+                return $this->successResponse(__('account_is_not_verified'), [
+                    'user'  => new UserResource($user),
+                    'token' => null,
+                ]);
+            }
+
             if ($user->freelancer) {
                 DB::table('sessions')->where('user_id', $user->id)->delete();
-
                 $encryptedId = encrypt($user->id);
                 $url = route('freelancer.login', ['token' => $encryptedId]);
 
                 return $this->successResponse(__('login_successful'), [
                     'redirect_to' => $url,
-                    'user' => new UserResource($result['user']),
-                    'token' => $result['token']
+                    'user'        => new UserResource($user),
+                    'token'       => $result['token'],
                 ]);
             }
 
-
             return $this->successResponse(__('login_successful'), [
-                'user' => new UserResource($result['user']),
-                'token' => $result['token']
+                'user'  => new UserResource($user),
+                'token' => $result['token'],
             ]);
         } catch (Exception $e) {
             return $this->exceptionResponse($e);
