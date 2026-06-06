@@ -133,6 +133,18 @@ class FilterController extends Controller
             $allowedFilterTypes = ['price', 'revisions', 'delivery_days', 'source_files'];
 
             foreach ($filters as $filter) {
+                // Rating is on the services table — apply directly and skip plan_features logic
+                if (isset($filter['rating'])) {
+                    $ratingMin = $filter['rating']['min'] ?? 0;
+                    $ratingMax = $filter['rating']['max'] ?? 5;
+                    $servicesQuery->whereBetween('rating', [$ratingMin, $ratingMax]);
+                    continue;
+                }
+
+                if (!isset($filter['filter_type']) && !isset($filter['source_files'])) {
+                    continue;
+                }
+
                 $query = PlanFeature::query();
 
                 // Price filter
