@@ -92,7 +92,9 @@ class FileManager
     protected static function generateUniqueFileName(UploadedFile $file): string
     {
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $extension = $file->getClientOriginalExtension();
+        // SEC-10/P2-04: Use $file->extension() (PHP Fileinfo-based detection) instead of
+        // getClientOriginalExtension() (client-controlled, easily spoofed).
+        $extension = $file->extension();
         $sanitizedName = preg_replace('/[^a-zA-Z0-9-_]/', '_', $originalName);
         return time() . '_' . $sanitizedName . '.' . $extension;
     }

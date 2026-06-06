@@ -8,21 +8,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
-            $table->id();
-            $table->string('action');
-            $table->unsignedBigInteger('action_id')->nullable();
-            $table->boolean('is_general')->default(false);
-            $table->string('icon')->nullable();
-            $table->timestamps();
-
-            // Add indexes for faster queries
-            $table->index('is_general');
-        });
+        // Superseded by 2025_06_16_063045_create_notifications_table.php
+        // which defines the canonical notifications schema. This migration
+        // is intentionally a no-op to preserve the migrations history.
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('notifications');
+        // No-op — canonical table is managed by 2025_06_16_063045.
     }
 };

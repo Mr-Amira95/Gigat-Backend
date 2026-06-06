@@ -2,14 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class AiConversationService extends Model
+class AiConversationService extends Pivot
 {
-    use HasFactory;
-
-
     protected $fillable = [
         'ai_conversation_id',
         'service_id',

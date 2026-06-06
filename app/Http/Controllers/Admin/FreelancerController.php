@@ -85,7 +85,6 @@ class FreelancerController extends Controller
             $freelancer = $this->freelancerService->updateVerification($request->id);
 
             // one signal notification*****************************************
-            // dd($freelancer->user);
             $user = $freelancer->user;
             if ($user) {
                 $titles = [

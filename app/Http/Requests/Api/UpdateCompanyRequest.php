@@ -22,7 +22,7 @@ class UpdateCompanyRequest extends FormRequest
         return [
             'name' => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'country_of_registration' => 'sometimes|required|string|max:255',
             'registration_number' => [
                 'sometimes',
@@ -37,7 +37,7 @@ class UpdateCompanyRequest extends FormRequest
             'website_url' => 'nullable|url|max:255',
 
             'social_links' => 'nullable|array',
-            'social_links.*.icon' => 'required_with:social_links|file|mimes:jpg,jpeg,png,svg,gif',
+            'social_links.*.icon' => 'required_with:social_links|file|mimes:jpg,jpeg,png,gif',
             'social_links.*.url'  => 'required_with:social_links|url|max:255',
             'social_links.*.title' => 'required_with:social_links|string|max:255',
         ];

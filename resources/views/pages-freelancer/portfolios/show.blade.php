@@ -35,7 +35,7 @@
 
                                 <div>
                                     <strong>{{ __('description') }}:</strong>
-                                    <p>{!! $portfolio->translation->description !!}</p>
+                                    <p>{{ $portfolio->translation->description }}</p>
                                 </div>
 
                                 {{-- <div>

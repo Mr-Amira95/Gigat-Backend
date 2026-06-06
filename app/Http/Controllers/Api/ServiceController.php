@@ -93,7 +93,6 @@ class ServiceController extends Controller
     {
         $perPage = $request->query('per_page', 15);
         $userId =  Auth::id() ?? $request->query('user_id');
-        // dd($userId);
         $services = $this->serviceService->getServicesByUserId($userId, $perPage);
         return $this->successResponse(
             __('success'),
@@ -109,7 +108,6 @@ class ServiceController extends Controller
         $currencyCode = $request->header('currency', 'USD');
         $currencyModel = Currency::where('code', strtoupper($currencyCode))->first();
         $symbol = $currencyModel ? $currencyModel->symbol : '$';
-        // dd($currencyCode);
         $service = $this->serviceService->getServiceDetails($serviceId);
         if (!$service) {
             return $this->errorResponse(__('service_unavailable'), 404);
@@ -204,7 +202,6 @@ class ServiceController extends Controller
 
             // Get currency code from header (default 'USD')
             $currencyCode = $request->currency;
-            // dd($data['plans']);
 
             // Loop on each plan and convert price to USD
             foreach ($data['plans'] as &$plan) {
@@ -215,7 +212,6 @@ class ServiceController extends Controller
                     }
                 }
             }
-            // dd($dd);
             // Add user id
             $data['user_id'] = Auth::id();
 

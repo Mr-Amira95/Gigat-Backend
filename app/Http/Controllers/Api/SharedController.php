@@ -130,7 +130,6 @@ class SharedController extends Controller
         $settings['unread_notifications'] = $this->notificationService->getUnreadNotifications();
 
         $userId = Auth::id() ?? null;
-        // dd($userId);
         $totalUnreadMessages = ChatMessage::where('is_read', false)
             ->where('sender_id', '!=', $userId)
             ->whereHas('chat', function ($q) use ($userId) {

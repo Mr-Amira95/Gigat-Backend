@@ -85,6 +85,8 @@ use App\Repositories\Interfaces\RequestFeedbackRepositoryInterface;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Session;
 
 class AppServiceProvider extends ServiceProvider
@@ -134,6 +136,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->configureRateLimiting();
+
+        Passport::tokensExpireIn(now()->addDays(1));
+        Passport::refreshTokensExpireIn(now()->addDays(30));
+        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+
         // Model::preventLazyLoading(!app()->isProduction());
 
         Model::preventLazyLoading(false);
@@ -189,5 +197,42 @@ class AppServiceProvider extends ServiceProvider
         if (session()->has('locale')) {
             App::setLocale(session('locale'));
         }
+    }
+
+    protected function configureRateLimiting(): void
+    {
+        // Admin login: 5 attempts per minute per IP
+        RateLimiter::for('admin-login', function ($request) {
+            return Limit::perMinute(5)->by($request->ip())->response(function () {
+                return back()->withErrors(['login' => __('Too many login attempts. Please try again in a minute.')]);
+            });
+        });
+
+        // Freelancer login: 5 attempts per minute per IP
+        RateLimiter::for('freelancer-login', function ($request) {
+            return Limit::perMinute(5)->by($request->ip())->response(function () {
+                return back()->withErrors(['phone' => __('Too many login attempts. Please try again in a minute.')]);
+            });
+        });
+
+        // Registration: 3 attempts per minute per IP (prevents mass account creation)
+        RateLimiter::for('register', function ($request) {
+            return Limit::perMinute(3)->by($request->ip());
+        });
+
+        // OTP verify / resend: 3 attempts per 10 minutes per IP
+        RateLimiter::for('otp-verify', function ($request) {
+            return Limit::perMinutes(10, 3)->by($request->ip());
+        });
+
+        // Password reset: 3 attempts per 5 minutes per IP
+        RateLimiter::for('password-reset', function ($request) {
+            return Limit::perMinutes(5, 3)->by($request->ip());
+        });
+
+        // Verify code: 5 attempts per 5 minutes per IP
+        RateLimiter::for('verify-code', function ($request) {
+            return Limit::perMinutes(5, 5)->by($request->ip());
+        });
     }
 }

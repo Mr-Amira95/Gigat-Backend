@@ -54,7 +54,6 @@ class ServiceController extends Controller
     }
     public function store(ServiceRequest $request)
     {
-        // dd($request->all());
 
         $data = $request->validated();
         $currency = Currency::find($data['currency_id']);
@@ -91,7 +90,6 @@ class ServiceController extends Controller
     public function update(UpdateServiceRequest $request, $id)
     {
         $data = $request->validated();
-        // dd($data);
         $currency = Currency::find($data['currency_id']);
         $exchangeRate = $currency->exchange_rate;
 
@@ -122,27 +120,14 @@ class ServiceController extends Controller
 
     public function toggleRecommended(Request $request)
     {
-
-        $request->validate([
-            'id' => 'required|exists:services,id',
-        ]);
-
-        $service = Service::findOrFail($request->id);
-        $service->is_recommended = !$service->is_recommended;
-        $service->save();
-
-        // بدل redirect، نرجع JSON response
-        return response()->json([
-            'success' => true,
-            'message' => __('service_updated_successfully'),
-        ]);
+        abort(403, 'Admin only');
     }
     public function show($id)
     {
         $categories = $this->categoryService->index();
         $service = $this->serviceService->getServiceDetails($id);
         $tags = $service->tags()->pluck('tags.id')->toArray();
-        $selectedTags = $service->tags()->pluck('tags.id')->toArray();
+        $selectedTags = $tags;
 
         $servicePlans = $this->serviceService->getPlansByServiceId($id);
         $plans = $this->planService->index();

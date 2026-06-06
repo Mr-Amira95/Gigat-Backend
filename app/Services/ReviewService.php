@@ -28,11 +28,18 @@ class ReviewService
         );
 
         if ($existingReview) {
-           return  [
-            'error'=>true,
-           'message'=> ('You have already reviewed this service')
-        ];
+            return ['error' => true, 'message' => 'You have already reviewed this service'];
         }
+
+        $hasCompletedRequest = \App\Models\Request::where('user_id', Auth::id())
+            ->where('service_id', $data['service_id'])
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->exists();
+
+        if (!$hasCompletedRequest) {
+            return ['error' => true, 'message' => 'You can only review a service after completing a request'];
+        }
+
         $data['user_id'] = Auth::id();
         return $this->reviewRepository->submitReview($data);
     }

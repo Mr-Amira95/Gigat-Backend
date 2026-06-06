@@ -16,6 +16,7 @@
         "laravel/socialite": "^5.18",
         "laravel/telescope": "^5.17",
         "laravel/tinker": "^2.9",
+        "mews/purifier": "^3.4",
         "proengsoft/laravel-jsvalidation": "^4.9",
         "pusher/pusher-php-server": "^7.2",
         "spatie/laravel-permission": "^6.13",

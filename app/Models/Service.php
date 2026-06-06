@@ -95,6 +95,6 @@ class Service extends Model
 
     public function aiConversations()
     {
-        return $this->belongsToMany(AiConversation::class, 'ai_conversation_service');
+        return $this->belongsToMany(AiConversation::class, 'ai_conversation_services');
     }
 }

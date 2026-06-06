@@ -17,7 +17,6 @@ use App\Services\OneSignalService;
 use App\Utilities\GoogleTranslator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Termwind\Components\Dd;
 
 class RequestRepository implements RequestRepositoryInterface
 {
@@ -92,22 +91,28 @@ class RequestRepository implements RequestRepositoryInterface
     }
     public function getRequestDetails($id)
     {
-        $request = $this->model->with([
-            'user.languages.language',
-            'service',
-            'plan.features' => function ($query) use ($id) {
-                $serviceId = $this->model->find($id)?->service_id;
-                if ($serviceId) {
-                    $query->where('service_id', $serviceId);
-                }
-            },
-            'logs.user',
-            'logs.attachments',
-            'deliveries.translation',
-            'deliveries.attachments',
-            'feedbacks.translation',
-            'feedbacks.attachments',
-        ])->findOrFail($id);
+        $userId = auth('api')->id();
+        $request = $this->model
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                  ->orWhereHas('service', fn($sq) => $sq->where('user_id', $userId));
+            })
+            ->with([
+                'user.languages.language',
+                'service',
+                'plan.features' => function ($query) use ($id) {
+                    $serviceId = $this->model->find($id)?->service_id;
+                    if ($serviceId) {
+                        $query->where('service_id', $serviceId);
+                    }
+                },
+                'logs.user',
+                'logs.attachments',
+                'deliveries.translation',
+                'deliveries.attachments',
+                'feedbacks.translation',
+                'feedbacks.attachments',
+            ])->findOrFail($id);
 
         $user = Auth::guard('api')->user();
         if ($user && !$user->freelancer()->exists()) {
@@ -120,10 +125,16 @@ class RequestRepository implements RequestRepositoryInterface
 
     public function addComment($data)
     {
-        $request = $this->find($data['request_id']);
+        $userId = auth('api')->id();
+        $request = $this->model
+            ->where('id', $data['request_id'])
+            ->where(function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                  ->orWhereHas('service', fn($sq) => $sq->where('user_id', $userId));
+            })
+            ->firstOrFail();
         $current_status = $request->status;
         $new_status = $data['status'];
-        $userId = auth()->id();
         $freelancer = $request->service->user;
         $client = $request->user;
 
@@ -284,23 +295,27 @@ class RequestRepository implements RequestRepositoryInterface
             'request_id' => $requestId,
         ]);
 
-        // Translate action text (en + ar)
-        $translations = $this->googleTranslator->translateForStorage($action);
-
-        // Store translations
-        foreach ($translations as $lang => $text) {
+        // Store placeholder translations immediately; async job translates both languages
+        foreach (['en', 'ar'] as $lang) {
             $requestLog->translations()->create([
                 'language' => $lang,
-                'action'   => $text,
+                'action'   => $action,
             ]);
         }
+
+        \App\Jobs\TranslateEntityJob::dispatch(
+            \App\Models\RequestLog::class, $requestLog->id, $action, 'action'
+        );
 
         return $requestLog;
     }
 
     public function confirmRequest($id)
     {
-        $request = $this->find($id);
+        $request = $this->model
+            ->where('id', $id)
+            ->where('user_id', auth('api')->id())
+            ->firstOrFail();
         $request->update([
             'status' => 'confirmed'
         ]);

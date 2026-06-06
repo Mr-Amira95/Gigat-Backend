@@ -17,7 +17,7 @@ class ClientRepository implements ClientRepositoryInterface
     {
         $this->model = $client;
     }
-    public function index($params)
+    public function index($params, ?int $perPage = 50)
     {
         $query = $this->model
             ->whereDoesntHave('freelancer')
@@ -46,7 +46,8 @@ class ClientRepository implements ClientRepositoryInterface
             $query->whereIn('country_id', $params['country']);
         }
 
-        return $query->get();
+        // P2-06/PERF-03: paginate by default; pass null to get all (e.g. for exports)
+        return $perPage ? $query->paginate($perPage) : $query->get();
     }
     public function store($data)
     {

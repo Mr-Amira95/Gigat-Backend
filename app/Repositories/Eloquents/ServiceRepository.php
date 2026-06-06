@@ -290,25 +290,26 @@ class ServiceRepository implements ServiceRepositoryInterface
             // Create the Service record
             $service = $this->model->create([
                 'sub_category_id' => $data['sub_category_id'],
-                'user_id' => $data['user_id'] ?? 5,
+                'user_id' => $data['user_id'] ?? throw new \InvalidArgumentException('user_id is required'),
                 'status' => 'approved',
                 'is_recommended' => true
             ]);
 
-            // Create Translations for Service
-            $translator = new GoogleTranslator();
-            $titleTranslations = $translator->translateForStorage($data['title']);
-            $descriptionTranslations = $translator->translateForStorage($data['description']);
-
-            // dd($titleTranslations);
-
+            // Create placeholder translations immediately; async job will overwrite with real translations
             foreach (['en', 'ar'] as $locale) {
                 $service->translations()->create([
-                    'language' => $locale,
-                    'title'        => $titleTranslations[$locale],
-                    'description'  => $descriptionTranslations[$locale],
+                    'language'    => $locale,
+                    'title'       => $data['title'],
+                    'description' => $data['description'],
                 ]);
             }
+
+            \App\Jobs\TranslateEntityJob::dispatch(
+                \App\Models\Service::class, $service->id, $data['title'], 'title'
+            );
+            \App\Jobs\TranslateEntityJob::dispatch(
+                \App\Models\Service::class, $service->id, $data['description'], 'description'
+            );
 
             // Handle the service plans and features
             foreach ($data['plans'] as $planData) {

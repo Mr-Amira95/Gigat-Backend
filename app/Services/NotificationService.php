@@ -33,8 +33,8 @@ class NotificationService
         return $this->notificationRepository->getUnreadNotifications();
     }
 
-    public function markNotificationAsRead($userId)
+    public function markNotificationAsRead($notificationId, $userId)
     {
-        return $this->notificationRepository->markAsRead($userId);
+        return $this->notificationRepository->markAsRead($notificationId, $userId);
     }
 }

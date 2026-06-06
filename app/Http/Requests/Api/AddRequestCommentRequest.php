@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Enums\RequestStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AddRequestCommentRequest extends FormRequest
@@ -23,10 +24,10 @@ class AddRequestCommentRequest extends FormRequest
     {
         return [
             'request_id'  => 'required|exists:requests,id',
-            'status'      => 'required',
+            'status'      => 'required|in:' . implode(',', RequestStatusEnum::values()),
             'action'      => 'required|string|max:255',
             'attachments' => 'nullable|array',
-            'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,mp4,m4a,zip',
+            'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,mp4,m4a,zip|max:51200',
 
         ];
     }

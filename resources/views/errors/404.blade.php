@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" dir="rtl" data-nav-layout="vertical" data-vertical-style="overlay" class="light"
-    data-header-styles="light" data-menu-styles="light" data-toggled="close">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}"
+      data-nav-layout="vertical" data-vertical-style="overlay" class="light"
+      data-header-styles="light" data-menu-styles="light">
 
 <head>
     <!-- TITLE -->

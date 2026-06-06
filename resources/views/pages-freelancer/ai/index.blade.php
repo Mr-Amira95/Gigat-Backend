@@ -47,7 +47,7 @@
                                     <div
                                         class="max-w-lg p-4 rounded-lg
                                 {{ $message->role == 'user' ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border' }}">
-                                        {!! $message->message !!}
+                                        {{ $message->message }}
                                         <div class="text-xs mt-2 opacity-60 text-right">
                                             {{ $message->created_at->format('Y-m-d H:i') }}
                                         </div>

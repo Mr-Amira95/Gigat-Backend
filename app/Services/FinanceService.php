@@ -36,8 +36,8 @@ class FinanceService
         $this->financeRepository->markAsPaid($financeIds);
     }
 
-    public function getAllFiltered(array $filters)
+    public function getAllFiltered(array $filters, ?int $perPage = 50)
     {
-        return $this->financeRepository->getAllFiltered($filters);
+        return $this->financeRepository->getAllFiltered($filters, $perPage);
     }
 }

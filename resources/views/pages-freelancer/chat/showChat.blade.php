@@ -1,10 +1,6 @@
 @extends('layouts.master')
 @section('title', __('chat'))
 @push('styles')
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.0/echo.iife.js"></script>
-
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
     <style>
@@ -41,6 +37,12 @@
                     {{-- <h3 class="text-[1.125rem] font-semibold">{{ __('chat_with') }} {{ $otherUser->username }}</h3> --}}
                 </div>
                 <ol class="flex items-center whitespace-nowrap">
+                    <li class="text-[0.813rem] ps-[0.5rem]">
+                        <a class="flex items-center text-primary" href="{{ route('freelancer.home.index') }}">
+                            <i class="ti ti-home me-1"></i> {{ __('home') }}
+                            <i class="ti ti-chevrons-right px-[0.5rem] rtl:rotate-180"></i>
+                        </a>
+                    </li>
                     <li class="text-[0.813rem] ps-[0.5rem]">
                         <a class="flex items-center text-primary" href="{{ route('freelancer.chat.index') }}">
                             {{ __('chats') }}
@@ -145,6 +147,7 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         const messages = {
             en: {
@@ -156,31 +159,21 @@
         };
 
         const currentLang = '{{ app()->getLocale() }}';
-    </script>
 
+        function escHtml(s) {
+            if (s == null) return '';
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // window.Pusher = Pusher;
-
-            // window.Echo = new Echo({
-            //     broadcaster: 'pusher',
-            //     key: '{{ env('VITE_PUSHER_APP_KEY') }}',
-            //     cluster: '{{ env('VITE_PUSHER_APP_CLUSTER') }}',
-            //     forceTLS: true,
-            //     encrypted: true,
-            //     // authEndpoint: '/broadcasting/auth',
-            //     // auth: {
-            //     //     headers: {
-            //     //         'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            //     //     }
-            //     // }
-            // });
-
-            console.log('DOM ready');
-
             const chatId = {{ $chat->id }};
-            console.log('Chat ID:', chatId);
 
 
 
@@ -277,57 +270,38 @@
             // Listen for new messages on private channel
             Echo.channel('chat.' + chatId)
                 .listen('.message.sent', (e) => {
-                    console.log('New message event received:', e);
-
                     const chatBody = document.getElementById('chatBody');
-                    if (!chatBody) {
-                        console.error('chatBody element not found');
-                        return;
-                    }
+                    if (!chatBody) return;
 
-                    // Create message bubble element
                     const bubble = document.createElement('div');
-                    bubble.classList.add('flex', e.message.sender_id == {{ auth()->id() }} ? 'justify-end' :
-                        'justify-start');
+                    bubble.classList.add('flex', e.message.sender_id == {{ auth()->id() }} ? 'justify-end' : 'justify-start');
 
+                    let content = `<div style="background:darkslateblue" class="max-w-xs p-3 rounded-lg text-white">`;
 
-                    let content = `
-                            <div style="background:darkslateblue" class="max-w-xs p-3 rounded-lg ${e.message.sender_id == {{ auth()->id() }} ? 'text-white' : 'bg-white border'}">
-                        `;
-
-                    // Attachment
                     if (e.message.attachment_url) {
-                        const fileUrl = e.message.attachment_url;
-                        const fileType = e.message.attachment_type;
-                        const fileName = fileUrl.split('/').pop();
+                        const fileUrl = escHtml(e.message.attachment_url);
+                        const fileType = e.message.attachment_type ?? '';
+                        const fileName = escHtml(e.message.attachment_url.split('/').pop());
 
                         if (fileType.startsWith('image')) {
                             content += `<img src="${fileUrl}" class="mt-2 mb-2 rounded-lg max-w-[150px]">`;
                         } else if (fileType.startsWith('video')) {
-                            content +=
-                                `<video controls class="mt-2 mb-2 max-w-[150px]"><source src="${fileUrl}"></video>`;
+                            content += `<video controls class="mt-2 mb-2 max-w-[150px]"><source src="${fileUrl}"></video>`;
                         } else if (fileType.startsWith('audio')) {
                             content += `<audio controls class="mt-2 mb-2"><source src="${fileUrl}"></audio>`;
                         } else {
-                            content +=
-                                `<a href="${fileUrl}" target="_blank" class="block mt-2 mb-2 underline">${fileName} <br> Download file</a>`;
+                            content += `<a href="${fileUrl}" target="_blank" class="block mt-2 mb-2 underline">${fileName}<br>Download file</a>`;
                         }
                     }
 
-                    // Message
-                    const fileType = e.message.attachment_type;
-                    if (e.message.message && fileType?.startsWith('call')) {
-                        content +=
-                            `<p class="text-sm text-white">📞 Call Duration <br> ${e.message.message}</p>`;
+                    const fileType = e.message.attachment_type ?? '';
+                    if (e.message.message && fileType.startsWith('call')) {
+                        content += `<p class="text-sm text-white">📞 Call Duration<br>${escHtml(e.message.message)}</p>`;
                     } else {
-                        content += `<p class="text-sm text-white">${e.message.message}</p>`;
+                        content += `<p class="text-sm text-white">${escHtml(e.message.message)}</p>`;
                     }
 
-                    content += `
-                        <span class="block text-xs text-gray-400 mt-1">
-                            ${new Date(e.message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                    </div>`;
+                    content += `<span class="block text-xs text-gray-400 mt-1">${new Date(e.message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></div>`;
                     bubble.innerHTML = content;
                     chatBody.appendChild(bubble);
                     chatBody.scrollTop = chatBody.scrollHeight;
@@ -371,21 +345,19 @@
 
             // Handle sending new message via AJAX
             const sendMessageForm = document.getElementById('sendMessageForm');
-            console.log('sendMessageForm:', sendMessageForm);
 
             if (sendMessageForm) {
 
                 sendMessageForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    if (isSending) return; // ✅ ما تكمل لو فيه إرسال جاري
+                    if (isSending) return;
 
-                    isSending = true; // ✅ قفّل الزر
+                    isSending = true;
 
                     const messageInput = document.getElementById('messageInput');
                     const attachmentInput = document.getElementById('attachmentInput');
 
                     if (audioBlobToSend && attachmentInput.files.length > 0) {
-                        console.log('condition matched');
                         alert(messages[currentLang].fileWithAudio);
                         isSending = false;
                         return;
@@ -414,12 +386,11 @@
 
                     axios.post("{{ route('freelancer.chat.sendMessage', $chat->id) }}", formData, {
                             headers: {
-                                'Content-Type': 'multipart/form-data'
+                                'Content-Type': 'multipart/form-data',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                             }
                         })
                         .then(response => {
-                            console.log('Message sent successfully');
-
                             messageInput.value = '';
                             attachmentInput.value = '';
                             attachmentPreview.innerHTML = '';
@@ -429,55 +400,38 @@
                             recordingTimer.classList.add('hidden');
                             recordingTimer.textContent = '';
 
-
                             const chatBody = document.getElementById('chatBody');
                             if (!chatBody) return;
 
                             const bubble = document.createElement('div');
                             bubble.classList.add('flex', 'justify-end');
 
-                            let content = `
-                                    <div style="background:darkslateblue" class="max-w-xs p-3 rounded-lg text-white">
-                                `;
-
+                            let content = `<div style="background:darkslateblue" class="max-w-xs p-3 rounded-lg text-white">`;
 
                             if (response.data.message.attachment_url) {
-                                const fileUrl = response.data.message.attachment_url;
-                                const fileType = response.data.message.attachment_type;
-                                const fileName = fileUrl.split('/').pop();
-
+                                const fileUrl = escHtml(response.data.message.attachment_url);
+                                const fileType = response.data.message.attachment_type ?? '';
+                                const fileName = escHtml(response.data.message.attachment_url.split('/').pop());
 
                                 if (fileType.startsWith('image')) {
-                                    content +=
-                                        `<img src="${fileUrl}" class="mt-2 mb-2 rounded-lg max-w-[150px]">`;
+                                    content += `<img src="${fileUrl}" class="mt-2 mb-2 rounded-lg max-w-[150px]">`;
                                 } else if (fileType.startsWith('video')) {
-                                    content +=
-                                        `<video controls class="mt-2 mb-2 max-w-[150px]"><source src="${fileUrl}"></video>`;
+                                    content += `<video controls class="mt-2 mb-2 max-w-[150px]"><source src="${fileUrl}"></video>`;
                                 } else if (fileType.startsWith('audio')) {
-                                    content +=
-                                        `<audio controls class="mt-2 mb-2"><source src="${fileUrl}"></audio>`;
+                                    content += `<audio controls class="mt-2 mb-2"><source src="${fileUrl}"></audio>`;
                                 } else {
-                                    content +=
-                                        `<a href="${fileUrl}" target="_blank" class="block mt-2 mb-2 underline">${fileName} <br> Download file</a>`;
+                                    content += `<a href="${fileUrl}" target="_blank" class="block mt-2 mb-2 underline">${fileName}<br>Download file</a>`;
                                 }
-
-
-
                             }
-                            const fileType = response.data.message.attachment_type;
 
-                            if (response.data.message.message && fileType?.startsWith('call')) {
-                                content +=
-                                    `<p class="text-sm text-white">📞 Call Duration <br> ${response.data.message.message}</p>`;
+                            const fileType = response.data.message.attachment_type ?? '';
+
+                            if (response.data.message.message && fileType.startsWith('call')) {
+                                content += `<p class="text-sm text-white">📞 Call Duration<br>${escHtml(response.data.message.message)}</p>`;
                             } else {
-                                content +=
-                                    `<p class="text-sm text-white">${response.data.message.message}</p>`;
+                                content += `<p class="text-sm text-white">${escHtml(response.data.message.message)}</p>`;
                             }
-                            content += `
-                                <span class="block text-xs text-gray-300 mt-1">
-                                    ${response.data.message.created_at.substring(11, 16)}
-                                </span>
-                            </div>`;
+                            content += `<span class="block text-xs text-gray-300 mt-1">${escHtml(response.data.message.created_at.substring(11, 16))}</span></div>`;
 
                             bubble.innerHTML = content;
                             chatBody.appendChild(bubble);
@@ -486,27 +440,20 @@
                         })
                         .catch(error => {
                             if (error.response && error.response.status === 403) {
-                                // show backend message (like "interaction_not_allowed")
                                 alert(error.response.data.message);
                             } else {
-                                // fallback for any other error
-                                console.error('Error sending message:', error);
                                 alert('Failed to send message.');
                             }
-
                         })
                         .finally(() => {
-                            isSending = false; // ✅ فك القفل بعد التنفيذ
+                            isSending = false;
                         });
                 });
             }
 
             function scrollToBottom() {
                 const chatBody = document.getElementById('chatBody');
-                if (chatBody) {
-                    chatBody.scrollTop = chatBody.scrollHeight;
-                    console.log('Scroll to bottom done');
-                }
+                if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
             }
 
             window.addEventListener('load', scrollToBottom);

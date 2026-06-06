@@ -9,6 +9,7 @@ use App\Models\Quotation;
 use App\Models\QuotationComment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
@@ -31,11 +32,12 @@ class StripeController extends Controller
             $serviceTitle = $response->getData(true)['data']['request_info']['title'];
             $formattedTotal = $response->getData(true)['data']['request_info']['original_total'];
             $amount = floatval(preg_replace('/[^0-9.]/', '', $formattedTotal));
-            // dd($amount); // e.g. 24.99
 
             $type =
                 !empty($validatedData['quotation_id']) ? 'quotation' : (!empty($validatedData['request_id']) ? 'request_payment' : 'service');
             // Prepare line items for Stripe
+            $expectedAmountCents = intval($amount * 100);
+
             $lineItems = [
                 [
                     'price_data' => [
@@ -43,19 +45,19 @@ class StripeController extends Controller
                         'product_data' => [
                             'name' => $serviceTitle,
                             'metadata' => [
-                                'user_id'      => auth()->id(),
-                                'service_id'   => $validatedData['service_id'] ?? null,
-                                'plan_id'      => $validatedData['plan_id'] ?? null,
-                                'quotation_id' => $validatedData['quotation_id'] ?? null,
-                                'comment_id'   => $validatedData['comment_id'] ?? null,
-                                'type'         => $type,
-                                // 'type'         => !empty($validatedData['quotation_id']) ? 'quotation' : 'service',
-                                'client_payment_status'   => 'paid',
-                                'request_id'   => $validatedData['request_id'] ?? null,
+                                'user_id'               => auth()->id(),
+                                'service_id'            => $validatedData['service_id'] ?? null,
+                                'plan_id'               => $validatedData['plan_id'] ?? null,
+                                'quotation_id'          => $validatedData['quotation_id'] ?? null,
+                                'comment_id'            => $validatedData['comment_id'] ?? null,
+                                'type'                  => $type,
+                                'client_payment_status' => 'paid',
+                                'request_id'            => $validatedData['request_id'] ?? null,
+                                'expected_amount_cents' => $expectedAmountCents,
                             ],
                         ],
 
-                        'unit_amount' => intval($amount * 100),
+                        'unit_amount' => $expectedAmountCents,
                     ],
                     'quantity' => 1,
                 ]
@@ -127,6 +129,19 @@ class StripeController extends Controller
             try {
                 $session = $event->data->object;
 
+                // Atomic lock: held until the Finance record is written, so two concurrent
+                // deliveries of the same event cannot both pass the idempotency check.
+                $lock = \Illuminate\Support\Facades\Cache::lock('stripe_webhook_' . $session->id, 120);
+                if (!$lock->get()) {
+                    return response('Processing in progress', 200);
+                }
+
+                // Idempotency guard inside the lock
+                if (\App\Models\Finance::where('stripe_session_id', $session->id)->exists()) {
+                    $lock->release();
+                    return response('Already processed', 200);
+                }
+
                 // Retrieve session with expanded line items to access metadata
                 $session = Session::retrieve([
                     'id' => $session->id,
@@ -136,6 +151,18 @@ class StripeController extends Controller
                 $lineItem = $session->line_items->data[0] ?? null;
                 $metadata = $lineItem->price->product->metadata ?? [];
                 $data = is_object($metadata) ? $metadata->toArray() : (array)$metadata;
+                $data['stripe_session_id'] = $session->id;
+
+                // Verify the charged amount matches what the server calculated at session creation time.
+                $expectedCents = isset($data['expected_amount_cents']) ? (int) $data['expected_amount_cents'] : null;
+                if ($expectedCents !== null && $session->amount_total !== $expectedCents) {
+                    Log::error('Stripe webhook amount mismatch', [
+                        'session_id'     => $session->id,
+                        'expected_cents' => $expectedCents,
+                        'actual_cents'   => $session->amount_total,
+                    ]);
+                    return response('Amount mismatch', 200);
+                }
 
                 // Check if payment is successful
                 // if ($session->payment_status === 'paid') {
@@ -202,14 +229,21 @@ class StripeController extends Controller
                         'type'       => $type
                     ]);
 
+                    $lock->release();
                     return $this->successResponse('Webhook processed successfully');
                 }
 
                 Log::warning('Payment not completed', ['session_id' => $session->id]);
+                $lock->release();
                 return $this->errorResponse('Payment not completed');
             } catch (\Exception $e) {
-                Log::error('Stripe webhook error in processing', ['error' => $e->getMessage()]);
-                return $this->exceptionResponse($e);
+                Log::error('Stripe webhook error in processing', [
+                    'error'   => $e->getMessage(),
+                    'session' => $session->id ?? null,
+                ]);
+                isset($lock) && $lock->release();
+                // Always return 200 so Stripe does not retry — error is handled via logs/alerts.
+                return response('Webhook handler error', 200);
             }
         }
         return $this->successResponse('Webhook received (no action taken)');

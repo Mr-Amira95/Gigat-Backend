@@ -21,7 +21,6 @@ class QuotationController extends Controller
     public function index()
     {
         $quotations = $this->quotationService->getQuotationsForFreelancerWithComment();
-        // dd($quotations);
         return view('pages-freelancer.quotations.index', compact('quotations'));
     }
     public function show($id)

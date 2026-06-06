@@ -12,12 +12,12 @@
     <div style="height:90px" class="main-sidebar-header">
         <div class="flex justify-center my-4">
             @if (auth()->guard('freelancer')->check())
-                <a href="{{ route('home.index') }}" class="logo">
+                <a href="{{ route('freelancer.home.index') }}" class="logo">
                     <img src="{{ asset($logo) }}" alt="logo"
                         class="desktop-logo w-[150px] sm:w-[150px] md:w-[300px] lg:w-[350px] h-auto ">
                 </a>
             @elseif (auth()->guard('admin')->check())
-                <a href="{{ route('freelancer.home.index') }}" class="logo">
+                <a href="{{ route('home.index') }}" class="logo">
                     <img src="{{ asset($logo) }}" alt="logo"
                         class="desktop-logo w-[150px] sm:w-[150px] md:w-[300px] lg:w-[350px] h-auto ">
                 </a>
@@ -95,6 +95,13 @@
                         <a href="{{ route('home.index') }}" class="side-menu__item">
                             <i class="bx bx-home side-menu__icon"></i>
                             <span class="side-menu__label">{{ __('dashboard') }}</span>
+                        </a>
+                    </li>
+
+                    <li class="slide">
+                        <a href="{{ route('analytics.index') }}" class="side-menu__item">
+                            <i class="bx bx-bar-chart-alt-2 side-menu__icon"></i>
+                            <span class="side-menu__label">Analytics</span>
                         </a>
                     </li>
 

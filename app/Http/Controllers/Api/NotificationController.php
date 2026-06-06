@@ -50,7 +50,8 @@ class NotificationController extends Controller
 
     public function markAsReadByNotification($notificationId)
     {
-        $result = $this->notificationService->markNotificationAsRead($notificationId);
+        $userId = Auth::guard('api')->id();
+        $this->notificationService->markNotificationAsRead($notificationId, $userId);
 
         return $this->successResponse(__('notification_marked_as_read'));
     }
