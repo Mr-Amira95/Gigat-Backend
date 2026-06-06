@@ -24,7 +24,9 @@ class Service extends Model
         'is_active'
     ];
     protected $casts = [
-        'is_active' => 'boolean'
+        'is_active'       => 'boolean',
+        'sub_category_id' => 'integer',
+        'user_id'         => 'integer',
     ];
     protected $with = ['translation'];
 

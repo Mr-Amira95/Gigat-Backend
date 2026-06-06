@@ -15,6 +15,11 @@ class AiConversationService extends Model
         'service_id',
     ];
 
+    protected $casts = [
+        'ai_conversation_id' => 'integer',
+        'service_id'         => 'integer',
+    ];
+
 
     public function services()
     {

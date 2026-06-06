@@ -16,6 +16,10 @@ class DocumentCategory extends Model
         'parent_id',
     ];
 
+    protected $casts = [
+        'parent_id' => 'integer',
+    ];
+
     protected $with = ['translation'];
 
     public function translations()

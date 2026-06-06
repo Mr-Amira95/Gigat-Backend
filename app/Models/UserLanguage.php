@@ -14,6 +14,11 @@ class UserLanguage extends Model
         'language_id',
         'level'
     ];
+
+    protected $casts = [
+        'user_id'     => 'integer',
+        'language_id' => 'integer',
+    ];
     /**
      * Get the freelancer that owns the language.
      */

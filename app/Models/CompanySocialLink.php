@@ -15,6 +15,10 @@ class CompanySocialLink extends Model
         'url',
     ];
 
+    protected $casts = [
+        'company_id' => 'integer',
+    ];
+
     protected $with = ['translation'];
 
     public function translations()

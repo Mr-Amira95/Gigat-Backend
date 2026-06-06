@@ -11,6 +11,10 @@ class RequestDeliveryAttachment extends Model
         'attachment_path',
     ];
 
+    protected $casts = [
+        'request_delivery_id' => 'integer',
+    ];
+
     public function delivery()
     {
         return $this->belongsTo(RequestDelivery::class, 'request_delivery_id');

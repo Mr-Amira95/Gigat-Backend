@@ -29,6 +29,9 @@ class Request extends Model
 
     protected $casts = [
         'revisions_count' => 'integer',
+        'user_id'         => 'integer',
+        'service_id'      => 'integer',
+        'plan_id'         => 'integer',
     ];
 
     public function translations()

@@ -11,6 +11,11 @@ class TicketAttachment extends Model
 
     protected $fillable = ['message_id', 'user_id', 'file_path', 'file_type'];
 
+    protected $casts = [
+        'message_id' => 'integer',
+        'user_id'    => 'integer',
+    ];
+
     public function message()
     {
         return $this->belongsTo(TicketMessage::class, 'message_id');

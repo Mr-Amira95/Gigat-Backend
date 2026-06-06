@@ -18,6 +18,11 @@ class Notification extends Model
         'sent_by_admin',
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'type_id' => 'integer',
+    ];
+
     // Relationships
     public function user()
     {

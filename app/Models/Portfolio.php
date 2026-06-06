@@ -19,6 +19,10 @@ class Portfolio extends Model
         'is_featured'
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+    ];
+
     protected $with = ['translation'];
 
     public function translations()

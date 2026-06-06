@@ -16,7 +16,8 @@ class PortfolioMedia extends Model
         'is_cover'
     ];
     protected $casts = [
-        'is_cover'=>'boolean'
+        'is_cover'     => 'boolean',
+        'portfolio_id' => 'integer',
     ];
     /**
      * Get the portfolio that owns the media.

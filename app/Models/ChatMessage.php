@@ -16,6 +16,11 @@ class ChatMessage extends Model
         'is_read',
     ];
 
+    protected $casts = [
+        'chat_id'   => 'integer',
+        'sender_id' => 'integer',
+    ];
+
     // العلاقة مع الشات
     public function chat(): BelongsTo
     {

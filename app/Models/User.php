@@ -60,9 +60,11 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'verified_at' => 'datetime',
-        'password' => 'hashed',
-        'gender' => GenderEnum::class,
+        'verified_at'   => 'datetime',
+        'password'      => 'hashed',
+        'gender'        => GenderEnum::class,
+        'profession_id' => 'integer',
+        'country_id'    => 'integer',
     ];
 
     protected $appends = ['full_phone', 'gender_label'];

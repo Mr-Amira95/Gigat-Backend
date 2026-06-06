@@ -15,6 +15,11 @@ class RequestFeature extends Model
         'type',
         'value'
     ];
+
+    protected $casts = [
+        'plan_id'    => 'integer',
+        'request_id' => 'integer',
+    ];
     protected $with = ['translation'];
 
     public function plan()

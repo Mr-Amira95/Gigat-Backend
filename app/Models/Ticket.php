@@ -8,6 +8,12 @@ class Ticket extends Model
 {
     protected $fillable = ['code','user_id', 'request_id', 'subject', 'status', 'priority', 'assigned_to'];
 
+    protected $casts = [
+        'user_id'     => 'integer',
+        'request_id'  => 'integer',
+        'assigned_to' => 'integer',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

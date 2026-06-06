@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\App;
 class FixedFeature extends Model
 {
     protected $fillable = ['plan_id', 'title_en', 'title_ar'];
+
+    protected $casts = [
+        'plan_id' => 'integer',
+    ];
     protected $appends = ['title'];
     public function getTitleAttribute()
     {

@@ -161,7 +161,7 @@ class QuotationController extends Controller
 
             if ($user) {
                 // if user is a client
-                if (! $user->freelancer && $quotation->user_id !== $user->id) {
+                if (! $user->freelancer && (int) $quotation->user_id !== (int) $user->id) {
                     return $this->errorResponse(__('unauthorized'), 403);
                 }
 

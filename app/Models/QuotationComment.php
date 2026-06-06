@@ -15,6 +15,11 @@ class QuotationComment extends Model
         'quotation_id',
     ];
 
+    protected $casts = [
+        'user_id'      => 'integer',
+        'quotation_id' => 'integer',
+    ];
+
     protected $with = ['translation'];
 
     public function translations()

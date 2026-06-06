@@ -15,6 +15,10 @@ class DeviceToken extends Model
         'agent'
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+    ];
+
     /**
      * Get the user that owns the device token.
      */

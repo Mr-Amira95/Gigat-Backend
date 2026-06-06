@@ -14,6 +14,12 @@ class UserRating extends Model
         'review'
     ];
 
+    protected $casts = [
+        'freelancer_id' => 'integer',
+        'client_id'     => 'integer',
+        'request_id'    => 'integer',
+    ];
+
     public function rater()
     {
         return $this->belongsTo(User::class, 'freelancer_id');

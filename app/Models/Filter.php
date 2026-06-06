@@ -16,6 +16,10 @@ class Filter extends Model
         'min_value',
         'max_value'
     ];
+
+    protected $casts = [
+        'category_id' => 'integer',
+    ];
     protected $with = ['translation'];
 
 

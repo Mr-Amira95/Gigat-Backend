@@ -8,6 +8,11 @@ class Conversation extends Model
 {
     protected $fillable = ['initiator_id', 'receiver_id','name', 'status_by_initiator','status_by_receiver'];
 
+    protected $casts = [
+        'initiator_id' => 'integer',
+        'receiver_id'  => 'integer',
+    ];
+
     public function initiator()
     {
         return $this->belongsTo(User::class, 'initiator_id');

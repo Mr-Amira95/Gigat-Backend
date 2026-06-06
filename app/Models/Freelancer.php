@@ -19,7 +19,9 @@ class Freelancer extends Model
     ];
 
     protected $casts = [
-        'deleted_at' => 'datetime'
+        'deleted_at' => 'datetime',
+        'user_id'    => 'integer',
+        'company_id' => 'integer',
     ];
 
     protected $with = ['translation'];

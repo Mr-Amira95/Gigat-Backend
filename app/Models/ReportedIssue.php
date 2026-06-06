@@ -15,6 +15,11 @@ class ReportedIssue extends Model
         'status',
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'type_id' => 'integer',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

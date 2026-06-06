@@ -16,6 +16,11 @@ class Review extends Model
         'rating',
     ];
 
+    protected $casts = [
+        'user_id'    => 'integer',
+        'service_id' => 'integer',
+    ];
+
     protected $with = ['translation'];
 
     public function translations()

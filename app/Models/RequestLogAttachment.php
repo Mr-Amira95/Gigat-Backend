@@ -8,5 +8,9 @@ class RequestLogAttachment extends Model
 {
     protected $fillable = ['media_path','media_type','log_id'];
 
+    protected $casts = [
+        'log_id' => 'integer',
+    ];
+
     
 }

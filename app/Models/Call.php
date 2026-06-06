@@ -25,7 +25,9 @@ class Call extends Model
     }
 
     protected $casts = [
-        'started_at' => 'datetime',
-        'ended_at'   => 'datetime',
+        'caller_id'   => 'integer',
+        'receiver_id' => 'integer',
+        'started_at'  => 'datetime',
+        'ended_at'    => 'datetime',
     ];
 }

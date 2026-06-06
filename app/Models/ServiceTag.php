@@ -15,6 +15,11 @@ class ServiceTag extends Model
         'tag_id',
     ];
 
+    protected $casts = [
+        'service_id' => 'integer',
+        'tag_id'     => 'integer',
+    ];
+
     /**
      * Get the service that owns the tag.
      */

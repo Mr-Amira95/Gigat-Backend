@@ -8,6 +8,10 @@ class QuotationAttachment extends Model
 {
     protected $fillable = ['quotation_id', 'attachment_url'];
 
+    protected $casts = [
+        'quotation_id' => 'integer',
+    ];
+
     public function quotation()
     {
         return $this->belongsTo(Quotation::class);

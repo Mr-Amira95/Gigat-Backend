@@ -15,6 +15,10 @@ class FreelancerBank extends Model
         'swift_code',
     ];
 
+    protected $casts = [
+        'freelancer_id' => 'integer',
+    ];
+
     // public function setAccountNumberAttribute($value)
     // {
     //     $this->attributes['account_number'] = Crypt::encryptString($value);

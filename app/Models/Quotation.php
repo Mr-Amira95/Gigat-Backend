@@ -20,6 +20,11 @@ class Quotation extends Model
         'user_id',
         'status'
     ];
+
+    protected $casts = [
+        'sub_category_id' => 'integer',
+        'user_id'         => 'integer',
+    ];
     protected $with = ['translation'];
 
     public function translations()

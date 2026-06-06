@@ -17,6 +17,11 @@ class Chat extends Model
         'user_two_deleted_at',
     ];
 
+    protected $casts = [
+        'user_id_one' => 'integer',
+        'user_id_two' => 'integer',
+    ];
+
     // علاقة المستخدم الأول
     public function userOne(): BelongsTo
     {

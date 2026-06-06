@@ -11,6 +11,10 @@ class FreelancerCertificate extends Model
 
     protected $fillable = ['user_id', 'file_name', 'file_path'];
 
+    protected $casts = [
+        'user_id' => 'integer',
+    ];
+
     protected $with = ['translation'];
 
     public function user()

@@ -17,6 +17,10 @@ class DocumentContent extends Model
         'document_category_id',
     ];
 
+    protected $casts = [
+        'document_category_id' => 'integer',
+    ];
+
     protected $with = ['translation'];
 
 

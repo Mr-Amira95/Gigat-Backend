@@ -13,6 +13,10 @@ class RequestFeedback extends Model
 
     protected $fillable = ['request_id'];
 
+    protected $casts = [
+        'request_id' => 'integer',
+    ];
+
     protected $with = ['translation'];
 
     public function translations()

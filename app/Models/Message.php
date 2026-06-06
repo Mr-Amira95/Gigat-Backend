@@ -9,7 +9,9 @@ class Message extends Model
     protected $fillable = ['conversation_id', 'sender_id', 'message', 'message_type'];
 
     protected $casts = [
-        'is_read'=>'boolean'
+        'is_read'         => 'boolean',
+        'conversation_id' => 'integer',
+        'sender_id'       => 'integer',
     ];
     public function conversation()
     {

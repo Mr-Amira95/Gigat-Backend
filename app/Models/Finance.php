@@ -20,7 +20,8 @@ class Finance extends Model
     ];
 
     protected $casts = [
-        'paid_at'        => 'datetime',
+        'paid_at'    => 'datetime',
+        'request_id' => 'integer',
     ];
     public function request()
     {

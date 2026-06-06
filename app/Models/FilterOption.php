@@ -13,6 +13,10 @@ class FilterOption extends Model
     protected $fillable = [
         'filter_id'
     ];
+
+    protected $casts = [
+        'filter_id' => 'integer',
+    ];
     protected $with = ['translation'];      
 
     /**

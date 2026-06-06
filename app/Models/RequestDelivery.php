@@ -13,6 +13,10 @@ class RequestDelivery extends Model
         'request_id',
     ];
 
+    protected $casts = [
+        'request_id' => 'integer',
+    ];
+
     protected $with = ['translation'];
 
     public function translations()

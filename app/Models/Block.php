@@ -13,6 +13,11 @@ class Block extends Model
         'blocked_type'
     ];
 
+    protected $casts = [
+        'blocker_id' => 'integer',
+        'blocked_id' => 'integer',
+    ];
+
 
     public function blockedUser()
 {
