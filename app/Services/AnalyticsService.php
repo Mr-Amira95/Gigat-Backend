@@ -42,9 +42,17 @@ class AnalyticsService
         try {
             $visitor = Visitor::where('visitor_uuid', $data['visitor_uuid'])->firstOrFail();
 
+            $userId = $data['user_id'] ?? null;
+
+            // If a user is identified and the visitor isn't linked yet, link them now
+            if ($userId && \is_null($visitor->user_id)) {
+                $visitor->user_id = $userId;
+                $visitor->save();
+            }
+
             return AnalyticsEvent::create([
                 'visitor_id'  => $visitor->getKey(),
-                'user_id'     => $data['user_id'] ?? null,
+                'user_id'     => $userId,
                 'event_name'  => $data['event_name'],
                 'screen_name' => $data['screen_name'] ?? null,
                 'metadata'    => $data['metadata'] ?? null,
