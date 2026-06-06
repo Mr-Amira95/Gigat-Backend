@@ -90,14 +90,69 @@ class StripeController extends Controller
         try {
             $sessionId = $request->query('session_id');
 
-            $session = Session::retrieve($sessionId);
+            $session = Session::retrieve([
+                'id'     => $sessionId,
+                'expand' => ['line_items.data.price.product'],
+            ]);
 
             if ($session->payment_status === 'paid') {
+                $this->processPayment($session);
                 $url = config('app.frontend_url') . '/request-success';
                 return redirect()->away($url);
             }
         } catch (\Exception $e) {
-            return $this->exceptionResponse($e);
+            Log::error('Stripe success handler error', ['error' => $e->getMessage()]);
+        }
+
+        return redirect()->away(config('app.frontend_url') . '/request-success');
+    }
+
+    private function processPayment($session): void
+    {
+        $lock = \Illuminate\Support\Facades\Cache::lock('stripe_webhook_' . $session->id, 120);
+        if (!$lock->get()) {
+            return;
+        }
+
+        if (\App\Models\Finance::where('stripe_session_id', $session->id)->exists()) {
+            $lock->release();
+            return;
+        }
+
+        try {
+            $lineItem = $session->line_items->data[0] ?? null;
+            $metadata = $lineItem->price->product->metadata ?? [];
+            $data = is_object($metadata) ? $metadata->toArray() : (array) $metadata;
+            $data['stripe_session_id'] = $session->id;
+
+            $type = $data['type'] ?? null;
+
+            switch ($type) {
+                case 'quotation':
+                    $quotationController = app(QuotationController::class);
+                    $quotation = Quotation::findOrFail($data['quotation_id']);
+                    $comment   = QuotationComment::findOrFail($data['comment_id']);
+                    $quotationController->finalizeQuotationRequest($quotation, $comment, $data);
+                    break;
+
+                case 'request_payment':
+                    $req = \App\Models\Request::findOrFail($data['request_id']);
+                    $req->finance()->update(['client_payment_status' => 'paid']);
+                    $req->update(['status' => 'pending']);
+                    break;
+
+                case 'service':
+                    $requestController = app(RequestController::class);
+                    $requestController->createRequest($data);
+                    break;
+
+                default:
+                    Log::warning('Stripe: unknown payment type', ['type' => $type]);
+            }
+
+            Log::info('Stripe payment processed', ['session_id' => $session->id, 'type' => $type]);
+        } finally {
+            $lock->release();
         }
     }
     public function cancel()
@@ -124,37 +179,21 @@ class StripeController extends Controller
             return $this->errorResponse('Invalid signature');
         }
 
-        // Handle checkout session completed
         if ($event->type === 'checkout.session.completed') {
             try {
                 $session = $event->data->object;
 
-                // Atomic lock: held until the Finance record is written, so two concurrent
-                // deliveries of the same event cannot both pass the idempotency check.
-                $lock = \Illuminate\Support\Facades\Cache::lock('stripe_webhook_' . $session->id, 120);
-                if (!$lock->get()) {
-                    return response('Processing in progress', 200);
-                }
-
-                // Idempotency guard inside the lock
-                if (\App\Models\Finance::where('stripe_session_id', $session->id)->exists()) {
-                    $lock->release();
-                    return response('Already processed', 200);
-                }
-
-                // Retrieve session with expanded line items to access metadata
+                // Verify amount before processing
                 $session = Session::retrieve([
-                    'id' => $session->id,
+                    'id'     => $session->id,
                     'expand' => ['line_items.data.price.product'],
                 ]);
 
-                $lineItem = $session->line_items->data[0] ?? null;
-                $metadata = $lineItem->price->product->metadata ?? [];
-                $data = is_object($metadata) ? $metadata->toArray() : (array)$metadata;
-                $data['stripe_session_id'] = $session->id;
-
-                // Verify the charged amount matches what the server calculated at session creation time.
+                $lineItem      = $session->line_items->data[0] ?? null;
+                $metadata      = $lineItem->price->product->metadata ?? [];
+                $data          = is_object($metadata) ? $metadata->toArray() : (array) $metadata;
                 $expectedCents = isset($data['expected_amount_cents']) ? (int) $data['expected_amount_cents'] : null;
+
                 if ($expectedCents !== null && $session->amount_total !== $expectedCents) {
                     Log::error('Stripe webhook amount mismatch', [
                         'session_id'     => $session->id,
@@ -164,88 +203,17 @@ class StripeController extends Controller
                     return response('Amount mismatch', 200);
                 }
 
-                // Check if payment is successful
-                // if ($session->payment_status === 'paid') {
-
-                //     if (($data['type'] ?? null) === 'quotation') {
-                //         // ✅ Finalize quotation flow
-                //         $quotationController = app(QuotationController::class);
-                //         $quotation = Quotation::findOrFail($data['quotation_id']);
-                //         $comment   = QuotationComment::findOrFail($data['comment_id']);
-                //         $quotationController->finalizeQuotationRequest($quotation, $comment, $data);
-                //     } else {
-                //         // ✅ Normal service flow
-                //         $requestController = app(RequestController::class);
-                //         $requestController->createRequest($data);
-                //     }
-
-                //     Log::info('Webhook processing completed successfully', ['session_id' => $session->id]);
-                //     return $this->successResponse('Webhook processed and request created');
-                // }
                 if ($session->payment_status === 'paid') {
-
-                    $type = $data['type'] ?? null;
-
-                    switch ($type) {
-
-                        case 'quotation':
-
-                            $quotationController = app(QuotationController::class);
-                            $quotation = Quotation::findOrFail($data['quotation_id']);
-                            $comment   = QuotationComment::findOrFail($data['comment_id']);
-                            $quotationController->finalizeQuotationRequest($quotation, $comment, $data);
-
-                            break;
-
-                        case 'request_payment':
-
-                            $request = \App\Models\Request::findOrFail($data['request_id']);
-
-                            // 1️⃣ Update finance
-                            $request->finance()->update([
-                                'client_payment_status' => 'paid'
-                            ]);
-
-                            $request->update([
-                                'status' => 'pending'
-                            ]);
-
-                            break;
-
-                        case 'service':
-
-                            $requestController = app(RequestController::class);
-                            $requestController->createRequest($data);
-
-                            break;
-
-                        default:
-                            Log::warning('Unknown payment type', ['type' => $type]);
-                            break;
-                    }
-
-                    Log::info('Webhook processed successfully', [
-                        'session_id' => $session->id,
-                        'type'       => $type
-                    ]);
-
-                    $lock->release();
-                    return $this->successResponse('Webhook processed successfully');
+                    $this->processPayment($session);
                 }
 
-                Log::warning('Payment not completed', ['session_id' => $session->id]);
-                $lock->release();
-                return $this->errorResponse('Payment not completed');
+                return response('OK', 200);
             } catch (\Exception $e) {
-                Log::error('Stripe webhook error in processing', [
-                    'error'   => $e->getMessage(),
-                    'session' => $session->id ?? null,
-                ]);
-                isset($lock) && $lock->release();
-                // Always return 200 so Stripe does not retry — error is handled via logs/alerts.
+                Log::error('Stripe webhook error', ['error' => $e->getMessage()]);
                 return response('Webhook handler error', 200);
             }
         }
-        return $this->successResponse('Webhook received (no action taken)');
+
+        return response('OK', 200);
     }
 }
