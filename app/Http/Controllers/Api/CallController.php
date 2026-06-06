@@ -122,7 +122,7 @@ class CallController extends Controller
         ]);
 
         $callerId   = auth()->id();
-        $receiverId = $request->receiver_id;
+        $receiverId = (int) $request->receiver_id;
 
         /**
          * ------------------------------------------------------------
@@ -267,9 +267,12 @@ class CallController extends Controller
             'call_id' => 'required|exists:calls,id',
         ]);
 
+    
         $call = Call::findOrFail($request->call_id);
 
         if ($call->caller_id !== auth()->id() && $call->receiver_id !== auth()->id()) {
+
+
             return $this->errorResponse(__('unauthorized'), 403);
         }
 
