@@ -37,6 +37,7 @@ use App\Http\Controllers\Admin\ReleaseController;
 use App\Http\Controllers\Admin\ReportedIssueController;
 use App\Http\Controllers\Admin\RequestController;
 use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
+use App\Http\Controllers\Admin\StatisticsController as AdminStatisticsController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Api\ChatController as ApiChatController;
 use App\Http\Controllers\Api\StripeController;
@@ -108,6 +109,7 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
     });
 
     $route->get('analytics', [AdminAnalyticsController::class, 'index'])->name('analytics.index');
+    $route->get('statistics', [AdminStatisticsController::class, 'index'])->name('statistics.index');
 
     $route->controller(NotificationController::class)->name('notifications.')->prefix('notifications')->group(function ($route) {
         $route->get('', 'index')->name('index');
