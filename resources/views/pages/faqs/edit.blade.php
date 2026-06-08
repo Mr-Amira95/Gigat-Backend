@@ -32,6 +32,9 @@
                         </ul>
                     </div>
                 @endif
+                @if (session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
 
                 <div class="grid grid-cols-12 gap-6">
                     <div class="col-span-12">

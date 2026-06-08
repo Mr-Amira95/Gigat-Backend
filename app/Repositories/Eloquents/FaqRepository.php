@@ -62,9 +62,10 @@ class FaqRepository implements FaqRepositoryInterface
     public function update($id, $data)
     {
         $faq = $this->find($id);
+        $isGeneral = empty($data['category_id']) || $data['category_id'] === 'general';
         $faq->update([
-            'faqable_type' => isset($data['category_id']) ? Category::class : null,
-            'faqable_id' => $data['category_id'] ?? null
+            'faqable_type' => $isGeneral ? null : Category::class,
+            'faqable_id'   => $isGeneral ? null : $data['category_id'],
         ]);
 
         foreach (['en', 'ar'] as $locale) {
