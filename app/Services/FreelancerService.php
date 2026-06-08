@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Freelancer;
+use App\Models\Quotation;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use App\Repositories\Interfaces\FreelancerRepositoryInterface;
@@ -71,6 +72,8 @@ class FreelancerService
             DB::beginTransaction();
 
             $freelancer = $this->freelancerRepository->completeProfile($data);
+
+            Quotation::where('user_id', $freelancer->id)->delete();
 
             DB::commit();
             return $freelancer;
