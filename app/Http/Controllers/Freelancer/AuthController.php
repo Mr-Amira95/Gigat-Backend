@@ -112,8 +112,8 @@ class AuthController extends Controller
         }
 
         if (is_null($freelancer->verified_at)) {
-            $code = GenerateCode::generate();
-            // $code = '123456';
+            // $code = GenerateCode::generate();
+            $code = '123456';
             $key = 'otp_' . $request->prefix . $request->phone;
             Cache::put($key, $code, now()->addMinutes(5));
 
@@ -399,8 +399,8 @@ class AuthController extends Controller
         }
 
         // OTP
-        $code = GenerateCode::generate();
-        // $code = '123456'; // GenerateCode::generate();
+        // $code = GenerateCode::generate();
+        $code = '123456'; // GenerateCode::generate();
         $key = 'otp_' . $request->prefix . $request->phone;
         Cache::put($key, $code, now()->addMinutes(5));
 
