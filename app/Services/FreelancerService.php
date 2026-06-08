@@ -16,9 +16,9 @@ class FreelancerService
         $this->freelancerRepository = $freelancerRepository;
     }
 
-    public function index($params)
+    public function index($params, ?int $perPage = 50)
     {
-        return $this->freelancerRepository->index($params);
+        return $this->freelancerRepository->index($params, $perPage);
     }
     public function getByAuthUser()
     {

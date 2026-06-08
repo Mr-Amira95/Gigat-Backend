@@ -40,7 +40,7 @@ class FreelancerController extends Controller
     public function index(Request $request)
     {
         $params = request()->all();
-        $freelancers = $this->freelancerService->index($params);
+        $freelancers = $this->freelancerService->index($params, null);
         $professions = $this->professionService->getAllActive();
         $countries = $this->countryService->getAllActive();
         return view('pages.freelancers.index', compact('freelancers', 'professions', 'countries'));
