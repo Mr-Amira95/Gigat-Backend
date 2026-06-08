@@ -302,7 +302,7 @@ class AuthController extends Controller
                 return $this->errorResponse(__('verification_code_expired'), 422);
             }
 
-            if (!Hash::check($request['code'], $result['user']->code)) {
+            if ($request['code'] !== $result['user']->code) {
                 return $this->errorResponse(__('invalid_verification_code'));
             }
             $result = $this->authService->verifyCode($result['user']);
