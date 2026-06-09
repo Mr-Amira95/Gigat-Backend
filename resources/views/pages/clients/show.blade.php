@@ -109,7 +109,7 @@
 <h5 class="text-lg font-semibold mb-4 flex items-center">
     <i class="ti ti-star me-2 text-primary"></i> {{ __('reviews') }}
     <span class="ms-auto text-gray-600">
-        ⭐{{ $client->rating }} ({{ $client->ratingsReceived->count() }} {{ __('reviews') }})
+        ⭐{{ round($client->ratingsReceived->avg('rating') ?? 0, 1) }} ({{ $client->ratingsReceived->count() }} {{ __('reviews') }})
     </span>
 </h5>        
     @forelse ($client->ratingsReceived as $rating)

@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use App\Enums\FreelancerStatusEnum;
 use App\Models\PlayerId;
+use App\Models\UserRating;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -41,7 +42,7 @@ class UserResource extends JsonResource
             'gender' => $this->gender_label,
             'is_notifiable' => $is_notifiable,
             'profession' => $this->profession->translation->title ?? null,
-            'rating' => (float) $this->rating,
+            'rating' => round((float) (UserRating::where('ratee_id', $this->id)->avg('rating') ?? 0), 1),
             'profession_object' => [
                 'id' => $this->profession->id ?? null,
                 'title' => $this->profession->translation->title ?? null,

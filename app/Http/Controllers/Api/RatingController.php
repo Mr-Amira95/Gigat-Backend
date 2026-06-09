@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\UserRating;
-use App\Models\User;
 use App\Models\Request as ServiceRequest;
 
 class RatingController extends Controller
@@ -49,11 +48,6 @@ class RatingController extends Controller
             'request_id' => $request->request_id,
             'rating' => $request->rating,
             'review' => $request->review
-        ]);
-
-        $avg = UserRating::where('ratee_id', $serviceRequest->user_id)->avg('rating');
-        User::where('id', $serviceRequest->user_id)->update([
-            'rating' => $avg
         ]);
 
         return response()->json([
@@ -105,9 +99,6 @@ class RatingController extends Controller
             'rating'     => $request->rating,
             'review'     => $request->review,
         ]);
-
-        $avg = UserRating::where('ratee_id', $freelancerId)->avg('rating');
-        User::where('id', $freelancerId)->update(['rating' => $avg]);
 
         return response()->json([
             'message' => 'Rating submitted successfully',
