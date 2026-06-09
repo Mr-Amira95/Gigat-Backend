@@ -44,11 +44,8 @@ class AuthService
     {
         try {
             $user = $this->authRepository->login($data);
-            if (!$user) {
+            if (!$user || $user->trashed()) {
                 throw new Exception(__('invalid_phone_number_or_password'), 401);
-            }
-            if ($user->trashed()) {
-                throw new Exception(__('account_deleted'), 403);
             }
             if (!$user->verified_at) {
                 return [
