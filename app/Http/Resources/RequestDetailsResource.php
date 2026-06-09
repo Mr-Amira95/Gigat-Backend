@@ -41,8 +41,8 @@ class RequestDetailsResource extends JsonResource
                 ->exists()
                 : false,
             'client_reviewed' => UserRating::where('request_id', $request->id)
-                ->where('freelancer_id', $service?->user_id)
-                ->where('client_id', $this->user_id)
+                ->where('rater_id', $service?->user_id)
+                ->where('ratee_id', $this->user_id)
                 ->exists(),
             'user' => new UserResource($this->user),
             'client' => new UserResource($this->user),

@@ -240,11 +240,11 @@ class User extends Authenticatable
 
     public function ratingsGiven()
     {
-        return $this->hasMany(UserRating::class, 'freelancer_id');
+        return $this->hasMany(UserRating::class, 'rater_id');
     }
 
     public function ratingsReceived()
     {
-        return $this->hasMany(UserRating::class, 'client_id');
+        return $this->hasMany(UserRating::class, 'ratee_id');
     }
 }

@@ -14,7 +14,9 @@ use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\ReviewResource;
+use App\Http\Resources\UserRatingResource;
 use App\Http\Resources\ServiceResource;
+use App\Models\UserRating;
 use App\Http\Resources\PortfolioResource;
 use App\Http\Resources\FreelancerResource;
 use App\Http\Requests\Api\UpdateProfileRequest;
@@ -82,9 +84,9 @@ class UserController extends Controller
             if (!$userId) {
                 return $this->errorResponse(__('unauthorized'));
             }
-            $averageRating = $this->reviewService->getAverageRatingByUser($userId);
             $user = $this->freelancerService->getUserProfile($userId);
-            $reviews = $this->reviewService->getForFreelancer($userId);
+            $ratings = UserRating::where('ratee_id', $userId)->with('rater')->latest()->get();
+            $averageRating = $ratings->avg('rating') ?? 0;
             $portfolio = $this->portfolioService->getPortfolioByUserId($userId);
             $services = $this->serviceService->getServicesByUserId($userId, $perPage = 10);
 
@@ -92,9 +94,9 @@ class UserController extends Controller
                 __('user_profile_retrieved'),
                 [
                     'freelancer' => new FreelancerResource($user),
-                    'average_rating' => $averageRating,
-                    'reviews' =>   [
-                        'data' => ReviewResource::collection($reviews),
+                    'average_rating' => round((float) $averageRating, 1),
+                    'ratings' => [
+                        'data' => UserRatingResource::collection($ratings),
                     ],
                     'portfolio' => [
                         'data' => PortfolioResource::collection($portfolio['data']),
@@ -118,8 +120,8 @@ class UserController extends Controller
             if (!$user) {
                 return $this->errorResponse(__('user_not_found'));
             }
-            $averageRating = $this->reviewService->getAverageRatingByUser($userId);
-            $reviews = $this->reviewService->getForFreelancer($userId);
+            $ratings = UserRating::where('ratee_id', $userId)->with('rater')->latest()->get();
+            $averageRating = $ratings->avg('rating') ?? 0;
             $portfolio = $this->portfolioService->getPortfolioByUserId($userId);
             $services = $this->serviceService->getServicesByUserId($userId, $perPage);
 
@@ -127,9 +129,9 @@ class UserController extends Controller
                 __('user_profile_retrieved'),
                 [
                     'freelancer' => new FreelancerResource($user),
-                    'average_rating' => $averageRating,
-                    'reviews' =>   [
-                        'data' => ReviewResource::collection($reviews),
+                    'average_rating' => round((float) $averageRating, 1),
+                    'ratings' => [
+                        'data' => UserRatingResource::collection($ratings),
                     ],
                     'portfolio' => [
                         'data' => PortfolioResource::collection($portfolio['data']),

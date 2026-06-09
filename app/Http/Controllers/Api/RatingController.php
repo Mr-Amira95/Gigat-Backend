@@ -20,7 +20,7 @@ class RatingController extends Controller
 
         $user = $request->user();
 
-        $exists = UserRating::where('freelancer_id', $user->id)
+        $exists = UserRating::where('rater_id', $user->id)
             ->where('request_id', $request->request_id)
             ->exists();
 
@@ -42,16 +42,16 @@ class RatingController extends Controller
                 'message' => 'You can only rate after the service is confirmed'
             ], 422);
         }
-        
+
         $rating = UserRating::create([
-            'freelancer_id' => $user->id,
-            'client_id' => $serviceRequest->user_id,
+            'rater_id' => $user->id,
+            'ratee_id' => $serviceRequest->user_id,
             'request_id' => $request->request_id,
             'rating' => $request->rating,
             'review' => $request->review
         ]);
 
-        $avg = UserRating::where('client_id', $serviceRequest->user_id)->avg('rating');
+        $avg = UserRating::where('ratee_id', $serviceRequest->user_id)->avg('rating');
         User::where('id', $serviceRequest->user_id)->update([
             'rating' => $avg
         ]);
