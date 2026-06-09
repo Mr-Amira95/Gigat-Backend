@@ -9,7 +9,7 @@ use App\Models\Portfolio;
 use App\Models\Quotation;
 use App\Models\ReportedIssue;
 use App\Models\Request as ModelsRequest;
-use App\Models\Review;
+use App\Models\UserRating;
 use App\Models\Service;
 use App\Models\Ticket;
 use App\Models\User;
@@ -95,9 +95,9 @@ class StatisticsController extends Controller
                 ->groupBy('payment_method')
                 ->get();
 
-            // ── Reviews ──────────────────────────────────────────────────────
-            $totalReviews  = $dateFilter(Review::query())->count();
-            $averageRating = $dateFilter(Review::query())->avg('rating') ?? 0;
+            // ── Ratings ──────────────────────────────────────────────────────
+            $totalReviews  = $dateFilter(UserRating::query())->count();
+            $averageRating = $dateFilter(UserRating::query())->avg('rating') ?? 0;
 
             // ── Tickets ──────────────────────────────────────────────────────
             $totalTickets    = $dateFilter(Ticket::query())->count();

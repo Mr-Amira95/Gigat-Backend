@@ -3,20 +3,16 @@
 namespace App\Http\Controllers\Freelancer;
 
 use App\Http\Controllers\Controller;
-use App\Services\ReviewService;
-use Illuminate\Http\Request;
+use App\Models\UserRating;
 
 class ReviewController extends Controller
 {
-    protected $reviewService;
-
-    public function __construct(ReviewService $reviewService)
+    public function index()
     {
-        $this->reviewService = $reviewService;
-    }
-
-    public function index(){
-        $reviews = $this->reviewService->getForFreelancer(auth()->id());
-        return view('pages-freelancer.reviews.index',compact('reviews'));
+        $reviews = UserRating::where('ratee_id', auth()->id())
+            ->with('rater')
+            ->latest()
+            ->get();
+        return view('pages-freelancer.reviews.index', compact('reviews'));
     }
 }

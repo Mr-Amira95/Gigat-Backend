@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use Exception;
 use Illuminate\Http\Request;
 use App\Services\ClientService;
-use App\Services\ReviewService;
 use App\Services\ServiceService;
 use App\Services\PortfolioService;
 use App\Services\FreelancerService;
@@ -34,21 +33,19 @@ class UserController extends Controller
 {
     protected $freelancerService;
     protected $clientService;
-    protected $reviewService;
     protected $portfolioService;
     protected $serviceService;
     protected $categoryService;
     protected $noticeService;
 
-    public function __construct(FreelancerService $freelancerService, ClientService $clientService, ReviewService $reviewService, PortfolioService $portfolioService, ServiceService $serviceService, CategoryService $categoryService, NoticeService $noticeService)
+    public function __construct(FreelancerService $freelancerService, ClientService $clientService, PortfolioService $portfolioService, ServiceService $serviceService, CategoryService $categoryService, NoticeService $noticeService)
     {
         $this->freelancerService = $freelancerService;
         $this->clientService = $clientService;
-        $this->reviewService = $reviewService;
         $this->portfolioService = $portfolioService;
         $this->categoryService = $categoryService;
         $this->serviceService = $serviceService;
-        $this->noticeService    = $noticeService;
+        $this->noticeService = $noticeService;
     }
     public function getClientProfile()
     {

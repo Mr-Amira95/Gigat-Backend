@@ -34,7 +34,6 @@ class ServiceRepository implements ServiceRepositoryInterface
     public function getAllActive($perPage = null)
     {
         $query = $this->model
-            ->with('reviews')
             ->status('approved')
             ->where('is_active', true)
             ->orderBy('id', 'desc');
@@ -110,7 +109,7 @@ class ServiceRepository implements ServiceRepositoryInterface
     public function getServiceDetails($serviceId)
     {
         $service = $this->model
-            ->with(['media', 'user.profession', 'reviews'])
+            ->with(['media', 'user.profession'])
             ->find($serviceId);
 
         if (!$service) {

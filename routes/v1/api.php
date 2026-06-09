@@ -13,7 +13,6 @@ use App\Http\Controllers\Api\{
     SharedController,
     ServiceController,
     WishlistController,
-    ReviewController,
     CategoryController,
     ChatController,
     CheckoutController,
@@ -184,10 +183,6 @@ Route::middleware('auth:api')->group(function () {
         $route->post('read', 'markAsRead');
     });
 
-    Route::controller(ReviewController::class)->group(function ($route) {
-        $route->post('submit-review', 'submitReview');
-        $route->get('reviews-by-user/{id}', 'getReviewsByUser');
-    });
     // Route::prefix('requests')->controller(RequestController::class)->group(function ($route) {
     //     $route->get('', 'getByUser');
     //     $route->post('create', 'createRequest');
@@ -270,6 +265,7 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::prefix('rating')->controller(RatingController::class)->group(function ($route) {
         $route->post('rate-client', 'rateClient')->middleware('freelancer.api');
+        $route->post('rate-freelancer', 'rateFreelancer');
     });
     Route::prefix('portfolio')->controller(PortfolioController::class)->group(function ($route) {
         $route->post('create', 'create')->middleware('freelancer.api');

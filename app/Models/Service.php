@@ -18,7 +18,6 @@ class Service extends Model
         'user_id',
         'status',
         'rating',
-        'reviews_count',
         'is_recommended',
         'is_featured',
         'is_active'
@@ -45,11 +44,6 @@ class Service extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
-    }
-
     public function serviceWishlist(): HasMany
     {
         return $this->hasMany(Wishlist::class);

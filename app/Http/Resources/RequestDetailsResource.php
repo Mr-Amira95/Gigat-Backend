@@ -35,12 +35,11 @@ class RequestDetailsResource extends JsonResource
             'contract_path' => url($this->contract_path),
             'client_payment_status' => optional($this->finance)->client_payment_status,
             // 'is_reviewed' => $this->service->reviews()->where('user_id', $this->user_id)->exists(),
-            'freelancer_reviewed' => $this->service
-                ? $this->service->reviews()
-                ->where('user_id', $this->user_id)
-                ->exists()
-                : false,
-            'client_reviewed' => UserRating::where('request_id', $request->id)
+            'freelancer_reviewed' => UserRating::where('request_id', $this->id)
+                ->where('rater_id', $this->user_id)
+                ->where('ratee_id', $service?->user_id)
+                ->exists(),
+            'client_reviewed' => UserRating::where('request_id', $this->id)
                 ->where('rater_id', $service?->user_id)
                 ->where('ratee_id', $this->user_id)
                 ->exists(),

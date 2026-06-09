@@ -3,20 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\ReviewService;
-use Illuminate\Http\Request;
+use App\Models\UserRating;
 
 class ReviewController extends Controller
 {
-    protected $reviewService;
-
-    public function __construct(ReviewService $reviewService)
+    public function index()
     {
-        $this->reviewService = $reviewService;        
-    }
-
-    public function index(){
-        $reviews = $this->reviewService->index();
-        return view('pages.reviews.index',compact('reviews'));
+        $reviews = UserRating::with('rater', 'rated')->latest()->get();
+        return view('pages.reviews.index', compact('reviews'));
     }
 }

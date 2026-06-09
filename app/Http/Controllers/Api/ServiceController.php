@@ -8,8 +8,9 @@ use App\Services\ServiceService;
 use App\Http\Resources\TagResource;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PlanResource;
-use App\Http\Resources\ReviewResource;
 use App\Http\Resources\ServiceResource;
+use App\Http\Resources\UserRatingResource;
+use App\Models\UserRating;
 use App\Http\Resources\ServiceDetailsResource;
 use App\Http\Resources\FeaturedServiceResource;
 use App\Http\Requests\Api\GetServicesBySubCategoryRequest;
@@ -18,7 +19,6 @@ use App\Http\Requests\Api\UpdateServiceRequest;
 use App\Http\Resources\PortfolioResource;
 use App\Http\Resources\SubCategoryResource;
 use App\Services\PortfolioService;
-use App\Services\ReviewService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use App\Utilities\CurrencyConverter;
@@ -34,13 +34,11 @@ class ServiceController extends Controller
     protected $serviceService;
     protected $tagService;
     protected $portfolioService;
-    protected $reviewService;
-    public function __construct(ServiceService $serviceService, TagService $tagService, PortfolioService $portfolioService, ReviewService $reviewService)
+    public function __construct(ServiceService $serviceService, TagService $tagService, PortfolioService $portfolioService)
     {
         $this->serviceService = $serviceService;
         $this->tagService = $tagService;
         $this->portfolioService = $portfolioService;
-        $this->reviewService = $reviewService;
     }
     public function getBySubCategory(GetServicesBySubCategoryRequest $request)
     {
@@ -149,13 +147,19 @@ class ServiceController extends Controller
             ];
         });
 
-        $avgUserRate = $this->reviewService->getAverageRatingByUser($service->user_id);
+        $avgUserRate = UserRating::where('ratee_id', $service->user_id)->avg('rating') ?? 0;
+        $serviceRatings = UserRating::whereHas('request', fn($q) => $q->where('service_id', $service->id))
+            ->where('ratee_id', $service->user_id)
+            ->with('rater')
+            ->latest()
+            ->get();
+
         return $this->successResponse(__('success'), [
-            'service' => new ServiceDetailsResource($service, $avgUserRate),
-            'portoflio' => PortfolioResource::collection($portfolio),
-            'reviews' => ReviewResource::collection($service->reviews->load('user.profession')),
+            'service'     => new ServiceDetailsResource($service, round((float) $avgUserRate, 1)),
+            'portoflio'   => PortfolioResource::collection($portfolio),
+            'ratings'     => UserRatingResource::collection($serviceRatings),
             'recommended' => ServiceResource::collection($recommended),
-            'plans' => $plans,
+            'plans'       => $plans,
         ]);
     }
 

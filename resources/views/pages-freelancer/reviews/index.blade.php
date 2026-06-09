@@ -6,7 +6,6 @@
 @section('content')
     <div class="content">
         <div class="main-content">
-            <!-- Page Header -->
             <div class="block justify-between page-header md:flex">
                 <div>
                     <h3 class="text-[1.125rem] font-semibold">{{ __('reviews') }}</h3>
@@ -36,7 +35,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>{{ __('client') }}</th>
-                                        <th>{{ __('comment') }}</th>
+                                        <th>{{ __('review') }}</th>
                                         <th>{{ __('rating') }}</th>
                                         <th>{{ __('date') }}</th>
                                     </tr>
@@ -45,16 +44,13 @@
                                     @foreach ($reviews as $review)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>
-                                               {{ $review->user->username ?? __('Anonymous') }}
-                                            </td>
-                                            <td>{{ $review->translation->comment }}</td>
+                                            <td>{{ $review->rater->username ?? __('Anonymous') }}</td>
+                                            <td>{{ $review->review ?? '-' }}</td>
                                             <td>
                                                 @if ($review->rating)
                                                     <div class="flex" style="color: gold">
                                                         @for ($i = 1; $i <= 5; $i++)
-                                                            <i
-                                                                class="las la-star{{ $i <= $review->rating ? '' : '-o' }} text-yellow-400"></i>
+                                                            <i class="las la-star{{ $i <= $review->rating ? '' : '-o' }} text-yellow-400"></i>
                                                         @endfor
                                                     </div>
                                                 @else
@@ -63,18 +59,14 @@
                                             </td>
                                             <td>{{ $review->created_at }}</td>
                                         </tr>
-
                                     @endforeach
                                 </tbody>
                             </table>
-
-
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 @endsection
 @push('scripts')

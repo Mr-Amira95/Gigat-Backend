@@ -55,8 +55,7 @@ use App\Http\Controllers\Freelancer\PortfolioController as FreelancerPortfolioCo
 use App\Http\Controllers\Freelancer\ProfileController;
 use App\Http\Controllers\Freelancer\QuotationController as FreelancerQuotationController;
 use App\Http\Controllers\Freelancer\RequestController as FreelancerRequestController;
-use App\Http\Controllers\Freelancer\ReviewController as FreelancerReviewController;
-use App\Http\Controllers\Freelancer\ServiceController as FreelancerServiceController;
+use App\Http\Controllers\Freelancer\ReviewController as FreelancerReviewController;use App\Http\Controllers\Freelancer\ServiceController as FreelancerServiceController;
 use App\Http\Controllers\Freelancer\SocialLoginController;
 use App\Http\Controllers\Freelancer\TicketController as FreelancerTicketController;
 use App\Models\Currency;
