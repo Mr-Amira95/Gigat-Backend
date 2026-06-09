@@ -420,7 +420,15 @@ class AuthController extends Controller
     public function deleteAccount(Request $request)
     {
         try {
+            $request->validate([
+                'password' => 'required|string',
+            ]);
+
             $user = $request->user();
+
+            if (!Hash::check($request->password, $user->password)) {
+                return $this->errorResponse(__('The password is incorrect.'), 422);
+            }
 
             $user->is_active = false;
             $user->save();
