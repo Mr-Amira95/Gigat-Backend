@@ -6,10 +6,11 @@ use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Request extends Model
 {
-    use HasTranslations;
+    use HasTranslations, SoftDeletes;
 
     protected $fillable = [
         'order_number',

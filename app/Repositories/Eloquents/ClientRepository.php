@@ -84,6 +84,10 @@ class ClientRepository implements ClientRepositoryInterface
     public function delete($id)
     {
         $client = $this->find($id);
+        $client->requests()->delete();
+        $client->quotations()->delete();
+        $client->chatsAsUserOne()->update(['user_one_deleted_at' => now(), 'user_two_deleted_at' => now()]);
+        $client->chatsAsUserTwo()->update(['user_one_deleted_at' => now(), 'user_two_deleted_at' => now()]);
         return $client->delete();
     }
 
@@ -155,6 +159,9 @@ class ClientRepository implements ClientRepositoryInterface
 
     public function restore($id)
     {
-        return $this->model->withTrashed()->findOrFail($id)->restore();
+        $client = $this->model->withTrashed()->findOrFail($id);
+        $client->requests()->withTrashed()->restore();
+        $client->quotations()->withTrashed()->restore();
+        return $client->restore();
     }
 }

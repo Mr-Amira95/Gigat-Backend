@@ -6,6 +6,7 @@ use App\Enums\FreelancerStatusEnum;
 use App\Models\User;
 use App\Models\Freelancer;
 use App\Models\FreelancerCateogry;
+use App\Models\Request as ServiceRequest;
 use App\Models\Service;
 use App\Models\UserLanguage;
 use App\Utilities\FileManager;
@@ -142,6 +143,12 @@ class FreelancerRepository implements FreelancerRepositoryInterface
     public function delete($id)
     {
         $client = $this->find($id);
+        $serviceIds = $client->services()->pluck('id');
+        ServiceRequest::whereIn('service_id', $serviceIds)->delete();
+        $client->services()->delete();
+        $client->portfolios()->delete();
+        $client->chatsAsUserOne()->update(['user_one_deleted_at' => now(), 'user_two_deleted_at' => now()]);
+        $client->chatsAsUserTwo()->update(['user_one_deleted_at' => now(), 'user_two_deleted_at' => now()]);
         return $client->delete();
     }
     public function updateActivation($id)
@@ -301,7 +308,12 @@ class FreelancerRepository implements FreelancerRepositoryInterface
     }
     public function restore($id)
     {
-        return $this->model->withTrashed()->findOrFail($id)->restore();
+        $user = $this->model->withTrashed()->findOrFail($id);
+        $serviceIds = $user->services()->withTrashed()->pluck('id');
+        ServiceRequest::withTrashed()->whereIn('service_id', $serviceIds)->restore();
+        $user->services()->withTrashed()->restore();
+        $user->portfolios()->withTrashed()->restore();
+        return $user->restore();
     }
 
     public function getByAuthUser()

@@ -434,9 +434,17 @@ class AuthController extends Controller
             $user->save();
 
             if ($user->freelancer) {
+                $serviceIds = $user->services()->pluck('id');
+                \App\Models\Request::whereIn('service_id', $serviceIds)->delete();
                 $user->services()->delete();
                 $user->portfolios()->delete();
+            } else {
+                $user->requests()->delete();
+                $user->quotations()->delete();
             }
+
+            $user->chatsAsUserOne()->update(['user_one_deleted_at' => now(), 'user_two_deleted_at' => now()]);
+            $user->chatsAsUserTwo()->update(['user_one_deleted_at' => now(), 'user_two_deleted_at' => now()]);
 
             $user->delete();
 

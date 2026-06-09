@@ -6,10 +6,11 @@ use App\Traits\BlockFilterTrait;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Quotation extends Model
 {
-    use HasFactory, BlockFilterTrait, HasTranslations;
+    use HasFactory, BlockFilterTrait, HasTranslations, SoftDeletes;
 
     protected $fillable = [
         'sub_category_id',

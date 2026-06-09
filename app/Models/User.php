@@ -157,6 +157,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Quotation::class);
     }
+
+    public function requests(): HasMany
+    {
+        return $this->hasMany(Request::class);
+    }
     public function quotationComments()
     {
         return $this->hasMany(QuotationComment::class);
