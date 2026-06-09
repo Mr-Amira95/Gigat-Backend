@@ -60,7 +60,9 @@ class TicketService
 
     public function addMessage(array $data, $user)
     {
-        $this->ticketRepository->getTicketByIdForUser($data['ticket_id'], auth('api')->id());
+        if (!($user instanceof \App\Models\Admin)) {
+            $this->ticketRepository->getTicketByIdForUser($data['ticket_id'], auth('api')->id());
+        }
 
         $message = $this->ticketRepository->addMessage($data['ticket_id'], [
             'user_id' => $user->id,

@@ -92,27 +92,31 @@ class RequestRepository implements RequestRepositoryInterface
     public function getRequestDetails($id)
     {
         $userId = auth('api')->id();
-        $request = $this->model
-            ->where(function ($q) use ($userId) {
+        $query = $this->model->with([
+            'user.languages.language',
+            'service',
+            'plan.features' => function ($query) use ($id) {
+                $serviceId = $this->model->find($id)?->service_id;
+                if ($serviceId) {
+                    $query->where('service_id', $serviceId);
+                }
+            },
+            'logs.user',
+            'logs.attachments',
+            'deliveries.translation',
+            'deliveries.attachments',
+            'feedbacks.translation',
+            'feedbacks.attachments',
+        ]);
+
+        if ($userId) {
+            $query->where(function ($q) use ($userId) {
                 $q->where('user_id', $userId)
                   ->orWhereHas('service', fn($sq) => $sq->where('user_id', $userId));
-            })
-            ->with([
-                'user.languages.language',
-                'service',
-                'plan.features' => function ($query) use ($id) {
-                    $serviceId = $this->model->find($id)?->service_id;
-                    if ($serviceId) {
-                        $query->where('service_id', $serviceId);
-                    }
-                },
-                'logs.user',
-                'logs.attachments',
-                'deliveries.translation',
-                'deliveries.attachments',
-                'feedbacks.translation',
-                'feedbacks.attachments',
-            ])->findOrFail($id);
+            });
+        }
+
+        $request = $query->findOrFail($id);
 
         $user = Auth::guard('api')->user();
         if ($user && !$user->freelancer()->exists()) {
