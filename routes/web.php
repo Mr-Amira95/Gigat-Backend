@@ -552,6 +552,20 @@ Route::middleware(['auth:freelancer', 'freelancer'])->prefix('freelancer')->name
     });
 });
 
+Route::get('/download', function () {
+    $agent = new Agent();
+
+    if ($agent->isAndroidOS()) {
+        return redirect('https://play.google.com/store/apps/details?id=com.botjourney.gigat');
+    }
+
+    if ($agent->is('iPhone') || $agent->is('iPad') || $agent->isIOS()) {
+        return redirect('https://apps.apple.com/app/id6758677101');
+    }
+
+    return redirect('https://gigat.app');
+});
+
 Route::get('/service_details', function (Request $request) {
     $id = $request->query('id');   // ✅ correct way
 
