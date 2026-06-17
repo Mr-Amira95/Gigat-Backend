@@ -139,7 +139,7 @@ class AuthController extends Controller
                 'token' => $result['token'],
             ]);
         } catch (Exception $e) {
-            return $this->exceptionResponse($e);
+            return $this->exceptionResponse($e, $e->getMessage());
         }
     }
 
