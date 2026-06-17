@@ -25,7 +25,6 @@ class RequestResource extends JsonResource
 
         $elapsedDays = 0;
         $totalDays = 0;
-        $progressPercentage = 0;
 
         if ($isValidDateRange) {
             $totalDays = abs($endDate->diffInDays($startDate));
@@ -33,8 +32,6 @@ class RequestResource extends JsonResource
             if ($currentDate->gte($startDate)) {
                 $elapsedDays = min($totalDays, $startDate->diffInDays($currentDate));
             }
-
-            $progressPercentage = $totalDays > 0 ? min(100, ($elapsedDays / $totalDays) * 100) : 0;
         }
 
         $isProgressStatus = in_array($this->status, ['confirmed', 'in_progress']);
@@ -50,7 +47,6 @@ class RequestResource extends JsonResource
             'end_date' => $isProgressStatus ? $endDate->toDateString() : null,
             'elapsed_days' => $isProgressStatus ? round($elapsedDays) : null,
             'total_days' => $isProgressStatus ? intval($totalDays) : null,
-            'progress_percentage' => round($progressPercentage),
             'created_at' => Carbon::parse($this->created_at)->toDayDateTimeString(),
             'created_since' => Carbon::parse($this->created_at)->diffForHumans(),
             'status_label' => RequestStatusEnum::tryFrom($this->status)?->label(),

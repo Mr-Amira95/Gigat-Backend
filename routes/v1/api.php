@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\{
     BlockController,
     BotController,
     CallController,
+    CertificateController,
     HomeController,
     UserController,
     FilterController,
@@ -272,6 +273,9 @@ Route::middleware('auth:api')->group(function () {
         $route->post('update/{id}', 'update')->middleware(['freelancer.api', 'owns:portfolio']);
         $route->delete('delete/{id}', 'delete')->middleware(['freelancer.api', 'owns:portfolio']);
         $route->delete('delete-media/{id}', 'deleteMedia')->middleware('freelancer.api');
+    });
+    Route::prefix('certificates')->controller(CertificateController::class)->group(function ($route) {
+        $route->delete('{id}', 'delete')->middleware(['freelancer.api', 'owns:certificate']);
     });
     Route::prefix('checkout')->controller(CheckoutController::class)->group(function ($route) {
         $route->post('proceed', 'proceedCheckout');

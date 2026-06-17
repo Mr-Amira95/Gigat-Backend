@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\Portfolio;
 use App\Models\Request as ServiceRequest;
 use App\Models\Ticket;
+use App\Models\FreelancerCertificate;
 
 class OwnsResource
 {
@@ -38,6 +39,11 @@ class OwnsResource
             case 'request':
                 $record = ServiceRequest::with('service')->find($id);
                 $unauthorized = !$record || !$record->service || $record->service->user_id !== $userId;
+                break;
+
+            case 'certificate':
+                $record = FreelancerCertificate::find($id);
+                $unauthorized = !$record || $record->user_id !== $userId;
                 break;
         }
 
