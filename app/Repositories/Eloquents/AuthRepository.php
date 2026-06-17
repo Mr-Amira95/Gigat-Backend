@@ -28,8 +28,8 @@ class AuthRepository implements AuthRepositoryInterface
             $localPhone = ltrim(preg_replace('/\D+/', '', $data['phone'] ?? ''), '0');
             $data['phone'] = $localPhone;
 
-            // $code = GenerateCode::generate();
-            $code = '123456';
+            $code = GenerateCode::generate();
+            // $code = '123456';
 
             // 🔹 Check if user exists (even soft deleted)
             $user = User::withTrashed()

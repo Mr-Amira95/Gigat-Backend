@@ -39,8 +39,8 @@ class CompanyRepository implements CompanyRepositoryInterface
             $localPhone = ltrim(preg_replace('/\D+/', '', $data['phone']), '0');
             $data['phone'] = $localPhone;
 
-            // $code = GenerateCode::generate();
-            $code = '123456';
+            $code = GenerateCode::generate();
+            // $code = '123456';
 
             $user = \App\Models\User::withTrashed()
                 ->where('email', $data['email'])
