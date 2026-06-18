@@ -41,7 +41,7 @@ class CategoryRepository implements CategoryRepositoryInterface
     }
     public function getAllActive($isPopular = null)
     {
-        $query = Category::query();
+        $query = Category::query()->with('subCategories');
 
         if ($isPopular) {
             $query->where('is_popular', true);
