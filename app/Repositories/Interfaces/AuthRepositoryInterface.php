@@ -19,6 +19,8 @@ interface AuthRepositoryInterface
 
     public function updateCode($user,$code);
 
+    public function sendCodeViaWhatsApp($user, $code): void;
+
     public function clearCode($user);
 
     public function updatePassword($user,$password);

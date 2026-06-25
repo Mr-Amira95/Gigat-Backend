@@ -53,15 +53,15 @@ Route::get('/test-time', function () {
 
 // Auth Routes
 Route::controller(AuthController::class)->group(function ($route) {
-    $route->post('login', 'login')->middleware('throttle:10,1');
-    $route->post('social-login', 'socialLogin')->middleware('throttle:10,1');
-    $route->post('register', 'register')->middleware('throttle:5,1');
-    $route->post('generate-code', 'generateCode')->middleware('throttle:5,5');
-    $route->post('verify-code', 'verifyCode')->middleware('throttle:10,5');
-    $route->post('reset-password', 'resetPassword')->middleware('throttle:5,5');
+    $route->post('login', 'login');
+    $route->post('social-login', 'socialLogin');
+    $route->post('register', 'register');
+    $route->post('generate-code', 'generateCode');
+    $route->post('verify-code', 'verifyCode');
+    $route->post('reset-password', 'resetPassword');
 
-    $route->post('create-freelancer', 'createFreelancer')->middleware('throttle:5,1');
-    $route->post('web-login', 'webLogin')->middleware('throttle:10,1');
+    $route->post('create-freelancer', 'createFreelancer');
+    $route->post('web-login', 'webLogin');
 });
 Route::controller(SocialAuthController::class)->prefix('auth')->group(function ($route) {
     $route->get('{provider}', [SocialAuthController::class, 'redirectToProvider']);

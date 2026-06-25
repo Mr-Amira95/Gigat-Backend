@@ -169,10 +169,14 @@ class AuthRepository implements AuthRepositoryInterface
             'code'            => $code,
             'code_expires_at' => Carbon::now()->addMinutes(10),
         ]);
+        return $user->fresh();
+    }
+
+    public function sendCodeViaWhatsApp($user, $code): void
+    {
         $whatsApp = new WhatsAppService();
         $fullPhoneNumber = $user->prefix . $user->phone;
         $whatsApp->sendTemplateMessage($fullPhoneNumber, $code);
-        return $user->fresh();
     }
 
     public function clearCode($user): User

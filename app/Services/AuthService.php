@@ -98,9 +98,11 @@ class AuthService
         try {
             DB::beginTransaction();
             $code = GenerateCode::generate();
-
             $user = $this->authRepository->updateCode($user, $code);
             DB::commit();
+
+            $this->authRepository->sendCodeViaWhatsApp($user, $code);
+
             return [
                 'code' => $code
             ];
