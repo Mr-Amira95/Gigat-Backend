@@ -20,6 +20,7 @@ class FeaturedServiceResource extends JsonResource
         return [
             'id' => $this->id,
             'cover' => $coverMedia ? url($coverMedia->media_path) : null,
+            'rating' => (float) ($this->rating ?? 0),
             'user' =>
             [
                 'id' => $this->user->id,

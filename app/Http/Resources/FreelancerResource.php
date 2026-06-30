@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use App\Enums\FreelancerStatusEnum;
 use App\Models\PlayerId;
+use App\Models\UserRating;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class FreelancerResource extends JsonResource
@@ -74,6 +75,7 @@ class FreelancerResource extends JsonResource
             'company' => ($this->freelancer && $this->freelancer->company_id)
                 ? new CompanyResource($this->freelancer->company)
                 : null,
+            'avg_rating' => round((float) (UserRating::where('ratee_id', $this->id)->avg('rating') ?? 0), 1),
         ];
     }
 }

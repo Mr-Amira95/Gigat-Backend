@@ -31,7 +31,15 @@ class UpdateServiceRequest extends FormRequest
             'plans.*.features' => ['required', 'array'],
 
             'plans.*.features.*.title' => ['required', 'string'],
-            'plans.*.features.*.value' => 'nullable',
+            'plans.*.features.*.value' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    $type = request()->input(str_replace('.value', '.type', $attribute));
+                    if (in_array($type, ['price', 'delivery_days', 'revisions']) && (is_null($value) || (float) $value <= 0)) {
+                        $fail("The {$attribute} must be greater than 0.");
+                    }
+                },
+            ],
             'plans.*.features.*.type' => ['required', 'in:additional,price,delivery_days,revisions,source_files'],
 
             'tags' => ['nullable', 'array'],
