@@ -62,7 +62,7 @@ class ClientRepository implements ClientRepositoryInterface
                     'profession_id' => $data['profession_id'] ?? null,
                     'country_id' => $data['country_id'] ?? null,
                     'password' => Hash::make($data['password']),
-                    'avatar' => isset($data['avatar']) ?  FileManager::upload('users', $data['avatar']) : null,
+                    'avatar' => isset($data['avatar']) ? FileManager::upload('users', $data['avatar']) : FileManager::generateInitialsAvatar($data['username']),
                 ]);
                 if (!empty($data['languages'])) {
                     foreach ($data['languages'] as $languageId) {

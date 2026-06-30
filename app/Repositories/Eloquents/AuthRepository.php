@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Repositories\Interfaces\AuthRepositoryInterface;
 use App\Services\WhatsAppService;
+use App\Utilities\FileManager;
 use App\Utilities\GenerateCode;
 use Carbon\Carbon;
 
@@ -54,7 +55,7 @@ class AuthRepository implements AuthRepositoryInterface
                 $user->profession_id = $data['profession_id'] ?? null;
                 $user->country_id = $data['country_id'] ?? null;
                 $user->password = Hash::make($data['password']);
-                $user->avatar = $data['avatar'] ?? null;
+                $user->avatar = $data['avatar'] ?? FileManager::generateInitialsAvatar($data['username']);
                 $user->google_id = $data['google_id'] ?? null;
                 $user->code = $code;
                 $user->code_expires_at = Carbon::now()->addMinutes(10);
@@ -87,7 +88,7 @@ class AuthRepository implements AuthRepositoryInterface
                     'profession_id' => $data['profession_id'] ?? null,
                     'country_id'    => $data['country_id'] ?? null,
                     'password'      => Hash::make($data['password']),
-                    'avatar'        => $data['avatar'] ?? null,
+                    'avatar'        => $data['avatar'] ?? FileManager::generateInitialsAvatar($data['username']),
                     'code'          => $code,
                     'code_expires_at' => Carbon::now()->addMinutes(10),
                     'google_id'     => $data['google_id'] ?? null,

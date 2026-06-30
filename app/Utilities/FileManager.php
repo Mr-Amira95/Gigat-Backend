@@ -86,6 +86,26 @@ class FileManager
     }
 
     /*********************************************************************************************************
+     * Generates a circular SVG avatar with the user's first letter and saves it to storage.
+
+     *********************************************************************************************************/
+    public static function generateInitialsAvatar(string $username): string
+    {
+        $letter = strtoupper(mb_substr($username, 0, 1));
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">'
+             . '<circle cx="50" cy="50" r="50" fill="#845adf"/>'
+             . '<text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="white" font-size="42" font-family="Arial,sans-serif" font-weight="bold">' . htmlspecialchars($letter, ENT_XML1) . '</text>'
+             . '</svg>';
+
+        $dir = 'users';
+        $fileName = 'avatar_' . time() . '_' . uniqid() . '.svg';
+        self::ensureDirectoryExists($dir);
+        Storage::disk('public')->put($dir . '/' . $fileName, $svg);
+
+        return self::getFilePath($dir, $fileName);
+    }
+
+    /*********************************************************************************************************
      * Generates a unique file name for the uploaded file.
 
      *********************************************************************************************************/
