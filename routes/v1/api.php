@@ -62,6 +62,7 @@ Route::controller(AuthController::class)->group(function ($route) {
 
     $route->post('create-freelancer', 'createFreelancer');
     $route->post('web-login', 'webLogin');
+    $route->delete('delete-unverified-user', 'deleteUnverifiedUser');
 });
 Route::controller(SocialAuthController::class)->prefix('auth')->group(function ($route) {
     $route->get('{provider}', [SocialAuthController::class, 'redirectToProvider']);

@@ -417,6 +417,51 @@ class AuthController extends Controller
         }
     }
 
+    public function deleteUnverifiedUser(Request $request)
+    {
+        try {
+            $request->validate([
+                'phone'  => 'required|string',
+                'prefix' => 'required|string',
+            ]);
+
+            $result = $this->authService->findByPhoneAndPrefix($request->only('phone', 'prefix'));
+
+            if (!$result['user']) {
+                return $this->errorResponse(__('user_not_found'), 404);
+            }
+
+            $user = $result['user'];
+
+            if (!is_null($user->verified_at)) {
+                return $this->errorResponse(__('user_already_verified'), 422);
+            }
+
+            $freelancer = $user->freelancer;
+
+            if ($freelancer) {
+                $companyId = $freelancer->company_id;
+                $freelancer->forceDelete();
+
+                if ($companyId) {
+                    $remainingFreelancers = \App\Models\Freelancer::withTrashed()
+                        ->where('company_id', $companyId)
+                        ->count();
+
+                    if ($remainingFreelancers === 0) {
+                        \App\Models\Company::find($companyId)?->delete();
+                    }
+                }
+            }
+
+            $user->delete();
+
+            return $this->successResponse(__('account_deleted_successfully'));
+        } catch (Exception $e) {
+            return $this->exceptionResponse($e);
+        }
+    }
+
     public function deleteAccount(Request $request)
     {
         try {
