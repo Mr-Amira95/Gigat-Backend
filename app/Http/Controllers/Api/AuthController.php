@@ -16,6 +16,7 @@ use App\Models\Notification;
 use App\Models\PlayerId;
 use App\Models\User;
 use App\Services\FreelancerService;
+use App\Services\MetaConversionsApiService;
 use App\Services\NoticeService;
 use App\Services\OneSignalService;
 use Illuminate\Http\JsonResponse;
@@ -30,19 +31,22 @@ class AuthController extends Controller
     protected $authService;
     protected $freelancerService;
     protected $noticeService;
+    protected $metaService;
 
 
-    public function __construct(AuthService $authService, FreelancerService $freelancerService, NoticeService $noticeService)
+    public function __construct(AuthService $authService, FreelancerService $freelancerService, NoticeService $noticeService, MetaConversionsApiService $metaService)
     {
         $this->authService = $authService;
         $this->freelancerService = $freelancerService;
         $this->noticeService    = $noticeService;
+        $this->metaService      = $metaService;
     }
 
     public function register(RegisterRequest $request)
     {
         try {
             $result = $this->authService->register($request->validated());
+            $this->metaService->dispatchEvent($result, $request, 'Client Register');
             return $this->successResponse(__('success'), 201);
         } catch (Exception $e) {
             return $this->exceptionResponse($e);
@@ -83,6 +87,8 @@ class AuthController extends Controller
                     'token' => null,
                 ]);
             }
+
+            $this->metaService->dispatchEvent($user, $request, $user->freelancer ? 'Freelancer Login' : 'Client Login');
 
             return $this->successResponse(__('login_successful'), [
                 'user'  => new UserResource($user),
@@ -133,6 +139,8 @@ class AuthController extends Controller
                     'token'       => $result['token'],
                 ]);
             }
+
+            $this->metaService->dispatchEvent($user, $request, 'Client Login');
 
             return $this->successResponse(__('login_successful'), [
                 'user'  => new UserResource($user),
@@ -209,6 +217,8 @@ class AuthController extends Controller
             }
 
             $token = $user->createToken('User Token')->accessToken;
+
+            $this->metaService->dispatchEvent($user, $request, $user->freelancer ? 'Freelancer Login' : 'Client Login');
 
             return $this->successResponse(__('login_successful'), [
                 'user'  => new UserResource($user),
@@ -410,6 +420,8 @@ class AuthController extends Controller
                 null,
                 false
             );
+
+            $this->metaService->dispatchEvent($user, $request, 'Freelancer Register');
 
             return $this->successResponse(__('freelancer_created'), new UserResource($user));
         } catch (Exception $e) {

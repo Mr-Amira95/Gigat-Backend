@@ -26,6 +26,7 @@ use App\Models\Notification;
 use App\Models\PlayerId;
 use App\Models\User;
 use App\Services\CategoryService;
+use App\Services\MetaConversionsApiService;
 use App\Services\NoticeService;
 use App\Services\OneSignalService;
 
@@ -147,7 +148,13 @@ class UserController extends Controller
     public function completeProfile(BecomeFreelancerRequest $request)
     {
         try {
+            $wasFreelancerAlready = (bool) $request->user()->freelancer;
+
             $freelancer = $this->freelancerService->completeProfile($request->validated());
+
+            if (!$wasFreelancerAlready) {
+                app(MetaConversionsApiService::class)->dispatchEvent($freelancer, $request, 'Freelancer Register');
+            }
 
             // $user = $freelancer;
             // // one signal notification*****************************************
@@ -253,6 +260,7 @@ class UserController extends Controller
             $filePath = $this->uploadFiles($file, 'freelancer');
 
             $freelancer->file = $filePath;
+            app(MetaConversionsApiService::class)->dispatchEvent($user, $request, 'Freelancer Submit Account Verification Request');
         }
         $freelancer->save();
 

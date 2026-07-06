@@ -19,6 +19,7 @@ use App\Models\QuotationComment;
 use App\Models\Request;
 use App\Models\Service;
 use App\Models\User;
+use App\Services\MetaConversionsApiService;
 use App\Services\NoticeService;
 use App\Services\QuotationService;
 use App\Services\RequestService;
@@ -146,6 +147,8 @@ class QuotationController extends Controller
         }
 
         // *********************************************//
+        app(MetaConversionsApiService::class)->dispatchEvent(Auth::user(), $request, 'Client Create RFQ');
+
         return $this->successResponse(__('success'), new QuotationResource($quotation));
     }
 
@@ -222,6 +225,10 @@ class QuotationController extends Controller
         }
 
         // *********************************************//
+        if (Auth::user()->freelancer) {
+            app(MetaConversionsApiService::class)->dispatchEvent(Auth::user(), $request, 'Freelancer Comment on RFQ');
+        }
+
         return $this->successResponse(__('success'), new QuotationCommentResource($comment));
     }
 

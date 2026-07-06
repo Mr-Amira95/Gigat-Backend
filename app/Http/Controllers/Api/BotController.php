@@ -10,6 +10,7 @@ use App\Models\Service;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Collection;
 use App\Services\Chatbot\ChatbotService;
+use App\Services\MetaConversionsApiService;
 
 class BotController extends Controller
 {
@@ -43,12 +44,18 @@ class BotController extends Controller
 
         $user = $request->user();
 
+        $isNewConversation = AiConversation::where('user_id', $user->id)->doesntExist();
+
         $chatbotService = new ChatbotService();
 
         $botConversationId = $chatbotService->respond(
             message: $request->message,
             userId: $user->id
         );
+
+        if ($isNewConversation && !$user->freelancer) {
+            app(MetaConversionsApiService::class)->dispatchEvent($user, $request, 'Client Start AI Conversation');
+        }
 
         $message = AiConversation::with(['services'])->find($botConversationId);
 

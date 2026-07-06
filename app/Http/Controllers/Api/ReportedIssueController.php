@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ReportedIssueResource;
+use App\Services\MetaConversionsApiService;
 use App\Services\ReportedIssueService;
 use Illuminate\Http\Request;
 
@@ -28,6 +29,10 @@ class ReportedIssueController extends Controller
             $request->all(),
             auth('api')->check() ? auth('api')->id() : null
         );
+
+        if (auth('api')->check() && !auth('api')->user()->freelancer) {
+            app(MetaConversionsApiService::class)->dispatchEvent(auth('api')->user(), $request, 'Client Report Issue');
+        }
 
         return $this->successResponse(__('success'), new ReportedIssueResource($issue));
     }

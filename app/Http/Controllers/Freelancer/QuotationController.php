@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Freelancer;
 use App\Http\Controllers\Controller;
 use App\Models\Quotation;
 use App\Models\QuotationComment;
+use App\Services\MetaConversionsApiService;
 use App\Services\QuotationService;
 use App\Utilities\GoogleTranslator;
 use Illuminate\Http\Request;
@@ -56,6 +57,8 @@ class QuotationController extends Controller
                 'comment'  => $translations[$lang],
             ]);
         }
+
+        app(MetaConversionsApiService::class)->dispatchEvent(auth()->user(), $request, 'Freelancer Comment on RFQ');
 
         return redirect()->route('freelancer.quotations.show', $quotationId)
             ->with('success', 'Comment added successfully.');

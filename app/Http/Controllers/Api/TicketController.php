@@ -9,6 +9,7 @@ use App\Http\Resources\TicketResource;
 use App\Http\Requests\Api\TicketRequest;
 use App\Http\Resources\TicketMessageResource;
 use App\Http\Requests\Api\TicketMessageRequest;
+use App\Services\MetaConversionsApiService;
 
 class TicketController extends Controller
 {
@@ -33,7 +34,12 @@ class TicketController extends Controller
 
     public function store(TicketRequest $request)
     {
-        $ticket = $this->ticketService->createTicket($request->validated(), auth()->guard('api')->user());
+        $user = auth()->guard('api')->user();
+        $ticket = $this->ticketService->createTicket($request->validated(), $user);
+
+        $eventName = $user->freelancer ? 'Freelancer Create Support Ticket' : 'Client Create Support Ticket';
+        app(MetaConversionsApiService::class)->dispatchEvent($user, $request, $eventName);
+
         return $this->successResponse(__('success'), new TicketResource($ticket));
     }
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Request as ModelsRequest;
 use App\Models\RequestLog;
 use App\Models\RequestLogAttachment;
+use App\Services\MetaConversionsApiService;
 use App\Services\RequestService;
 use App\Utilities\FileManager;
 use App\Utilities\GoogleTranslator;
@@ -106,6 +107,10 @@ class RequestController extends Controller
 
         $requestItem->status = $newStatus;
         $requestItem->save();
+
+        if ($currentStatus === 'pending' && $newStatus === 'in_progress') {
+            app(MetaConversionsApiService::class)->dispatchEvent(auth()->user(), $request, 'Freelancer Request Approval');
+        }
 
         // Save comment to request_logs
         // $log = new RequestLog();

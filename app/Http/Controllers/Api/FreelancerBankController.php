@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\BankDetailsRequest;
 use App\Http\Resources\FreelancerBankResource;
 use App\Services\FreelancerBankService;
+use App\Services\MetaConversionsApiService;
 use Illuminate\Http\Request;
 
 class FreelancerBankController extends Controller
@@ -39,6 +40,10 @@ class FreelancerBankController extends Controller
             $data = $request->validated();
 
             $bank = $this->bankService->updateOrCreate($freelancerId, $data);
+
+            if ($bank->wasRecentlyCreated) {
+                app(MetaConversionsApiService::class)->dispatchEvent(auth('api')->user(), $request, 'Freelancer Add Bank Details');
+            }
 
             return $this->successResponse(__('success'), new FreelancerBankResource($bank));
         } catch (\Exception $e) {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BlockResource;
 use App\Models\Block;
 use App\Models\User;
+use App\Services\MetaConversionsApiService;
 use Illuminate\Http\Request;
 
 class BlockController extends Controller
@@ -56,6 +57,10 @@ class BlockController extends Controller
                 'blocker_type' => $blockerType,
                 'blocked_type' => $blockedType,
             ]);
+
+            if ($blockerType === 'client') {
+                app(MetaConversionsApiService::class)->dispatchEvent($user, $request, 'Client Block User');
+            }
 
             return $this->successResponse(__('user_blocked_successfully'), 201);
         }

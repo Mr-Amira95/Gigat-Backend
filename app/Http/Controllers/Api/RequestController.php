@@ -21,6 +21,7 @@ use App\Models\Notification;
 use App\Models\PlayerId;
 use App\Notifications\NewPortalNotification;
 use App\Services\ContractGeneratorService;
+use App\Services\MetaConversionsApiService;
 use App\Services\NoticeService;
 use App\Services\OneSignalService;
 use Illuminate\Support\Facades\Log;
@@ -160,6 +161,8 @@ class RequestController extends Controller
 
                 )
             );
+
+            app(MetaConversionsApiService::class)->dispatchEvent($createdRequest['request']->user, request(), 'Client Service Request');
 
             return $this->successResponse(__('success'), new RequestResource($createdRequest['request']));
         } catch (\Exception $e) {

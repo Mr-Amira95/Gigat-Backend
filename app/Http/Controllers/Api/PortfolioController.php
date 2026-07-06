@@ -11,6 +11,7 @@ use App\Http\Resources\PortfolioResource;
 use App\Http\Requests\Api\PortfolioRequest;
 use App\Http\Requests\Api\UpdatePortfolioRequest;
 use App\Http\Resources\PortfolioDetalisResource;
+use App\Services\MetaConversionsApiService;
 use App\Models\PortfolioMedia;
 
 class PortfolioController extends Controller
@@ -51,6 +52,9 @@ class PortfolioController extends Controller
             $data = $request->validated();
             $data = array_merge($data, ['user_id' => Auth::id()]);
             $portfolio = $this->portfolioService->create($data);
+
+            app(MetaConversionsApiService::class)->dispatchEvent(Auth::user(), $request, 'Freelancer Create Portfolio');
+
             return $this->successResponse(__('success'), new PortfolioDetalisResource($portfolio));
         } catch (Exception $e) {
             return $this->exceptionResponse($e);

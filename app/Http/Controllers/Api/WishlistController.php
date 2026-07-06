@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\ServiceResource;
 use App\Http\Requests\Api\WishlistToggleRequest;
+use App\Services\MetaConversionsApiService;
 
 class WishlistController extends Controller
 {
@@ -25,10 +26,15 @@ class WishlistController extends Controller
             return $this->errorResponse(__('unauthorized'));
         }
 
-        $result = $this->wishlistService->toggleWishlist(
+        $added = $this->wishlistService->toggleWishlist(
             $userId,
             $request->service_id
         );
+
+        if ($added && !Auth::user()->freelancer) {
+            app(MetaConversionsApiService::class)->dispatchEvent(Auth::user(), $request, 'Client Add to Wishlist');
+        }
+
         return $this->successResponse(__('messages.wishlist.toggle_success'));
     }
 

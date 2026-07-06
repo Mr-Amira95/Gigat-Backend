@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Events\MessageReadEvent;
 use App\Events\PusherNewMessage;
+use App\Listeners\TrackMetaLoginEvent;
 use App\Listeners\UpdateMessageReadStatus;
+use Illuminate\Auth\Events\Login;
 use App\Models\Category;
 use App\Models\User;
 use Laravel\Passport\Passport;
@@ -146,6 +148,8 @@ class AppServiceProvider extends ServiceProvider
         Category::observe(CategoryObserver::class);
         User::observe(UserObserver::class);
         Passport::enablePasswordGrant();
+
+        Event::listen(Login::class, TrackMetaLoginEvent::class);
         // Event::listen(
         //     PusherNewMessage::class,
         //     // UpdateMessageReadStatus::class,

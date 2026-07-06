@@ -18,6 +18,7 @@ use App\Http\Requests\Api\ServiceRequest;
 use App\Http\Requests\Api\UpdateServiceRequest;
 use App\Http\Resources\PortfolioResource;
 use App\Http\Resources\SubCategoryResource;
+use App\Services\MetaConversionsApiService;
 use App\Services\PortfolioService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -221,6 +222,8 @@ class ServiceController extends Controller
 
             // Continue with saving
             $service = $this->serviceService->create($data);
+
+            app(MetaConversionsApiService::class)->dispatchEvent($user, $request, 'Freelancer Create Service');
 
             return $this->successResponse(__('success'), new ServiceDetailsResource($service));
         } catch (Exception $e) {

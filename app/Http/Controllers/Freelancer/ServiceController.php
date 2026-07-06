@@ -12,6 +12,7 @@ use App\Models\Plan;
 use App\Models\Service;
 use App\Services\CategoryService;
 use App\Services\FreelancerService;
+use App\Services\MetaConversionsApiService;
 use App\Services\PlanService;
 use App\Services\ServiceService;
 use App\Services\TagService;
@@ -69,6 +70,9 @@ class ServiceController extends Controller
 
         $service = $this->serviceService->create($data);
         $service->tags()->sync($data['tags'] ?? []);
+
+        app(MetaConversionsApiService::class)->dispatchEvent(auth()->user(), $request, 'Freelancer Create Service');
+
         return redirect()->route('freelancer.services.index')->with('success', __('service_created_successfully'));
     }
     public function edit($id)

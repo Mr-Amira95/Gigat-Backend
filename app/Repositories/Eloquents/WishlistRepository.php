@@ -15,13 +15,16 @@ class WishlistRepository implements WishlistRepositoryInterface
             ->first();
 
         if ($wishlist) {
-            return $wishlist->delete();
+            $wishlist->delete();
+            return false;
         }
 
-        return (bool) Wishlist::create([
+        Wishlist::create([
             'user_id' => $userId,
             'service_id' => $serviceId
         ]);
+
+        return true;
     }
 
     public function getWishlistByUserId($userId)

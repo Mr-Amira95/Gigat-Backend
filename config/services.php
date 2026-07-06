@@ -64,5 +64,11 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'meta' => [
+        'dataset_id'      => env('META_DATASET_ID', '989416403886234'),
+        'access_token'    => env('META_CAPI_ACCESS_TOKEN'),
+        'api_version'     => env('META_API_VERSION', 'v21.0'),
+        'test_event_code' => env('META_TEST_EVENT_CODE'),
+    ],
 
 ];

@@ -16,6 +16,7 @@ use App\Services\CategoryService;
 use App\Services\CountryService;
 use App\Services\FreelancerService;
 use App\Services\LanguageService;
+use App\Services\MetaConversionsApiService;
 use App\Services\ProfessionService;
 use App\Utilities\FileManager;
 use Illuminate\Http\Request;
@@ -264,6 +265,8 @@ class ProfileController extends Controller
             $user->freelancer->file = $path;
             // $user->is_verified = false; // pending
             $user->save();
+
+            app(MetaConversionsApiService::class)->dispatchEvent($user, $request, 'Freelancer Submit Account Verification Request');
         }
 
         return back()->with('success', __('verification_document_submitted'));

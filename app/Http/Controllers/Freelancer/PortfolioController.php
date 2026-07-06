@@ -7,6 +7,7 @@ use App\Http\Requests\Freelancer\PortfolioRequest;
 use App\Http\Requests\Freelancer\UpdatePortfolioRequest;
 use App\Models\Service;
 use App\Services\FreelancerService;
+use App\Services\MetaConversionsApiService;
 use App\Services\PortfolioService;
 use App\Services\ServiceService;
 use Exception;
@@ -38,6 +39,9 @@ class PortfolioController extends Controller
     {
         try {
             $this->portfolioService->create($request->validated());
+
+            app(MetaConversionsApiService::class)->dispatchEvent(auth()->user(), $request, 'Freelancer Create Portfolio');
+
             return redirect()->route('freelancer.portfolios.index')
                 ->with('success', __('portfolio_created_successfully'));
         } catch (Exception $e) {

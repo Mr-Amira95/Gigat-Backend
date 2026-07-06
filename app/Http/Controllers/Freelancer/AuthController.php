@@ -15,6 +15,7 @@ use App\Models\PlayerId;
 use App\Models\Profession;
 use App\Models\User;
 use App\Models\UserLanguage;
+use App\Services\MetaConversionsApiService;
 use App\Services\WhatsAppService;
 use App\Utilities\FileManager;
 use App\Utilities\GenerateCode;
@@ -489,6 +490,8 @@ class AuthController extends Controller
 
 
             Auth::guard('freelancer')->login($user);
+
+            app(MetaConversionsApiService::class)->dispatchEvent($user, $request, 'Freelancer Register');
 
             return redirect()->route('freelancer.home.index')
                 ->with('success', __('account_verified_successfully'));
