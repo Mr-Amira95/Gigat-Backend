@@ -202,20 +202,6 @@ class AppServiceProvider extends ServiceProvider
 
     protected function configureRateLimiting(): void
     {
-        // Admin login: 5 attempts per minute per IP
-        RateLimiter::for('admin-login', function ($request) {
-            return Limit::perMinute(5)->by($request->ip())->response(function () {
-                return back()->withErrors(['login' => __('Too many login attempts. Please try again in a minute.')]);
-            });
-        });
-
-        // Freelancer login: 5 attempts per minute per IP
-        RateLimiter::for('freelancer-login', function ($request) {
-            return Limit::perMinute(5)->by($request->ip())->response(function () {
-                return back()->withErrors(['phone' => __('Too many login attempts. Please try again in a minute.')]);
-            });
-        });
-
         // Registration: 3 attempts per minute per IP (prevents mass account creation)
         RateLimiter::for('register', function ($request) {
             return Limit::perMinute(3)->by($request->ip());

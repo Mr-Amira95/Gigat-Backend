@@ -78,7 +78,13 @@ class MetaConversionsApiService
 
         $response = Http::asForm()->post($url, $payload);
 
-        if (!$response->successful()) {
+        if ($response->successful()) {
+            // TEMP diagnostic: logged at error level so it shows up even with LOG_LEVEL=error. Remove once confirmed.
+            Log::error('MetaConversionsApiService: event sent successfully', [
+                'event_name' => $eventData['event_name'] ?? null,
+                'response'   => $response->json(),
+            ]);
+        } else {
             Log::error('MetaConversionsApiService: failed to send event', [
                 'event_name' => $eventData['event_name'] ?? null,
                 'status'     => $response->status(),

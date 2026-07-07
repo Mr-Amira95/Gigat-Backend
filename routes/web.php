@@ -83,8 +83,7 @@ Route::get('auth/google/callback', [SocialLoginController::class, 'handleGoogleC
 // Guest Routes
 Route::middleware('guest:admin')->group(function ($route) {
     $route->get('', [AuthController::class, 'showLoginForm'])->name('login');
-    $route->post('login', [AuthController::class, 'login'])->name('login.submit')
-          ->middleware('throttle:admin-login');
+    $route->post('login', [AuthController::class, 'login'])->name('login.submit');
 
     // Forgot Password Flow
     Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.form');
@@ -400,10 +399,8 @@ Route::get('/lang/{locale}', function ($locale) {
 Route::prefix('freelancer')->middleware('guest:freelancer')->group(function ($route) {
     // login
     $route->get('login', [FreelancerAuthController::class, 'showLoginForm'])->name('freelancer.login');
-    $route->post('login', [FreelancerAuthController::class, 'login'])->name('freelancer.login.submit')
-          ->middleware('throttle:freelancer-login');
-    $route->post('websiteLogin', [FreelancerAuthController::class, 'websiteLogin'])->name('freelancer.weblogin')
-          ->middleware('throttle:freelancer-login');
+    $route->post('login', [FreelancerAuthController::class, 'login'])->name('freelancer.login.submit');
+    $route->post('websiteLogin', [FreelancerAuthController::class, 'websiteLogin'])->name('freelancer.weblogin');
 
     // register
     $route->get('register', [FreelancerAuthController::class, 'showRegisterForm'])->name('freelancer.register');
