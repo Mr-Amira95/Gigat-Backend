@@ -221,7 +221,7 @@
     "code_verified_successfully": "تم التحقق من الرمز بنجاح",
     "invalid_verification_code": "الرمز غير صالح",
     "password_reset_successfully": "تم إعادة تعيين كلمة المرور بنجاح",
-    "invalid_phone_number_or_password": "رقم الهاتف أو كلمة المرور غير صالحة",
+    "invalid_phone_number_or_password": "رقم الهاتف أو البريد الإلكتروني أو كلمة المرور غير صالحة",
     "account_is_not_active": "الحساب غير نشط",
     "messages.wishlist.toggle_success": "تم تبديل قائمة الرغبات بنجاح",
     "edit_faq": "تعديل السؤال الشائع",

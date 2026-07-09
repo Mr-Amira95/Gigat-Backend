@@ -16,6 +16,7 @@ use App\Models\Profession;
 use App\Models\User;
 use App\Models\UserLanguage;
 use App\Services\MetaConversionsApiService;
+use App\Services\OtpMailService;
 use App\Services\WhatsAppService;
 use App\Utilities\FileManager;
 use App\Utilities\GenerateCode;
@@ -124,7 +125,8 @@ class AuthController extends Controller
             $fullPhoneNumber =  $request->prefix . $request->phone;
 
             $whatsApp = new WhatsAppService();
-            $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code);
+            $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code, $freelancer);
+            (new OtpMailService())->send($freelancer, $code);
             // ممكن تبعت SMS هنا لو عندك API
             // SmsHelper::send($freelancer->prefix.$freelancer->phone, "Your verification code is $otpCode");
 
@@ -410,7 +412,8 @@ class AuthController extends Controller
 
         $fullPhoneNumber = $request->prefix . $request->phone;
         $whatsApp = new WhatsAppService();
-        $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code);
+        $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code, $user);
+        (new OtpMailService())->send($user, $code);
 
         $prefix = $request->prefix;
         $phone = $request->phone;
@@ -526,7 +529,8 @@ class AuthController extends Controller
 
         $fullPhoneNumber = $request->prefix  . $request->phone;
         $whatsApp = new WhatsAppService();
-        $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code);
+        $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code, $user);
+        (new OtpMailService())->send($user, $code);
 
 
         return back()->with('success', __('verification_code_sent_again'));

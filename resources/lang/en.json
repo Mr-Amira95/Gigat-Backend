@@ -235,7 +235,7 @@
     "code_verified_successfully": "Code verified successfully",
     "invalid_verification_code": "Invalid verification code",
     "password_reset_successfully": "Password reset successfully",
-    "invalid_phone_number_or_password": "Invalid phone number or password",
+    "invalid_phone_number_or_password": "Invalid phone number, email, or password",
     "edit_faq": "Edit FAQ",
     "view_faq": "View FAQ",
     "faq_details": "FAQ Details",

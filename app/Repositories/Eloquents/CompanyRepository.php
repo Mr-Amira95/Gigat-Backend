@@ -8,6 +8,7 @@ use App\Models\FreelancerCateogry;
 use App\Models\PlayerId;
 use App\Models\UserLanguage;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
+use App\Services\OtpMailService;
 use App\Services\WhatsAppService;
 use App\Utilities\FileManager;
 use App\Utilities\GenerateCode;
@@ -117,10 +118,11 @@ class CompanyRepository implements CompanyRepositoryInterface
                 ]);
             }
 
-            // Send OTP
+            // Send OTP via WhatsApp and email
             $fullPhone = $data['prefix'] . $data['phone'];
             $whatsapp = new WhatsAppService();
-            $whatsapp->sendTemplateMessage($fullPhone, $code);
+            $whatsapp->sendTemplateMessage($fullPhone, $code, $user);
+            (new OtpMailService())->send($user, $code);
 
 
             /*

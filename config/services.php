@@ -48,9 +48,10 @@ return [
         'redirect' => env('LINKEDIN_REDIRECT_URI'),
     ],
     'whatsapp' => [
-        'token'            => env('WHATSAPP_TOKEN'),
-        'phone_number_id'  => env('WHATSAPP_PHONE_NUMBER_ID'),
-        'template_name'    => env('WA_TEMPLATE_NAME'),
+        'token'                 => env('WHATSAPP_TOKEN'),
+        'phone_number_id'       => env('WHATSAPP_PHONE_NUMBER_ID'),
+        'template_name'         => env('WA_TEMPLATE_NAME'),
+        'webhook_verify_token'  => env('WHATSAPP_WEBHOOK_VERIFY_TOKEN'),
     ],
 
     'external' => [
@@ -69,6 +70,12 @@ return [
         'access_token'    => env('META_CAPI_ACCESS_TOKEN'),
         'api_version'     => env('META_API_VERSION', 'v21.0'),
         'test_event_code' => env('META_TEST_EVENT_CODE'),
+    ],
+
+    'phone' => [
+        // Country dial code assumed when a phone number has no country code
+        // embedded in it at all (e.g. "0792856567" or "792856567").
+        'default_prefix' => env('DEFAULT_PHONE_PREFIX', '962'),
     ],
 
 ];

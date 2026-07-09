@@ -39,7 +39,8 @@ use App\Http\Controllers\Api\{
     ChatbotController,
     HireFreelancerController,
     RatingController,
-    AnalyticsController
+    AnalyticsController,
+    WhatsAppWebhookController
 };
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
@@ -63,6 +64,11 @@ Route::controller(AuthController::class)->group(function ($route) {
     $route->post('create-freelancer', 'createFreelancer');
     $route->post('web-login', 'webLogin');
     $route->delete('delete-unverified-user', 'deleteUnverifiedUser');
+});
+
+Route::controller(WhatsAppWebhookController::class)->prefix('whatsapp')->group(function ($route) {
+    $route->get('webhook', 'verify');
+    $route->post('webhook', 'handle');
 });
 Route::controller(SocialAuthController::class)->prefix('auth')->group(function ($route) {
     $route->get('{provider}', [SocialAuthController::class, 'redirectToProvider']);

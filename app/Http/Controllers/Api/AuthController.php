@@ -318,7 +318,7 @@ class AuthController extends Controller
             $result = $this->authService->verifyCode($result['user']);
 
             // Store OTP-verified token so resetPassword can confirm OTP was completed
-            Cache::put('pwd_reset_' . $request['prefix'] . '_' . $request['phone'], true, now()->addMinutes(10));
+            Cache::put('pwd_reset_user_' . $result['user']->id, true, now()->addMinutes(10));
 
             return $this->successResponse(__('code_verified_successfully'), [
                 'user' => new UserResource($result['user']),
@@ -346,10 +346,11 @@ class AuthController extends Controller
             }
 
             // Ensure OTP was verified before allowing password reset
-            if (!Cache::has('pwd_reset_' . $request['prefix'] . '_' . $request['phone'])) {
+            $otpVerifiedKey = 'pwd_reset_user_' . $result['user']->id;
+            if (!Cache::has($otpVerifiedKey)) {
                 return $this->errorResponse('Please verify your OTP code first', 422);
             }
-            Cache::forget('pwd_reset_' . $request['prefix'] . '_' . $request['phone']);
+            Cache::forget($otpVerifiedKey);
 
             $result = $this->authService->resetPassword($result['user'], $request->password);
             return $this->successResponse(__('password_reset_successfully'), [

@@ -15,7 +15,7 @@ interface AuthRepositoryInterface
     public function register(array $data);
     public function login(array $data);
 
-    public function findByPhoneAndPrefix($phone,$prefix);
+    public function findByPhoneAndPrefix($phone, $prefix = null, $email = null);
 
     public function updateCode($user,$code);
 

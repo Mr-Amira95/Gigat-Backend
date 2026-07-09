@@ -78,7 +78,7 @@ class AuthService
     public function findByPhoneAndPrefix(array $data)
     {
         try {
-            $user = $this->authRepository->findByPhoneAndPrefix($data['phone'], $data['prefix']);
+            $user = $this->authRepository->findByPhoneAndPrefix($data['phone'] ?? null, $data['prefix'] ?? null, $data['email'] ?? null);
             return [
                 'user' => $user
             ];

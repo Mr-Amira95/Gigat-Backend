@@ -8,9 +8,12 @@ use App\Models\UserLanguage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Repositories\Interfaces\AuthRepositoryInterface;
+use App\Services\OtpMailService;
 use App\Services\WhatsAppService;
 use App\Utilities\FileManager;
 use App\Utilities\GenerateCode;
+use App\Utilities\PhoneNormalizer;
+use App\Utilities\PhonePrefixResolver;
 use Carbon\Carbon;
 
 class AuthRepository implements AuthRepositoryInterface
@@ -121,10 +124,11 @@ class AuthRepository implements AuthRepositoryInterface
                 }
             }
 
-            // 🔹 Send WhatsApp code
+            // 🔹 Send code via WhatsApp and email
             $fullPhoneNumber = $data['prefix'] . $data['phone'];
             $whatsApp = new WhatsAppService();
-            $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code);
+            $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code, $user);
+            (new OtpMailService())->send($user, $code);
 
             return $user->load(['profession', 'country', 'languages.language']);
         });
@@ -139,14 +143,18 @@ class AuthRepository implements AuthRepositoryInterface
      */
     public function login(array $data)
     {
+        $query = User::withTrashed()->with(['profession', 'country', 'languages.language']);
 
-        $localPhone = ltrim(preg_replace('/\D+/', '', $data['phone'] ?? ''), '0');
+        if (!empty($data['email'])) {
+            $user = $query->where('email', $data['email'])->first();
+        } else {
+            $resolved = PhonePrefixResolver::resolve($data['phone'] ?? '');
+            $localPhone = $resolved['phone'];
 
-        $user = User::withTrashed()->with(['profession', 'country', 'languages.language'])
-            ->where('prefix', $data['prefix'])
-            ->whereIn('phone', [$localPhone, '0' . $localPhone])
-
-            ->first();
+            $user = $query->where('prefix', $resolved['prefix'])
+                ->whereIn('phone', [$localPhone, '0' . $localPhone])
+                ->first();
+        }
 
         if (!$user || !Hash::check($data['password'], $user->password)) {
             return null;
@@ -155,9 +163,24 @@ class AuthRepository implements AuthRepositoryInterface
         return $user;
     }
 
-    public function findByPhoneAndPrefix($phone, $prefix)
+    /**
+     * Find a user by phone or email. If $prefix is given explicitly, the phone
+     * is matched against that exact prefix (legacy callers that still separate
+     * prefix from phone). Otherwise the prefix is resolved from $phone itself.
+     */
+    public function findByPhoneAndPrefix($phone, $prefix = null, $email = null)
     {
-        $localPhone = ltrim(preg_replace('/\D+/', '', $phone ?? ''), '0');
+        if (!empty($email)) {
+            return User::where('email', $email)->first();
+        }
+
+        if ($prefix !== null) {
+            $localPhone = PhoneNormalizer::normalize($phone ?? '', $prefix);
+        } else {
+            $resolved = PhonePrefixResolver::resolve($phone ?? '');
+            $prefix = $resolved['prefix'];
+            $localPhone = $resolved['phone'];
+        }
 
         return User::where('prefix', $prefix)
             ->whereIn('phone', [$localPhone, '0' . $localPhone])
@@ -175,9 +198,12 @@ class AuthRepository implements AuthRepositoryInterface
 
     public function sendCodeViaWhatsApp($user, $code): void
     {
-        $whatsApp = new WhatsAppService();
-        $fullPhoneNumber = $user->prefix . $user->phone;
-        $whatsApp->sendTemplateMessage($fullPhoneNumber, $code);
+        if ($user->prefix && $user->phone) {
+            $whatsApp = new WhatsAppService();
+            $fullPhoneNumber = $user->prefix . $user->phone;
+            $whatsApp->sendTemplateMessage($fullPhoneNumber, $code, $user);
+        }
+        (new OtpMailService())->send($user, $code);
     }
 
     public function clearCode($user): User

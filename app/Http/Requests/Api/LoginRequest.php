@@ -23,8 +23,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'prefix' => ['required', 'string', 'max:5', new ConvertNumbers],
-            'phone' => ['required', 'string', 'max:15', 'regex:/^[0-9]+$/', new ConvertNumbers],
+            'email' => ['nullable', 'string', 'email', 'required_without:phone'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9+]+$/', 'required_without:email', new ConvertNumbers],
             'password' => 'required|string',
         ];
     }

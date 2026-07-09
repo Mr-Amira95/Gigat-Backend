@@ -123,6 +123,22 @@ return [
             'handler' => NullHandler::class,
         ],
 
+        'whatsapp' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/whatsapp.log'),
+            'level' => 'debug',
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
+        'otp_email' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/otp-email.log'),
+            'level' => 'debug',
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],

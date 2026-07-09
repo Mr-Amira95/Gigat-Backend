@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Freelancer;
 use App\Http\Controllers\Controller;
 use App\Models\PlayerId;
 use App\Models\User;
+use App\Services\OtpMailService;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use App\Utilities\GenerateCode;
@@ -44,7 +45,8 @@ class SocialLoginController extends Controller
                         $fullPhoneNumber =  $user->prefix . $user->phone;
 
                         $whatsApp = new WhatsAppService();
-                        $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code);
+                        $response = $whatsApp->sendTemplateMessage($fullPhoneNumber, $code, $user);
+                        (new OtpMailService())->send($user, $code);
 
                         $prefix = $user->prefix;
                         $phone = $user->phone;

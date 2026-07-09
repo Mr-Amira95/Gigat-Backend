@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api;
 
+use App\Rules\ConvertNumbers;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GenerateCodeRequest extends FormRequest
@@ -14,8 +15,8 @@ class GenerateCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'prefix' => 'required|string',
-            'phone' => 'required|string',
+            'email' => ['nullable', 'string', 'email', 'required_without:phone'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9+]+$/', 'required_without:email', new ConvertNumbers],
         ];
     }
 
