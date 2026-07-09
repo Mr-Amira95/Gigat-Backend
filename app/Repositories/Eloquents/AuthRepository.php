@@ -151,7 +151,7 @@ class AuthRepository implements AuthRepositoryInterface
             $resolved = PhonePrefixResolver::resolve($data['phone'] ?? '');
             $localPhone = $resolved['phone'];
 
-            $user = $query->where('prefix', $resolved['prefix'])
+            $user = $query->when($resolved['prefix'] !== null, fn ($q) => $q->where('prefix', $resolved['prefix']))
                 ->whereIn('phone', [$localPhone, '0' . $localPhone])
                 ->first();
         }
@@ -176,13 +176,16 @@ class AuthRepository implements AuthRepositoryInterface
 
         if ($prefix !== null) {
             $localPhone = PhoneNormalizer::normalize($phone ?? '', $prefix);
-        } else {
-            $resolved = PhonePrefixResolver::resolve($phone ?? '');
-            $prefix = $resolved['prefix'];
-            $localPhone = $resolved['phone'];
+
+            return User::where('prefix', $prefix)
+                ->whereIn('phone', [$localPhone, '0' . $localPhone])
+                ->first();
         }
 
-        return User::where('prefix', $prefix)
+        $resolved = PhonePrefixResolver::resolve($phone ?? '');
+        $localPhone = $resolved['phone'];
+
+        return User::when($resolved['prefix'] !== null, fn ($q) => $q->where('prefix', $resolved['prefix']))
             ->whereIn('phone', [$localPhone, '0' . $localPhone])
             ->first();
     }

@@ -8,11 +8,9 @@ use Illuminate\Support\Facades\Cache;
 class PhonePrefixResolver
 {
     /**
-     * A real E.164 calling code never starts with "0", and this app's own bare
-     * local numbers (e.g. "0792856567" / "792856567") never exceed this length.
-     * Anything unmarked (no "+"/"00") at or under this length is treated as a
-     * bare local number of the default/home country rather than risking a false
-     * match against an unrelated country's short calling code.
+     * A real E.164 calling code never starts with "0". Anything unmarked
+     * (no "+"/"00") at or under this length is short enough to plausibly be a
+     * bare local number, so no country-code match is attempted for it.
      */
     private const UNMARKED_LOCAL_MAX_DIGITS = 10;
 
@@ -22,50 +20,45 @@ class PhonePrefixResolver
     /**
      * Split a raw phone string into ['prefix' => ..., 'phone' => ...].
      *
-     * Accepts, given the default prefix "962":
-     *   00962792856567, +962792856567, 962792856567, 0792856567, 792856567
-     * all resolving to prefix "962", phone "792856567".
+     * 'prefix' is null when the number has no determinable country code (a
+     * bare local number, e.g. "0792856567" / "792856567") — callers should
+     * then match on the local number alone, across all prefixes.
+     *
+     * Otherwise, e.g. 00962792856567, +962792856567, or 962792856567 (11+
+     * digits) all resolve to prefix "+962", phone "792856567".
      */
     public static function resolve(?string $rawPhone): array
     {
-        $defaultPrefix = (string) config('services.phone.default_prefix', '962');
         $trimmed = trim($rawPhone ?? '');
         $hasPlusMarker = $trimmed !== '' && $trimmed[0] === '+';
         $digits = preg_replace('/\D/', '', $rawPhone ?? '');
 
+        if ($hasPlusMarker) {
+            return self::matchCountryCode($digits) ?? self::withoutPrefix($digits);
+        }
+
         if (str_starts_with($digits, '00')) {
             $rest = substr($digits, 2);
-            return self::matchCountryCode($rest) ?? self::withDefault($defaultPrefix, $rest);
-        }
-
-        if ($hasPlusMarker) {
-            return self::matchCountryCode($digits) ?? self::withDefault($defaultPrefix, $digits);
-        }
-
-        if (str_starts_with($digits, '0')) {
-            return self::withDefault($defaultPrefix, $digits);
+            return self::matchCountryCode($rest) ?? self::withoutPrefix($rest);
         }
 
         if (strlen($digits) > self::UNMARKED_LOCAL_MAX_DIGITS) {
-            $match = self::matchCountryCode($digits);
-            if ($match) {
-                return $match;
-            }
+            return self::matchCountryCode($digits) ?? self::withoutPrefix($digits);
         }
 
-        return self::withDefault($defaultPrefix, $digits);
+        return self::withoutPrefix($digits);
     }
 
-    private static function withDefault(string $prefix, string $digits): array
+    private static function withoutPrefix(string $digits): array
     {
-        return ['prefix' => $prefix, 'phone' => ltrim($digits, '0')];
+        return ['prefix' => null, 'phone' => ltrim($digits, '0')];
     }
 
     private static function matchCountryCode(string $digits): ?array
     {
         foreach (self::countryCodes() as $code) {
             if (str_starts_with($digits, $code) && strlen($digits) - strlen($code) >= self::MIN_LOCAL_REMAINDER) {
-                return ['prefix' => $code, 'phone' => ltrim(substr($digits, strlen($code)), '0')];
+                return ['prefix' => '+' . $code, 'phone' => ltrim(substr($digits, strlen($code)), '0')];
             }
         }
 

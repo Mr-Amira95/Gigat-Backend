@@ -72,10 +72,4 @@ return [
         'test_event_code' => env('META_TEST_EVENT_CODE'),
     ],
 
-    'phone' => [
-        // Country dial code assumed when a phone number has no country code
-        // embedded in it at all (e.g. "0792856567" or "792856567").
-        'default_prefix' => env('DEFAULT_PHONE_PREFIX', '962'),
-    ],
-
 ];
