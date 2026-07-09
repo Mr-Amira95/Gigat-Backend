@@ -87,16 +87,13 @@ Route::middleware('guest:admin')->group(function ($route) {
 
     // Forgot Password Flow
     Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot.form');
-    Route::post('/forgot-password', [AuthController::class, 'submitForgot'])->name('forgot.submit')
-         ->middleware('throttle:password-reset');
+    Route::post('/forgot-password', [AuthController::class, 'submitForgot'])->name('forgot.submit');
 
     Route::get('/verify-code', [AuthController::class, 'showVerifyForm'])->name('verify.code.form');
-    Route::post('/verify-code', [AuthController::class, 'submitVerify'])->name('verify.code.submit')
-         ->middleware('throttle:verify-code');
+    Route::post('/verify-code', [AuthController::class, 'submitVerify'])->name('verify.code.submit');
 
     Route::get('/reset-password', [AuthController::class, 'showResetForm'])->name('reset.form');
-    Route::post('/reset-password', [AuthController::class, 'submitReset'])->name('reset.submit')
-         ->middleware('throttle:password-reset');
+    Route::post('/reset-password', [AuthController::class, 'submitReset'])->name('reset.submit');
 });
 // Protected Routes
 Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
@@ -404,15 +401,12 @@ Route::prefix('freelancer')->middleware('guest:freelancer')->group(function ($ro
 
     // register
     $route->get('register', [FreelancerAuthController::class, 'showRegisterForm'])->name('freelancer.register');
-    $route->post('register', [FreelancerAuthController::class, 'register'])->name('freelancer.register.submit')
-          ->middleware('throttle:register');
+    $route->post('register', [FreelancerAuthController::class, 'register'])->name('freelancer.register.submit');
 
     // phone verification
     $route->get('verify-phone', [FreelancerAuthController::class, 'showVerifyPhoneForm'])->name('freelancer.verify.phone');
-    $route->post('verify-phone', [FreelancerAuthController::class, 'verifyPhone'])->name('freelancer.verify.phone.submit')
-          ->middleware('throttle:otp-verify');
-    $route->post('resend-phone-code', [FreelancerAuthController::class, 'resendPhoneCode'])->name('freelancer.resend.phone.code')
-          ->middleware('throttle:otp-verify');
+    $route->post('verify-phone', [FreelancerAuthController::class, 'verifyPhone'])->name('freelancer.verify.phone.submit');
+    $route->post('resend-phone-code', [FreelancerAuthController::class, 'resendPhoneCode'])->name('freelancer.resend.phone.code');
 });
 
 

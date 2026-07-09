@@ -328,8 +328,8 @@ Route::middleware('auth:api')->group(function () {
 
 // Analytics — public endpoints (auth is optional on /event to attach user_id)
 Route::prefix('analytics')->controller(AnalyticsController::class)->group(function ($route) {
-    $route->post('visitor', 'visitor')->middleware('throttle:60,1');
-    $route->post('event', 'event')->middleware('throttle:120,1');
+    $route->post('visitor', 'visitor');
+    $route->post('event', 'event');
 });
 
 // Route::middleware('auth:api')->post('/broadcasting/auth', function (Request $request) {

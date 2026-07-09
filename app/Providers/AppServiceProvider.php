@@ -85,8 +85,6 @@ use App\Repositories\Interfaces\RequestFeedbackRepositoryInterface;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Session;
 
 class AppServiceProvider extends ServiceProvider
@@ -135,8 +133,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->configureRateLimiting();
-
         Passport::tokensExpireIn(now()->addDays(1));
         Passport::refreshTokensExpireIn(now()->addDays(30));
         Passport::personalAccessTokensExpireIn(now()->addMonths(6));
@@ -200,26 +196,4 @@ class AppServiceProvider extends ServiceProvider
         }
     }
 
-    protected function configureRateLimiting(): void
-    {
-        // Registration: 3 attempts per minute per IP (prevents mass account creation)
-        RateLimiter::for('register', function ($request) {
-            return Limit::perMinute(3)->by($request->ip());
-        });
-
-        // OTP verify / resend: 3 attempts per 10 minutes per IP
-        RateLimiter::for('otp-verify', function ($request) {
-            return Limit::perMinutes(10, 3)->by($request->ip());
-        });
-
-        // Password reset: 3 attempts per 5 minutes per IP
-        RateLimiter::for('password-reset', function ($request) {
-            return Limit::perMinutes(5, 3)->by($request->ip());
-        });
-
-        // Verify code: 5 attempts per 5 minutes per IP
-        RateLimiter::for('verify-code', function ($request) {
-            return Limit::perMinutes(5, 5)->by($request->ip());
-        });
-    }
 }
