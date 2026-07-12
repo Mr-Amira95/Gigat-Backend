@@ -285,8 +285,12 @@ class AuthController extends Controller
                 return $this->errorResponse(__('user_not_found'), 404);
             }
 
-            $result = $this->authService->generateCode($result['user']);
-            return $this->successResponse(__('code_generated_successfully'));
+            $user = $result['user'];
+            $this->authService->generateCode($user);
+            return $this->successResponse(__('code_generated_successfully'), [
+                'email' => $user->email,
+                'phone' => $user->phone,
+            ]);
         } catch (Exception $e) {
             return $this->exceptionResponse($e);
         }
