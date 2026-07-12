@@ -289,7 +289,7 @@ class AuthController extends Controller
             $this->authService->generateCode($user);
             return $this->successResponse(__('code_generated_successfully'), [
                 'email' => $user->email,
-                'phone' => $user->phone,
+                'phone' => $user->full_phone,
             ]);
         } catch (Exception $e) {
             return $this->exceptionResponse($e);
