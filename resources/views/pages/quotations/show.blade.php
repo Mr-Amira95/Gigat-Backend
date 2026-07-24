@@ -31,20 +31,18 @@
                         <div class="box-header flex justify-between items-center">
                             <h5 class="box-title">{{ __('quotation_details') }}</h5>
                             <div>
-                                @can('delete_quotations')
-                                    <a aria-label="anchor" href="javascript:void(0);"
-                                        onclick="showDeleteConfirmation('{{ __('are_you_sure') }}', {{ $quotation->id }})"
-                                        class="ti-btn btn-wave ti-btn-danger flex items-center gap-1">
-                                        <i class="las la-trash"></i> {{ __('delete') }}
-                                    </a>
+                                <a aria-label="anchor" href="javascript:void(0);"
+                                    onclick="showDeleteConfirmation('{{ __('are_you_sure') }}', {{ $quotation->id }})"
+                                    class="ti-btn btn-wave ti-btn-danger flex items-center gap-1">
+                                    <i class="las la-trash"></i> {{ __('delete') }}
+                                </a>
 
-                                    <form id="delete-form-{{ $quotation->id }}"
-                                        action="{{ route('quotations.destroy', $quotation->id) }}" method="POST"
-                                        class="hidden">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
-                                @endcan
+                                <form id="delete-form-{{ $quotation->id }}"
+                                    action="{{ route('quotations.destroy', $quotation->id) }}" method="POST"
+                                    class="hidden">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
                             </div>
                         </div>
                         <div class="box-body">
