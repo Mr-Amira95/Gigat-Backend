@@ -23,4 +23,11 @@ class QuotationController extends Controller
         $quotation = $this->quotationService->getQuotationDetails($id);
         return view('pages.quotations.show',compact('quotation'));
     }
+
+    public function destroy($id)
+    {
+        $this->quotationService->delete($id);
+        return redirect()->route('quotations.index')
+            ->with('success', __('quotation_deleted_successfully'));
+    }
 }

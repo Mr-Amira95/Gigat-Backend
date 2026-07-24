@@ -28,8 +28,24 @@
             <div class="grid grid-cols-12 gap-6">
                 <div class="col-span-12">
                     <div class="box">
-                        <div class="box-header">
+                        <div class="box-header flex justify-between items-center">
                             <h5 class="box-title">{{ __('quotation_details') }}</h5>
+                            <div>
+                                @can('delete_quotations')
+                                    <a aria-label="anchor" href="javascript:void(0);"
+                                        onclick="showDeleteConfirmation('{{ __('are_you_sure') }}', {{ $quotation->id }})"
+                                        class="ti-btn btn-wave ti-btn-danger flex items-center gap-1">
+                                        <i class="las la-trash"></i> {{ __('delete') }}
+                                    </a>
+
+                                    <form id="delete-form-{{ $quotation->id }}"
+                                        action="{{ route('quotations.destroy', $quotation->id) }}" method="POST"
+                                        class="hidden">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                @endcan
+                            </div>
                         </div>
                         <div class="box-body">
                             <div class="max-w-5xl mx-auto p-6 bg-white rounded-xl shadow-md space-y-6">

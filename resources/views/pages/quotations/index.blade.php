@@ -53,11 +53,23 @@
                                                 {!! \App\Enums\QuotationStatusEnum::tryFrom($quotation->status)?->badge() !!}
                                             </td>
                                             <td>
-
                                                 <a aria-label="anchor" href="{{ route('quotations.show', $quotation->id) }}"
                                                     class="ti-btn btn-wave ti-btn-icon ti-btn-sm ti-btn-success mx-1 rounded-pill">
                                                     <i class="las la-eye"></i>
                                                 </a>
+                                                @can('delete_quotations')
+                                                    <a aria-label="anchor" href="javascript:void(0);"
+                                                        onclick="showDeleteConfirmation('{{ __('are_you_sure') }}', {{ $quotation->id }})"
+                                                        class="ti-btn btn-wave ti-btn-icon ti-btn-sm ti-btn-danger mx-1 rounded-pill">
+                                                        <i class="las la-trash"></i>
+                                                    </a>
+                                                    <form id="delete-form-{{ $quotation->id }}"
+                                                        action="{{ route('quotations.destroy', $quotation->id) }}" method="POST"
+                                                        class="hidden">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                    </form>
+                                                @endcan
                                             </td>
                                         </tr>
                                     @endforeach

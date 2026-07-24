@@ -59,6 +59,10 @@ class PermissionSeeder extends Seeder
             ['name' => 'view_tickets', 'description' => 'View Tickets'],
             ['name' => 'reply_tickets', 'description' => 'Reply to Tickets'],
             ['name' => 'delete_tickets', 'description' => 'Delete Tickets'],
+
+            // Quotations
+            ['name' => 'view_quotations', 'description' => 'View Quotations'],
+            ['name' => 'delete_quotations', 'description' => 'Delete Quotations'],
         ];
 
         foreach ($permissions as $permission) {
