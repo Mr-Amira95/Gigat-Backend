@@ -461,6 +461,7 @@
     "send_notifications": "إرسال الإشعارات",
     "notifications": "الإشعارات",
     "target_audience": "الجمهور المستهدف",
+    "leave_empty_to_send_to_all": "اتركه فارغاً للإرسال لجميع المستخدمين ضمن الجمهور المحدد",
     "all": "الكل",
     "client": "العميل",
     "ios": "iOS",

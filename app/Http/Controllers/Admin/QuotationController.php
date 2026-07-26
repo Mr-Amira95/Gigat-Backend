@@ -15,8 +15,9 @@ class QuotationController extends Controller
         $this->quotationService = $quotationService;
     }
 
-    public function index(){
-        $quotations = $this->quotationService->index();
+    public function index(Request $request){
+        $params = $request->all();
+        $quotations = $this->quotationService->index($params);
         return view('pages.quotations.index',compact('quotations'));
     }
     public function show($id){

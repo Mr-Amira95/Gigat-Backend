@@ -35,6 +35,12 @@ class RequestRepository implements RequestRepositoryInterface
             ->when(!empty($filters['status']), function ($query) use ($filters) {
                 $query->where('status', $filters['status']);
             })
+            ->when(!empty($filters['created_date_from']), function ($query) use ($filters) {
+                $query->whereDate('created_at', '>=', $filters['created_date_from']);
+            })
+            ->when(!empty($filters['created_date_to']), function ($query) use ($filters) {
+                $query->whereDate('created_at', '<=', $filters['created_date_to']);
+            })
             ->orderBy('id', 'DESC')
             ->get();
     }

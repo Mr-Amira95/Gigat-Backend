@@ -30,9 +30,10 @@ class PortfolioController extends Controller
         $this->freelancerService = $freelancerService;
         $this->noticeService    = $noticeService;
     }
-    public function index()
+    public function index(Request $request)
     {
-        $portfolios = $this->portfolioService->index();
+        $params = $request->all();
+        $portfolios = $this->portfolioService->index($params);
         return view('pages.portfolios.index', compact('portfolios'));
     }
     public function create()

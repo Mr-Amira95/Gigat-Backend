@@ -14,9 +14,9 @@ class QuotationService
     {
         $this->quotationRepository = $quotationRepository;
     }
-    public function index()
+    public function index($params = [])
     {
-        return $this->quotationRepository->getAll();
+        return $this->quotationRepository->getAll($params);
     }
     public function store(array $data)
     {

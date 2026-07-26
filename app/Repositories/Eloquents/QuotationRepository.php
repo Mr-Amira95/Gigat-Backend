@@ -23,9 +23,19 @@ class QuotationRepository implements QuotationRepositoryInterface
         $this->quotationComment = $quotationComment;
         $this->googleTranslator = $googleTranslator;
     }
-    public function getAll()
+    public function getAll($params = [])
     {
-        return $this->model->with('user.profession')->orderBy('id', 'desc')->get();
+        $query = $this->model->with('user.profession')->orderBy('id', 'desc');
+
+        if (!empty($params['created_date_from'])) {
+            $query->whereDate('created_at', '>=', $params['created_date_from']);
+        }
+
+        if (!empty($params['created_date_to'])) {
+            $query->whereDate('created_at', '<=', $params['created_date_to']);
+        }
+
+        return $query->get();
     }
     public function store(array $data)
     {

@@ -4,7 +4,7 @@ namespace App\Repositories\Interfaces;
 
 interface PortfolioRepositoryInterface
 {
-    public function index();
+    public function index($params = []);
     public function getPortfolioByUserId($userId, $perPage = null);
     public function getFeaturedPortfolios($perPage = null);
     public function getPortfolioDetails($id);

@@ -86,6 +86,24 @@
                                             @endforeach
                                         </select>
                                     </div>
+                                    {{-- Created Date From --}}
+                                    <div class="w-48">
+                                        <label for="created-date-from"
+                                            class="text-sm font-medium text-gray-700 mb-1 block">{{ __('from_date') }}</label>
+                                        <input type="date" id="created-date-from" name="created_date_from"
+                                            value="{{ request('created_date_from') }}"
+                                            class="w-48 px-2 py-2 mt-1 block rounded-lg border-gray-300">
+                                    </div>
+
+                                    {{-- Created Date To --}}
+                                    <div class="w-48">
+                                        <label for="created-date-to"
+                                            class="text-sm font-medium text-gray-700 mb-1 block">{{ __('to_date') }}</label>
+                                        <input type="date" id="created-date-to" name="created_date_to"
+                                            value="{{ request('created_date_to') }}"
+                                            class="w-48 px-2 py-2 mt-1 block rounded-lg border-gray-300">
+                                    </div>
+
                                     {{-- Submit --}}
                                     <button type="submit"
                                         class="flex justify-center items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/80">

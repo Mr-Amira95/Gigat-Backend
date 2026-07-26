@@ -109,6 +109,7 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
     $route->controller(NotificationController::class)->name('notifications.')->prefix('notifications')->group(function ($route) {
         $route->get('', 'index')->name('index');
         $route->get('create', 'create')->name('create');
+        $route->get('search-users', 'searchUsers')->name('searchUsers');
         $route->post('send', 'send')->name('send');
     });
 

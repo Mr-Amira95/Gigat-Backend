@@ -4,7 +4,7 @@ namespace App\Repositories\Interfaces;
 
 interface QuotationRepositoryInterface
 {
-    public function getAll();
+    public function getAll($params = []);
     public function store(array $data);
     public function findAll($perPage = null);
     public function findById(int $id);

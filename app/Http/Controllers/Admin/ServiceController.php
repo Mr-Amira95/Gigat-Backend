@@ -57,6 +57,20 @@ class ServiceController extends Controller
                 return $service->user_id == request('freelancer');
             });
         }
+
+        // Filter by created date range
+        if (request()->filled('created_date_from')) {
+            $from = request('created_date_from');
+            $services = $services->filter(function ($service) use ($from) {
+                return $service->created_at && $service->created_at->format('Y-m-d') >= $from;
+            });
+        }
+        if (request()->filled('created_date_to')) {
+            $to = request('created_date_to');
+            $services = $services->filter(function ($service) use ($to) {
+                return $service->created_at && $service->created_at->format('Y-m-d') <= $to;
+            });
+        }
         return view('pages.services.index', compact('services', 'categories', 'freelancers'));
     }
     public function create()

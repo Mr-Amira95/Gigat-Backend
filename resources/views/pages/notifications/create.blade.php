@@ -56,6 +56,18 @@
                                         @enderror
                                     </div>
 
+                                    {{-- Users (filtered by audience) --}}
+                                    <div class="col-span-12 md:col-span-6">
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('users') }}</label>
+                                        <select name="user_ids[]" id="user_ids" multiple="multiple"
+                                            class="js-user-select mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary {{ $errors->has('user_ids') ? 'border-danger' : 'border-gray-300' }}">
+                                        </select>
+                                        <small class="text-gray-500">{{ __('leave_empty_to_send_to_all') }}</small>
+                                        @error('user_ids')
+                                            <p class="text-danger text-xs mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
                                     {{-- Platform --}}
                                     <div class="col-span-12 md:col-span-6">
                                         <label class="block text-sm font-medium text-gray-700">{{ __('platform') }}</label>
@@ -210,6 +222,40 @@
 @endsection
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        (function() {
+            const audienceSelect = document.querySelector('select[name="audience"]');
+            const userSelect = document.getElementById('user_ids');
+
+            $(userSelect).select2({
+                placeholder: "{{ __('search_user') }}",
+                allowClear: true,
+                width: '100%',
+                minimumInputLength: 0,
+                ajax: {
+                    url: "{{ route('notifications.searchUsers') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term || '',
+                            audience: audienceSelect.value
+                        };
+                    },
+                    processResults: function(response) {
+                        return {
+                            results: response.data
+                        };
+                    }
+                }
+            });
+
+            audienceSelect.addEventListener('change', function() {
+                $(userSelect).val(null).trigger('change');
+            });
+        })();
+    </script>
 
     <script>
         (function() {

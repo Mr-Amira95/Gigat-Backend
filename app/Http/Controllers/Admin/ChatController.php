@@ -114,6 +114,12 @@ class ChatController extends Controller
 
             if ($chat) {
                 $messages = ChatMessage::where('chat_id', $chat->id)
+                    ->when($request->filled('created_date_from'), function ($query) use ($request) {
+                        $query->whereDate('created_at', '>=', $request->created_date_from);
+                    })
+                    ->when($request->filled('created_date_to'), function ($query) use ($request) {
+                        $query->whereDate('created_at', '<=', $request->created_date_to);
+                    })
                     ->orderBy('created_at', 'asc')
                     ->get();
             }

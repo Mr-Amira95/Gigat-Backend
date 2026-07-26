@@ -12,8 +12,8 @@ class PortfolioService
     {
         $this->portfolioRepository = $portfolioRepository;
     }
-    public function index(){
-        return $this->portfolioRepository->index();
+    public function index($params = []){
+        return $this->portfolioRepository->index($params);
     }
     public function getUserPortfolio(){
         return $this->portfolioRepository->getUserPortfolio();

@@ -39,6 +39,32 @@ class NotificationController extends Controller
         return view('pages.notifications.create', compact('categories', 'services', 'portfolios'));
     }
 
+    public function searchUsers(Request $request)
+    {
+        $q = $request->get('q', '');
+        $audience = $request->get('audience', 'all');
+
+        $usersQuery = User::query();
+
+        if ($audience === 'freelancer') {
+            $usersQuery->whereHas('freelancer');
+        } elseif ($audience === 'client') {
+            $usersQuery->whereDoesntHave('freelancer');
+        }
+
+        $usersQuery->when($q !== '', function ($query) use ($q) {
+            $query->where('username', 'like', "%{$q}%")
+                ->orWhere('email', 'like', "%{$q}%");
+        });
+
+        $users = $usersQuery->limit(20)->get(['id', 'username', 'email']);
+
+        return response()->json(['status' => true, 'data' => $users->map(fn ($u) => [
+            'id'   => $u->id,
+            'text' => "{$u->username} ({$u->email})",
+        ])]);
+    }
+
     public function send(Request $request)
     {
         $request->validate([
@@ -50,6 +76,8 @@ class NotificationController extends Controller
             'body_ar'    => 'required|string',
             'notif_type'  => ['nullable', Rule::in(['categories', 'services', 'portfolio'])],
             'notif_id'    => ['nullable', 'string', 'max:191', Rule::requiredIf($request->filled('notif_type'))],
+            'user_ids'    => ['nullable', 'array'],
+            'user_ids.*'  => ['integer', 'exists:users,id'],
         ]);
         // (Optional but recommended) Ensure notif_id exists in the selected table when provided
         if ($request->filled('notif_type') && $request->filled('notif_id')) {
@@ -73,6 +101,10 @@ class NotificationController extends Controller
         } elseif ($request->audience == 'client') {
             $freelancerIds = Freelancer::pluck('user_id')->toArray();
             $usersQuery->whereNotIn('id', $freelancerIds);
+        }
+
+        if ($request->filled('user_ids')) {
+            $usersQuery->whereIn('id', $request->user_ids);
         }
 
         $users = $usersQuery->pluck('id')->toArray();

@@ -26,14 +26,47 @@
             <div class="grid grid-cols-12 gap-6">
                 <div class="col-span-12">
                     <div class="box">
-                        <div class="box-header">
+                        <div class="box-header flex justify-between align-center">
                             <h5 class="box-title">{{ __('portfolios') }}</h5>
-                            @can('create_portfolio')
-                                <a href="{{ route('portfolios.create') }}"
-                                    class="flex items-center gap-2 px-4 py-3 text-white bg-primary hover:bg-blue-600 rounded-lg shadow">
-                                    <i class="las la-plus-circle text-lg"></i>{{ __('add_portfolio') }}
+                            <div class="ms-auto flex items-center gap-2">
+                                @can('create_portfolio')
+                                    <a href="{{ route('portfolios.create') }}"
+                                        class="flex items-center gap-2 px-4 py-3 text-white bg-primary hover:bg-blue-600 rounded-lg shadow">
+                                        <i class="las la-plus-circle text-lg"></i>{{ __('add_portfolio') }}
+                                    </a>
+                                @endcan
+                                <a href="javascript:void(0)" id="filter-btn"
+                                    class="flex items-center gap-2 px-4 py-2 text-white bg-secondary hover:bg-blue-600 rounded-lg shadow">
+                                    <i class="las la-filter"></i> {{ __('filter') }}
                                 </a>
-                            @endcan
+                            </div>
+                        </div>
+                        <div class="box-footer border-t p-4" style="display: none;">
+                            <h6 class="font-bold mb-2">{{ __('filter') }}</h6>
+                            <div class="flex flex-wrap gap-4">
+                                <div class="w-48">
+                                    <label for="created-date-from"
+                                        class="text-sm font-medium text-gray-700 mb-1 block">{{ __('from_date') }}</label>
+                                    <input type="date" id="created-date-from" name="created_date_from"
+                                        value="{{ request()->get('created_date_from') }}"
+                                        class="w-48 px-2 py-2 mt-1 block rounded-lg border-gray-300">
+                                </div>
+                                <div class="w-48">
+                                    <label for="created-date-to"
+                                        class="text-sm font-medium text-gray-700 mb-1 block">{{ __('to_date') }}</label>
+                                    <input type="date" id="created-date-to" name="created_date_to"
+                                        value="{{ request()->get('created_date_to') }}"
+                                        class="w-48 px-2 py-2 mt-1 block rounded-lg border-gray-300">
+                                </div>
+                                <a href="javascript:void(0)" id="filter-submit"
+                                    class="flex justify-center items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">
+                                    {{ __('submit_filter') }}
+                                </a>
+                                <a href="javascript:void(0)" id="filter-reset"
+                                    class="flex justify-center items-center px-4 py-2 bg-danger text-white rounded-lg hover:bg-blue-600">
+                                    {{ __('reset_filter') }}
+                                </a>
+                            </div>
                         </div>
                         <div class="box-body">
                             <table id="basic-table" class="table">
@@ -42,6 +75,7 @@
                                         <th>#</th>
                                         <th>{{ __('title') }}</th>
                                         <th>{{ __('description') }}</th>
+                                        <th>{{ __('created_at') }}</th>
                                         <th>{{ __('actions') }}</th>
                                     </tr>
                                 </thead>
@@ -53,6 +87,7 @@
                                             {{-- <td>{{ \Illuminate\Support\Str::limit(strip_tags($portfolio->description), 100, '...') }}
                                             </td> --}}
                                             <td>{!! \Illuminate\Support\Str::limit($portfolio->translation->description, 100, '...') !!}</td>
+                                            <td>{{ $portfolio->created_at?->format('Y-m-d') }}</td>
 
                                             <td>
                                                 <a aria-label="anchor"
@@ -101,6 +136,28 @@
     <script>
         $(document).ready(function() {
             $('#basic-table').DataTable();
+
+            $('#filter-btn').on('click', function() {
+                $('.box-footer').stop().slideToggle();
+            });
+            $('#filter-submit').on('click', function() {
+                var params = {
+                    created_date_from: $('#created-date-from').val(),
+                    created_date_to: $('#created-date-to').val(),
+                };
+
+                var queryString = $.param(params);
+                window.location.href = "{{ route('portfolios.index') }}?" + queryString;
+            });
+            if (
+                '{{ request()->get('created_date_from') }}' ||
+                '{{ request()->get('created_date_to') }}'
+            ) {
+                $('.box-footer').show();
+            }
+            $('#filter-reset').on('click', function() {
+                window.location.href = "{{ route('portfolios.index') }}";
+            });
         });
     </script>
 @endpush

@@ -19,6 +19,8 @@ class RequestController extends Controller
     {
         $filters = [
             'status' => $request->query('status'),
+            'created_date_from' => $request->query('created_date_from'),
+            'created_date_to' => $request->query('created_date_to'),
         ];
         $requests = $this->requestService->getAll($filters);
         return view('pages.requests.index', compact('requests'));

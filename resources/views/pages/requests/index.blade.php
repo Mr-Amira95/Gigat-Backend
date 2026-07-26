@@ -48,6 +48,24 @@
                                     </select>
                                 </div>
 
+                                {{-- Created Date From --}}
+                                <div class="col-span-12 md:col-span-4">
+                                    <label for="created-date-from"
+                                        class="text-sm font-medium text-gray-700 mb-1 block">{{ __('from_date') }}</label>
+                                    <input type="date" id="created-date-from" name="created_date_from"
+                                        value="{{ request('created_date_from') }}"
+                                        class="w-full px-2 py-2 rounded-lg border-gray-300">
+                                </div>
+
+                                {{-- Created Date To --}}
+                                <div class="col-span-12 md:col-span-4">
+                                    <label for="created-date-to"
+                                        class="text-sm font-medium text-gray-700 mb-1 block">{{ __('to_date') }}</label>
+                                    <input type="date" id="created-date-to" name="created_date_to"
+                                        value="{{ request('created_date_to') }}"
+                                        class="w-full px-2 py-2 rounded-lg border-gray-300">
+                                </div>
+
                                 {{-- Buttons --}}
                                 <div class="col-span-12 md:col-span-4 flex items-end gap-2">
                                     <a href="javascript:void(0)" id="filter-submit"
@@ -70,6 +88,7 @@
                                         <th>{{ __('order_number') }}</th>
                                         <th>{{ __('title') }}</th>
                                         <th>{{ __('status') }}</th>
+                                        <th>{{ __('created_at') }}</th>
                                         <th>{{ __('actions') }}</th>
                                     </tr>
                                 </thead>
@@ -82,6 +101,7 @@
                                             <td>
                                                 {!! \App\Enums\RequestStatusEnum::tryFrom($request->status)?->badge() !!}
                                             </td>
+                                            <td>{{ $request->created_at?->format('Y-m-d') }}</td>
                                             <td>
 
                                                 <a aria-label="anchor" href="{{ route('requests.show', $request->id) }}"
@@ -115,6 +135,8 @@
         $('#filter-submit').click(function() {
             const query = new URLSearchParams();
             if ($('#status-filter').val()) query.append('status', $('#status-filter').val());
+            if ($('#created-date-from').val()) query.append('created_date_from', $('#created-date-from').val());
+            if ($('#created-date-to').val()) query.append('created_date_to', $('#created-date-to').val());
 
             const baseUrl = "{{ route('requests.index') }}";
             window.location.href = `${baseUrl}?${query.toString()}`;

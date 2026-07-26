@@ -23,9 +23,18 @@ class PortfolioRepository implements PortfolioRepositoryInterface
         $this->model = $portfolio;
         $this->googleTranslator = $googleTranslator;
     }
-    public function index()
+    public function index($params = [])
     {
         $query = Portfolio::query()->orderBy('id', 'desc');
+
+        if (!empty($params['created_date_from'])) {
+            $query->whereDate('created_at', '>=', $params['created_date_from']);
+        }
+
+        if (!empty($params['created_date_to'])) {
+            $query->whereDate('created_at', '<=', $params['created_date_to']);
+        }
+
         return $query->get();
     }
 

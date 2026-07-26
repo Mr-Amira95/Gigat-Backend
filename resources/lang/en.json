@@ -517,6 +517,7 @@
     "send_notifications": "Send Notifications",
     "notifications": "Notifications",
     "target_audience": "Target Audience",
+    "leave_empty_to_send_to_all": "Leave empty to send to all users in the selected audience",
     "all": "All",
     "client": "Client",
     "ios": "iOS",

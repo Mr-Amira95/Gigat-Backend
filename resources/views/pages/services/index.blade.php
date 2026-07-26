@@ -96,6 +96,21 @@
                                     </select>
                                 </div>
 
+                                <div class="w-48">
+                                    <label for="created-date-from"
+                                        class="text-sm font-medium text-gray-700 mb-1 block">{{ __('from_date') }}</label>
+                                    <input type="date" id="created-date-from" name="created_date_from"
+                                        value="{{ request()->get('created_date_from') }}"
+                                        class="w-48 px-2 py-2 mt-1 block rounded-lg border-gray-300">
+                                </div>
+                                <div class="w-48">
+                                    <label for="created-date-to"
+                                        class="text-sm font-medium text-gray-700 mb-1 block">{{ __('to_date') }}</label>
+                                    <input type="date" id="created-date-to" name="created_date_to"
+                                        value="{{ request()->get('created_date_to') }}"
+                                        class="w-48 px-2 py-2 mt-1 block rounded-lg border-gray-300">
+                                </div>
+
                                 <a href="javascript:void(0)" id="filter-submit"
                                     class="flex justify-center items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">
                                     {{ __('submit_filter') }}
@@ -116,6 +131,7 @@
                                         <th>{{ __('title') }}</th>
                                         <th>{{ __('category') }}</th>
                                         <th>{{ __('freelancer') }}</th>
+                                        <th>{{ __('created_at') }}</th>
                                         <th>{{ __('recommended') }}</th>
                                         <th>{{ __('activation') }}</th>
                                         <th>{{ __('actions') }}</th>
@@ -131,6 +147,7 @@
 
 
                                             <td>{{ $service->user->username }}</td>
+                                            <td>{{ $service->created_at?->format('Y-m-d') }}</td>
                                             <td>
                                                 <div class="flex items-center justify-center">
                                                     <input type="checkbox" id="hs-small-switch-{{ $service->id }}"
@@ -217,6 +234,8 @@
                 var params = {
                     category: $('#category-filter').val(),
                     freelancer: $('#freelancer-filter').val(),
+                    created_date_from: $('#created-date-from').val(),
+                    created_date_to: $('#created-date-to').val(),
                 };
 
                 var queryString = $.param(params);
@@ -225,7 +244,9 @@
 
             if (
                 @json(!empty(request()->get('category'))) ||
-                @json(!empty(request()->get('freelancer')))
+                @json(!empty(request()->get('freelancer'))) ||
+                '{{ request()->get('created_date_from') }}' ||
+                '{{ request()->get('created_date_to') }}'
             ) {
                 $('.box-footer').show();
             }
