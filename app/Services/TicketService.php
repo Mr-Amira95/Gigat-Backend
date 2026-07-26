@@ -58,6 +58,23 @@ class TicketService
         return $ticket->load(['messages.attachments']);
     }
 
+    public function createTicketByAdmin(array $data, $targetUser, $admin)
+    {
+        $data['user_id']     = $targetUser->id;
+        $data['status']      = 'open';
+        $data['assigned_to'] = $admin->id;
+        $data['code']        = GenerateCode::generateTicketCode();
+        $ticket = $this->ticketRepository->createTicket($data);
+
+        $this->addMessage([
+            'ticket_id'  => $ticket->id,
+            'message'    => $data['message'],
+            'attachment' => $data['attachment'] ?? null,
+        ], $admin);
+
+        return $ticket->load(['messages.attachments']);
+    }
+
     public function addMessage(array $data, $user)
     {
         if (!($user instanceof \App\Models\Admin)) {

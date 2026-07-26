@@ -284,6 +284,10 @@ Route::middleware(['auth:admin', 'admin'])->group(function ($route) {
     });
     $route->controller(TicketController::class)->name('tickets.')->prefix('tickets')->group(function ($route) {
         $route->get('', 'index')->name('index');
+        $route->get('create', 'create')->name('create');
+        $route->post('store', 'store')->name('store');
+        $route->get('search-users', 'searchUsers')->name('searchUsers');
+        $route->get('{userId}/link-options', 'linkOptions')->name('linkOptions');
         $route->get('show/{id}', 'show')->name('show');
         $route->post('reply/{id}', 'reply')->name('reply');
         $route->put('{ticket}/change-status', 'changeStatus')->name('changeStatus');
