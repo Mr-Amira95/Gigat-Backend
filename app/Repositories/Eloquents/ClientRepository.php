@@ -46,6 +46,14 @@ class ClientRepository implements ClientRepositoryInterface
             $query->whereIn('country_id', $params['country']);
         }
 
+        if (!empty($params['created_date_from'])) {
+            $query->whereDate('created_at', '>=', $params['created_date_from']);
+        }
+
+        if (!empty($params['created_date_to'])) {
+            $query->whereDate('created_at', '<=', $params['created_date_to']);
+        }
+
         // P2-06/PERF-03: paginate by default; pass null to get all (e.g. for exports)
         return $perPage ? $query->paginate($perPage) : $query->get();
     }

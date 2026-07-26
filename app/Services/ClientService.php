@@ -15,9 +15,9 @@ class ClientService
         $this->clientRepository = $clientRepository;
     }
 
-    public function index($params)
+    public function index($params, ?int $perPage = 50)
     {
-        return $this->clientRepository->index($params);
+        return $this->clientRepository->index($params, $perPage);
     }
    
     public function store($data)

@@ -28,7 +28,7 @@ class ClientController extends Controller
     {
         $params = $request->all();
 
-        $clients = $this->clientService->index($params);
+        $clients = $this->clientService->index($params, null);
         $professions = $this->professionService->getAllActive();
         $countries = $this->countryService->getAllActive();
         return view('pages.clients.index', compact('clients', 'professions', 'countries'));

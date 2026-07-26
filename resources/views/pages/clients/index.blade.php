@@ -91,6 +91,20 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="w-48">
+                                    <label for="created-date-from"
+                                        class="text-sm font-medium text-gray-700 mb-1 block">{{ __('from_date') }}</label>
+                                    <input type="date" id="created-date-from" name="created_date_from"
+                                        value="{{ request()->get('created_date_from') }}"
+                                        class="w-48 px-2 py-2 mt-1 block rounded-lg border-gray-300">
+                                </div>
+                                <div class="w-48">
+                                    <label for="created-date-to"
+                                        class="text-sm font-medium text-gray-700 mb-1 block">{{ __('to_date') }}</label>
+                                    <input type="date" id="created-date-to" name="created_date_to"
+                                        value="{{ request()->get('created_date_to') }}"
+                                        class="w-48 px-2 py-2 mt-1 block rounded-lg border-gray-300">
+                                </div>
                                 <a href="javascript:void(0)" id="filter-submit"
                                     class="flex justify-center items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">
                                     {{ __('submit_filter') }}
@@ -114,6 +128,7 @@
                                         <th>{{ __('phone') }}</th>
                                         <th>{{ __('profession') }}</th>
                                         <th>{{ __('rate') }}</th>
+                                        <th>{{ __('created_at') }}</th>
                                         <th>{{ __('status') }}</th>
                                         <th>{{ __('actions') }}</th>
                                     </tr>
@@ -133,6 +148,7 @@
                                             <td>{{ $client->full_phone }}</td>
                                             <td>{{ $client->profession->translation->title }}</td>
                                             <td>⭐{{ $client->rating }}</td>
+                                            <td>{{ $client->created_at?->format('Y-m-d') }}</td>
                                             <td>
                                                 @can('delete_clients')
                                                     <div class="flex items-center justify-center">
@@ -218,6 +234,8 @@
                     gender: $('#gender-filter').val(),
                     profession: $('#profession-filter').val(),
                     country: $('#country-filter').val(),
+                    created_date_from: $('#created-date-from').val(),
+                    created_date_to: $('#created-date-to').val(),
                 };
 
                 var queryString = $.param(params);
@@ -228,6 +246,8 @@
                 '{{ request()->get('email') }}' ||
                 '{{ request()->get('phone') }}' ||
                 '{{ request()->get('gender') }}' ||
+                '{{ request()->get('created_date_from') }}' ||
+                '{{ request()->get('created_date_to') }}' ||
                 @json(!empty(request()->get('profession'))) ||
                 @json(!empty(request()->get('country')))
             ) {

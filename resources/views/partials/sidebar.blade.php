@@ -113,7 +113,7 @@
                     </li>
 
                     <li class="slide__category"><span class="category-name">{{ __('pages') }}</span></li>
-                    @canany(['view_admins', 'view_clients', 'view_freelancers', 'view_roles', 'view_companies'])
+                    @canany(['view_admins', 'view_clients', 'view_freelancers', 'view_roles'])
                         <li class="slide has-sub">
                             <a href="javascript:void(0);" class="side-menu__item">
                                 <i class="bx bx-user side-menu__icon"></i>
@@ -146,16 +146,6 @@
                                         </a>
                                     </li>
                                 @endcan
-
-                                @can('view_companies')
-                                    <li class="slide">
-                                        <a href="{{ route('companies.index') }}" class="side-menu__item">
-                                            <i class="bx bx-buildings side-menu__icon"></i>
-                                            <span class="side-menu__label">{{ __('companies') }}</span>
-                                        </a>
-                                    </li>
-                                @endcan
-
 
                                 @can('view_roles')
                                     <li class="slide">
