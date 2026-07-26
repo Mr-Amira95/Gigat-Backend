@@ -137,7 +137,7 @@ class ServiceController extends Controller
 
         $servicePlans = $this->serviceService->getPlansByServiceId($id);
         $plans = $this->planService->index();
-        $freelancers = $this->freelancerService->index([]);
+        $freelancers = $this->freelancerService->index([], null);
         $currencies = Currency::all();
 
         $plansCount = Plan::count();
@@ -218,7 +218,7 @@ class ServiceController extends Controller
 
         $servicePlans = $this->serviceService->getPlansByServiceId($id);
         $plans = $this->planService->index();
-        $freelancers = $this->freelancerService->index([]);
+        $freelancers = $this->freelancerService->index([], null);
         $currencies = Currency::all();
 
         $plansCount = Plan::count();

@@ -56,18 +56,6 @@
                                         @enderror
                                     </div>
 
-                                    {{-- Users (filtered by audience) --}}
-                                    <div class="col-span-12 md:col-span-6">
-                                        <label class="block text-sm font-medium text-gray-700">{{ __('users') }}</label>
-                                        <select name="user_ids[]" id="user_ids" multiple="multiple"
-                                            class="js-user-select mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary {{ $errors->has('user_ids') ? 'border-danger' : 'border-gray-300' }}">
-                                        </select>
-                                        <small class="text-gray-500">{{ __('leave_empty_to_send_to_all') }}</small>
-                                        @error('user_ids')
-                                            <p class="text-danger text-xs mt-1">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-
                                     {{-- Platform --}}
                                     <div class="col-span-12 md:col-span-6">
                                         <label class="block text-sm font-medium text-gray-700">{{ __('platform') }}</label>
@@ -84,6 +72,18 @@
                                                 {{ __('web') }}</option>
                                         </select>
                                         @error('platform')
+                                            <p class="text-danger text-xs mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    {{-- Users (filtered by audience) --}}
+                                    <div class="col-span-12">
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('users') }}</label>
+                                        <select name="user_ids[]" id="user_ids" multiple="multiple"
+                                            class="js-user-select mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary {{ $errors->has('user_ids') ? 'border-danger' : 'border-gray-300' }}">
+                                        </select>
+                                        <small class="text-gray-500">{{ __('leave_empty_to_send_to_all') }}</small>
+                                        @error('user_ids')
                                             <p class="text-danger text-xs mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
