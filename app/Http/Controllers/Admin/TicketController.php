@@ -126,7 +126,7 @@ class TicketController extends Controller
                 ->map(fn ($s) => ['id' => $s->id, 'text' => $s->translation->title ?? ('#' . $s->id)]),
             'portfolio' => Portfolio::where('user_id', $userId)
                 ->get()
-                ->map(fn ($p) => ['id' => $p->id, 'text' => $p->title]),
+                ->map(fn ($p) => ['id' => $p->id, 'text' => $p->translation->title ?? ('#' . $p->id)]),
             default => collect(),
         };
 
