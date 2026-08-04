@@ -53,6 +53,14 @@ class StatisticsController extends Controller
                 ->doesntHave('freelancer')
                 ->count();
 
+            // Active = has at least 1 service, Not Active = has none
+            $activeFreelancers = $dateFilter(Freelancer::query())
+                ->whereHas('user.services')
+                ->count();
+            $notActiveFreelancers = $dateFilter(Freelancer::query())
+                ->whereDoesntHave('user.services')
+                ->count();
+
             // ── Services ────────────────────────────────────────────────────
             $totalServices    = $dateFilter(Service::query())->count();
             $servicesByStatus = $dateFilter(Service::query())
@@ -136,6 +144,7 @@ class StatisticsController extends Controller
             return compact(
                 'totalUsers', 'verifiedUsers', 'genderBreakdown',
                 'totalFreelancers', 'freelancersByStatus', 'totalClients',
+                'activeFreelancers', 'notActiveFreelancers',
                 'totalServices', 'servicesByStatus', 'featuredServices', 'recommendedServices',
                 'totalPortfolios', 'featuredPortfolios',
                 'totalRequests', 'requestsByStatus', 'completionRate',

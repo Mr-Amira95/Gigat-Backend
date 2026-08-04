@@ -91,6 +91,16 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <select id="activation-status-filter"
+                                    class="w-48 px-2 py-2 mt-1 block rounded-lg  border-gray-300 text-gray-500">
+                                    <option value="">{{ __('all_statuses') }}</option>
+                                    <option value="active"
+                                        {{ request()->get('activation_status') == 'active' ? 'selected' : '' }}>
+                                        {{ __('active') }}</option>
+                                    <option value="inactive"
+                                        {{ request()->get('activation_status') == 'inactive' ? 'selected' : '' }}>
+                                        {{ __('inactive') }}</option>
+                                </select>
                                 <div class="w-48">
                                     <label for="created-date-from"
                                         class="text-sm font-medium text-gray-700 mb-1 block">{{ __('from_date') }}</label>
@@ -278,6 +288,7 @@
                     gender: $('#gender-filter').val(),
                     profession: $('#profession-filter').val(),
                     country: $('#country-filter').val(),
+                    activation_status: $('#activation-status-filter').val(),
                     created_date_from: $('#created-date-from').val(),
                     created_date_to: $('#created-date-to').val(),
                 };
@@ -290,6 +301,7 @@
                 '{{ request()->get('email') }}' ||
                 '{{ request()->get('phone') }}' ||
                 '{{ request()->get('gender') }}' ||
+                '{{ request()->get('activation_status') }}' ||
                 '{{ request()->get('created_date_from') }}' ||
                 '{{ request()->get('created_date_to') }}' ||
                 @json(!empty(request()->get('profession'))) ||

@@ -58,27 +58,17 @@
             <div class="box-body p-4">
                 <form method="GET" action="{{ route('statistics.index') }}">
                     <div class="grid grid-cols-12 gap-4">
-                        <div class="col-span-12 md:col-span-3">
+                        <div class="col-span-12 md:col-span-4">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">From</label>
                             <input type="date" name="from" value="{{ $from }}"
                                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1f2937] dark:text-white text-sm">
                         </div>
-                        <div class="col-span-12 md:col-span-3">
+                        <div class="col-span-12 md:col-span-4">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">To</label>
                             <input type="date" name="to" value="{{ $to }}"
                                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1f2937] dark:text-white text-sm">
                         </div>
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">Platform (Visitors)</label>
-                            <select name="platform"
-                                class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-[#1f2937] dark:text-white text-sm">
-                                <option value="">All Platforms</option>
-                                @foreach (['web', 'android', 'ios'] as $p)
-                                    <option value="{{ $p }}" @selected($platform === $p)>{{ ucfirst($p) }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-span-12 md:col-span-3 flex items-end gap-2">
+                        <div class="col-span-12 md:col-span-4 flex items-end gap-2">
                             <button type="submit"
                                 class="flex-1 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90">
                                 <i class="bx bx-search me-1"></i>Apply
@@ -94,29 +84,35 @@
         </div>
 
         {{-- ── Top KPI Cards ──────────────────────────────────────────────────── --}}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
 
             @php
                 $kpis = [
-                    ['label' => 'Registered Users',  'value' => $totalUsers,       'icon' => 'bx-group',        'color' => 'text-primary'],
-                    ['label' => 'Total Services',    'value' => $totalServices,    'icon' => 'bx-cube',         'color' => 'text-success'],
-                    ['label' => 'Total Requests',    'value' => $totalRequests,    'icon' => 'bx-clipboard',    'color' => 'text-warning'],
-                    ['label' => 'Paid Revenue',      'value' => number_format($totalRevenue, 2), 'icon' => 'bx-dollar-circle', 'color' => 'text-danger'],
-                    ['label' => 'Freelancers',       'value' => $totalFreelancers, 'icon' => 'bx-user-check',   'color' => 'text-info'],
-                    ['label' => 'Portfolios',        'value' => $totalPortfolios,  'icon' => 'bx-image',        'color' => 'text-purple-500'],
-                    ['label' => 'Open Tickets',      'value' => $ticketsByStatus->get('open', 0), 'icon' => 'bx-support', 'color' => 'text-orange-500'],
-                    ['label' => 'App Visitors',      'value' => $totalVisitors,    'icon' => 'bx-bar-chart-alt-2', 'color' => 'text-teal-500'],
+                    // Row 1
+                    ['label' => 'Registered Users',     'value' => $totalUsers,           'icon' => 'bx-group',           'color' => 'text-primary'],
+                    ['label' => 'Clients',               'value' => $totalClients,         'icon' => 'bx-user',            'color' => 'text-cyan-500',   'href' => route('clients.index')],
+                    ['label' => 'Freelancers',            'value' => $totalFreelancers,     'icon' => 'bx-user-check',      'color' => 'text-info',       'href' => route('freelancers.index')],
+                    ['label' => 'Active Freelancers',     'value' => $activeFreelancers,    'icon' => 'bx-badge-check',     'color' => 'text-success',    'href' => route('freelancers.index', ['activation_status' => 'active'])],
+                    ['label' => 'Not Active Freelancer',  'value' => $notActiveFreelancers, 'icon' => 'bx-user-x',          'color' => 'text-gray-500',   'href' => route('freelancers.index', ['activation_status' => 'inactive'])],
+                    // Row 2
+                    ['label' => 'Total Services',        'value' => $totalServices,        'icon' => 'bx-cube',            'color' => 'text-success',    'href' => route('services.index')],
+                    ['label' => 'Total Portfolios',       'value' => $totalPortfolios,      'icon' => 'bx-image',           'color' => 'text-purple-500', 'href' => route('portfolios.index')],
+                    ['label' => 'Total Requests',         'value' => $totalRequests,        'icon' => 'bx-clipboard',       'color' => 'text-warning',    'href' => route('requests.index')],
+                    ['label' => 'Paid Revenues',          'value' => number_format($totalRevenue, 2), 'icon' => 'bx-dollar-circle', 'color' => 'text-danger', 'href' => route('finances.index')],
+                    ['label' => 'Open Tickets',            'value' => $ticketsByStatus->get('open', 0), 'icon' => 'bx-support', 'color' => 'text-orange-500', 'href' => route('tickets.index')],
                 ];
             @endphp
 
             @foreach ($kpis as $kpi)
-            <div class="stat-card border rounded-[10px] border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1f2937] p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="stat-label text-gray-400">{{ $kpi['label'] }}</span>
-                    <i class="bx {{ $kpi['icon'] }} text-2xl {{ $kpi['color'] }}"></i>
-                </div>
-                <div class="stat-number text-defaulttextcolor dark:text-white">{{ $kpi['value'] }}</div>
-            </div>
+                @php $href = $kpi['href'] ?? null; @endphp
+                <{{ $href ? 'a' : 'div' }} @if ($href) href="{{ $href }}" @endif
+                    class="stat-card border rounded-[10px] border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1f2937] p-5 block{{ $href ? ' cursor-pointer' : '' }}">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="stat-label text-gray-600 dark:text-gray-400">{{ $kpi['label'] }}</span>
+                        <i class="bx {{ $kpi['icon'] }} text-2xl {{ $kpi['color'] }}"></i>
+                    </div>
+                    <div class="stat-number text-defaulttextcolor dark:text-white">{{ $kpi['value'] }}</div>
+                </{{ $href ? 'a' : 'div' }}>
             @endforeach
 
         </div>

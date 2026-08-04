@@ -61,6 +61,13 @@ class FreelancerRepository implements FreelancerRepositoryInterface
         if (!empty($params['created_date_to'])) {
             $query->whereDate('created_at', '<=', $params['created_date_to']);
         }
+        if (!empty($params['activation_status'])) {
+            if ($params['activation_status'] === 'active') {
+                $query->has('services');
+            } elseif ($params['activation_status'] === 'inactive') {
+                $query->doesntHave('services');
+            }
+        }
         // P2-06/PERF-02: paginate by default; pass null to get all (e.g. for exports)
         return $perPage ? $query->paginate($perPage) : $query->get();
     }
